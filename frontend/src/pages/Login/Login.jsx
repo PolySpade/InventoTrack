@@ -52,7 +52,7 @@ const Login = () => {
             </div>
             <div>
             <Link to="/" className=" font-medium underline underline-offset-1">
-              Can't login?
+              Can't login??
             </Link>
             </div>
 
