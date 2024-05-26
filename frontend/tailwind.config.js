@@ -33,7 +33,9 @@ export default {
 
           error: "#E72D04",
 
-          "base-200": "#6237A0"
+          "base-200": "#6237A0",
+
+          "base-300": "#D8BCFF"
         },
       },
     ],
