@@ -1,14 +1,16 @@
-import Sidebar from "../../components/layout/Sidebar/Sidebar";
-
+import { Link } from "react-router-dom";
 const Home = () => {
   return (
     <>
-      <a href="/login">
+      <Link to="/login">
         <div className="daisy-btn daisy-btn-secondary">Login</div>
-      </a>
-      <a href="/create-account">
+      </Link>
+      <Link to="/create-account">
         <div className="daisy-btn daisy-btn-secondary">Create Account</div>
-      </a>
+      </Link>
+      <Link to="/inventory">
+        <div className="daisy-btn daisy-btn-secondary">Create Account</div>
+      </Link>
     </>
   );
 };
