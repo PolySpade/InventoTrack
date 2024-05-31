@@ -41,13 +41,19 @@ const SidebarItem = ({ icon, text }) => {
   const { expanded } = useContext(SidebarContext);
 
   return (
-    <li className="pb-4">
-      <a className="p-3 hover:bg-base-100">
-        {icon }
-        {expanded && <span className=" text-base">{text}</span>}
-      </a>
-    </li>
-  );
+    <div className="static flex group items-center">
+      <li className="py-3 w-full">
+        <a className="p-3 group-hover:bg-base-100">
+          {icon }
+          {expanded && <span className=" text-base">{text}</span>}
+        </a>
+      </li>
+      {!expanded &&
+      <div className="absolute invisible ml-20 group-hover:visible rounded-md p-1 text-white opacity-20 group-hover:bg-neutral transition-opacity group-hover:opacity-100 group-hover:ease-in-out duration-200 ">
+        {text}
+      </div>}
+    </div>
+  )
 };
 
 export default Sidebar;
