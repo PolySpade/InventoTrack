@@ -9,7 +9,7 @@ const Home = () => {
         <div className="daisy-btn daisy-btn-secondary">Create Account</div>
       </Link>
       <Link to="/inventory">
-        <div className="daisy-btn daisy-btn-secondary">Create Account</div>
+        <div className="daisy-btn daisy-btn-secondary">Inventory</div>
       </Link>
     </>
   );
