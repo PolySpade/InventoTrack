@@ -1,6 +1,7 @@
 import React from "react";
 
 const InventoryEditForm = () => {
+  // TODO prevent multiple forms opened
   return (
     <div className="absolute right-full -mt-4 w-96 bg-neutral rounded-lg max-h-80 overflow-auto  shadow-lg">
       <form className="flex flex-col justify-center m-8 space-y-4">
@@ -22,82 +23,24 @@ const InventoryEditForm = () => {
           />
         </label>
         <hr className="h-px border-0 bg-white" />
-        <h2 className="text-base"> Category </h2>
-        <div className=" dropdown dropdown-bottom">
-          <label tabIndex={1} className="btn m-1 bg-secondary border-none text-white">
-            Category
-          </label>
-          <ul
-            tabIndex={1}
-            className="dropdown-content menu block p-2 shadow bg-secondary rounded-box w-52 max-h-48 overflow-y-auto z-10"
-          >
-            <li>
-              <a>Item 1</a>
-            </li>
-            <li>
-              <a>Item 2</a>
-            </li>
-            <li>
-              <a>Item 2</a>
-            </li>
-            <li>
-              <a>Item 2</a>
-            </li>
-            <li>
-              <a>Item 2</a>
-            </li>
-            <li>
-              <a>Item 2</a>
-            </li>
-            <li>
-              <a>Item 2</a>
-            </li>
-            <li>
-              <a>Item 2</a>
-            </li>
-            <li>
-              <a>Item 2</a>
-            </li>
-          </ul>
-        </div>
-        <h2 className="text-base"> Warehouse </h2>
-        <div className=" dropdown dropdown-bottom">
-          <label tabIndex={0} className="btn m-1 bg-secondary border-none text-white">
-            Warehouse
-          </label>
-          <ul
-            tabIndex={0}
-            className=" block dropdown-content menu p-2 shadow bg-secondary rounded-box w-52 max-h-48 overflow-y-auto"
-          >
-            <li>
-              <a>Item 1</a>
-            </li>
-            <li>
-              <a>Item 2</a>
-            </li>
-            <li>
-              <a>Item 2</a>
-            </li>
-            <li>
-              <a>Item 2</a>
-            </li>
-            <li>
-              <a>Item 2</a>
-            </li>
-            <li>
-              <a>Item 2</a>
-            </li>
-            <li>
-              <a>Item 2</a>
-            </li>
-            <li>
-              <a>Item 2</a>
-            </li>
-            <li>
-              <a>Item 2</a>
-            </li>
-          </ul>
-        </div>
+        <div className='my-2 flex flex-col'>
+                  <label className='text-xs' htmlFor='category'>Category</label>
+                  <select id="category" className="input input-bordered input-base w-full max-w-xs">
+                    <option value="">Select a category</option>
+                    <option value="electronics">Electronics</option>
+                    <option value="fashion">Fashion</option>
+                    <option value="home">Home</option>
+                    <option value="beauty">Beauty</option>
+                    <option value="sports">Sports</option>
+                  </select>
+            </div>
+            <div className='my-2 flex flex-col'>
+                  <label className='text-xs' htmlFor='category'>Category</label>
+                  <select id="category" className="input input-bordered input-base w-full max-w-xs">
+                    <option value="">Select a warehouse</option>
+                    <option value="electronics">Warehouse A</option>
+                  </select>
+            </div>
         <hr className="h-px border-0 bg-white" />   
         <h2 className="text-base"> Unit Cost </h2>
         <label className="input input-bordered flex items-center p-3 bg-white">

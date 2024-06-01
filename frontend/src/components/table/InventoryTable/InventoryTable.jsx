@@ -19,7 +19,7 @@ const InventoryTable = () => {
   );
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto overflow-y-hidden">
       <div className="flex items-center justify-center">
         <SearchIcon size={20} className="text-white mr-3"></SearchIcon>
         <input
@@ -46,7 +46,7 @@ const InventoryTable = () => {
   </div>
 )}
       
-      <table className="table table-pin-rows">
+      <table className="table table-pin-rows flex-1">
         {/* head */}
         <thead>
           <tr className="border-none text-white">
@@ -111,7 +111,7 @@ const TableContents = ({
           <input type="checkbox" className="checkbox checkbox-secondary" />
         </label>
       </th>
-      <td>
+      {/* //external feature, add image <td>
         <div className="flex items-center gap-3">
           <div className="avatar">
             <div className="mask mask-squircle w-12 h-12">
@@ -122,7 +122,8 @@ const TableContents = ({
             <div className="font-bold">{sku}</div>
           </div>
         </div>
-      </td>
+      </td> */}
+      <td>{sku}</td>
       <td>{name}</td>
       <td>{category}</td>
       <td>{cost}</td>
