@@ -40,12 +40,12 @@ const Login = () => {
           <img src={logo_default_text} width={345} alt="Logo" />
           <div>
             <div className="pt-4 space-y-4 w-full max-w-xs">
-              <label className="daisy-input daisy-input-bordered flex items-center gap-2 bg-white">
+              <label className="input input-bordered flex items-center gap-2 bg-white">
                 <MailIcon size={16} />
                 <input type="email" className="grow" placeholder="Email" />
               </label>
 
-              <label className="daisy-input daisy-input-bordered flex items-center gap-2 bg-white">
+              <label className="input input-bordered flex items-center gap-2 bg-white">
                 <KeyIcon size={16} />
                 <input
                   type={hidePass ? "password" : "text"}
@@ -63,7 +63,7 @@ const Login = () => {
               <div className="flex justify-center">
                 <Link
                   to="/"
-                  className="daisy-btn daisy-btn-secondary px-10 text-white transition ease-in-out delay-150 hover:bg-base-200 hover:-translate-y-1 hover:scale-105"
+                  className="btn btn-secondary px-10 text-white transition ease-in-out delay-150 hover:bg-base-200 hover:-translate-y-1 hover:scale-105"
                 >
                   Login
                 </Link>

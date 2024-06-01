@@ -45,18 +45,18 @@ const CreateAccount = () => {
               Create Account
             </div>
 
-            <label className="daisy-input daisy-input-bordered flex items-center gap-2 bg-white">
+            <label className="input input-bordered flex items-center gap-2 bg-white">
               <PersonIcon size={16} />
               <input type="name" className="grow" placeholder="Username" />
             </label>
 
 
-            <label className="daisy-input daisy-input-bordered flex items-center gap-2 bg-white">
+            <label className="input input-bordered flex items-center gap-2 bg-white">
               <MailIcon size={16} />
               <input type="email" className="grow" placeholder="Email" />
             </label>
 
-            <label className="daisy-input daisy-input-bordered flex items-center gap-2 bg-white">
+            <label className="input input-bordered flex items-center gap-2 bg-white">
               <KeyIcon size={16} />
               <input
                 type={hidePass ? "password" : "text"}
@@ -72,7 +72,7 @@ const CreateAccount = () => {
               </button>
             </label>
 
-            <label className="daisy-input daisy-input-bordered flex items-center gap-2 bg-white">
+            <label className="input input-bordered flex items-center gap-2 bg-white">
               <KeyIcon size={16} />
               <input
                 type={hidePass ? "password" : "text"}
@@ -95,7 +95,7 @@ const CreateAccount = () => {
                 {/* #TODO insert hyperlink in terms of use */}
                 <Link
                   to="/"
-                  className="daisy-btn daisy-btn-secondary px-10 text-white transition ease-in-out delay-150 hover:bg-base-200 hover:-translate-y-1 hover:scale-105"
+                  className="btn btn-secondary px-10 text-white transition ease-in-out delay-150 hover:bg-base-200 hover:-translate-y-1 hover:scale-105"
                 >
                   Create Account
                 </Link>

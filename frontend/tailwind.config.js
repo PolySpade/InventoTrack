@@ -11,7 +11,7 @@ export default {
   plugins: [require("daisyui")],
   daisyui: {
     styled: true,
-    prefix: "daisy-",
+    prefix: "",
     themes: [
       {
         mytheme: {
@@ -23,7 +23,7 @@ export default {
 
           neutral: "#261E35",
 
-          "base-100": "#3C354A",
+          "base-100": "#2F293E",
 
           info: "#5D5FEF",
 
@@ -35,7 +35,9 @@ export default {
 
           "base-200": "#6237A0",
 
-          "base-300": "#D8BCFF"
+          "base-300": "#D8BCFF",
+
+          "base-content": "#3C354A"
         },
       },
     ],
