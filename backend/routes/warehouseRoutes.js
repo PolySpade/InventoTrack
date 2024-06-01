@@ -6,7 +6,7 @@ import { warehouseModel } from '../models/warehouseModel.js';
 router.post('/CreateWarehouse', async (req, res) => {
     try {
         if (!req.body.name || !req.body.address) {
-            return res.status(400).send({message: "Send all fields: firstname, lastname, email, password",});
+            return res.status(400).send({message: "Send all fields!",});
         }
 
         const newWarehouse = {

@@ -1,4 +1,4 @@
-import mongose, { MongooseError } from 'mongoose';
+import mongoose from 'mongoose';
 
 const productSchema = new mongoose.Schema({
     name: {
@@ -29,21 +29,27 @@ const productSchema = new mongoose.Schema({
     dimensions: {
         lengthCM: {
             type: Number,
+            set: v => parseFloat(v.toFixed(2)), // Ensuring two decimal places
+            get: v => v.toFixed(2), // Ensuring two decimal places on retrieval
             required: true
         },
         widthCM: {
             type: Number,
+            set: v => parseFloat(v.toFixed(2)), // Ensuring two decimal places
+            get: v => v.toFixed(2), // Ensuring two decimal places on retrieval
             required: true
         },
         heightCM: {
             type: Number,
+            set: v => parseFloat(v.toFixed(2)), // Ensuring two decimal places
+            get: v => v.toFixed(2), // Ensuring two decimal places on retrieval
             required: true
         }
     },
     stockLeft: {
         type: Number,
-        requried: true
+        required: true
     }
 });
 
-export const productModel = mongose.model("proucts", productSchema);
+export const productModel = mongoose.model("products", productSchema);
