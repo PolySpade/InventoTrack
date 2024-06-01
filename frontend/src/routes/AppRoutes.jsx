@@ -1,10 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Outlet, useLocation } from 'react-router-dom';
-import Home from '../pages/Home/Home';
-import Login from '../pages/Login/Login';
-import CreateAccount from '../pages/CreateAccount/CreateAccount';
-import Sidebar from '../components/layout/Sidebar/Sidebar';
-import Inventory from '../pages/Inventory/Inventory';
+import Home from '../pages/Home';
+import Login from '../pages/Login';
+import CreateAccount from '../pages/CreateAccount';
+import Sidebar from '../components/layout/Sidebar';
+import Inventory from '../pages/Inventory';
+import Orders from '../pages/Orders';
 
 const Layout = () => {
     const location = useLocation();
@@ -28,6 +29,7 @@ const AppRoutes = () => {
                     <Route path="/create-account" element={<CreateAccount />} />
                     <Route path="*" element={<Home />} />
                     <Route path="/inventory" element={<Inventory />} />
+                    <Route path="/orders" element={<Orders />} />
                 </Route>
             </Routes>
         </Router>
