@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext } from "react";
 import { ArchiveIcon, ArrowRightIcon, CreditCardIcon, GearIcon, GraphIcon, HomeIcon, InfoIcon, KebabHorizontalIcon, PackageIcon, PeopleIcon, PersonIcon, SignInIcon, SignOutIcon } from "@primer/octicons-react";
-import { logo_default, logo_default_text, logo_white, logo_white_text } from "../../../assets/logo";
+import { logo_default, logo_default_text, logo_white, logo_white_text } from "../../assets/logo";
 import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 

@@ -67,3 +67,87 @@ export const inventory = [
     quantity: 300,
   },
 ];
+
+
+export const orders = [
+  {
+    id: 1,
+    products: [
+      {
+        name: "Product 1",
+        quantity: 2
+      },
+      {
+        name: "Product 2",
+        quantity: 1
+      }
+    ],
+    courierName: "Courier 1",
+    trackingNumber: "TRACK12345",
+    sellingPlatform: "Shopee"
+  },
+  {
+    id: 2,
+    products: [
+      {
+        name: "Product 3",
+        quantity: 3
+      },
+      {
+        name: "Product 4",
+        quantity: 2
+      }
+    ],
+    courierName: "Courier 2",
+    trackingNumber: "TRACK67890",
+    sellingPlatform: "Lazada"
+  },
+  {
+    id: 3,
+    products: [
+      {
+        name: "Product 5",
+        quantity: 1
+      },
+      {
+        name: "Product 6",
+        quantity: 4
+      }
+    ],
+    courierName: "Courier 3",
+    trackingNumber: "TRACK11223",
+    sellingPlatform: "Facebook"
+  },
+  {
+    id: 4,
+    products: [
+      {
+        name: "Product 7",
+        quantity: 2
+      },
+      {
+        name: "Product 8",
+        quantity: 3
+      }
+    ],
+    courierName: "Courier 4",
+    trackingNumber: "TRACK44556",
+    sellingPlatform: "Tiktok"
+  },
+  {
+    id: 5,
+    products: [
+      {
+        name: "Product 9",
+        quantity: 5
+      },
+      {
+        name: "Product 10",
+        quantity: 2
+      }
+    ],
+    courierName: "Courier 5",
+    trackingNumber: "TRACK77889",
+    sellingPlatform: "Others"
+  }
+];

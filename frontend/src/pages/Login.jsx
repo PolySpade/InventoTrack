@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { logo_default_text } from "../../assets/logo";
+import { logo_default_text } from "../assets/logo";
 import { Link } from "react-router-dom";
 import {
   MailIcon,
