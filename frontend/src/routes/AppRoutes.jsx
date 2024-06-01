@@ -10,9 +10,9 @@ const Layout = () => {
     const location = useLocation();
     console.log(location.hash)
     return (
-        <div className='flex flex-row h-full'>
+        <div className='flex flex-row h-full z-10'>
             <Sidebar />
-            <div className="flex-1">
+            <div className="flex-1 z-0">
                 <Outlet />
             </div>
         </div>

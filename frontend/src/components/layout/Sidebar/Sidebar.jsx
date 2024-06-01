@@ -15,7 +15,7 @@ const Sidebar = () => {
 
   return (
     <SidebarContext.Provider value={{ expanded, pathname }}>
-      <aside id="sidebar" className="top-0 left-0 h-screen">
+      <aside id="sidebar" className="top-0 left-0 h-screen z-50">
         <div className="h-full flex flex-col py-4 overflow-y-auto overflow-x-clip bg-neutral">
           <div className="p-2">
           <div className="flex items-center justify-center p-2">
@@ -23,7 +23,7 @@ const Sidebar = () => {
           </div>
           </div>
           <div className="flex-1">
-            <ul className="daisy-menu daisy-menu-lg rounded-box text-base-300">
+            <ul className="menu menu-lg rounded-box text-base-300">
               <SidebarItem icon={<HomeIcon size={24}/>} text="Dashboard" link="/dashboard" />
               <SidebarItem icon={<PackageIcon size={24}/>} text="Orders" link="/orders" />
               <SidebarItem icon={<ArchiveIcon size={24}/>} text="Inventory" link="/inventory" />
@@ -33,7 +33,7 @@ const Sidebar = () => {
             </ul>
           </div>
           <div className={`flex items-center ${expanded ? "justify-end pr-3" : "justify-center"}`}>
-          <button className="p-1.5 cursor-pointer" onClick={() => setExpanded((curr) => !curr)}>
+          <button className="p-1.5 cursor-pointer text-base-300" onClick={() => setExpanded((curr) => !curr)}>
               {expanded ? <SignInIcon size={20} /> : <SignOutIcon size={20} />}
           </button>
           </div>
@@ -50,7 +50,7 @@ const SidebarItem = ({ icon, text, link }) => {
   return (
     <div className="static flex group items-center text-base-300">
       <li className="py-2 w-full">
-        <Link to={link} className={`p-3  text-base-300 ${pathname === link ? `bg-base-100` : `group-hover:bg-base-100`}`}>
+        <Link to={link} className={`p-3 text-base-300 ${pathname === link ? `bg-base-100` : `group-hover:bg-base-100`}`}>
           <div className="m-0 text-base-300">{icon}</div>
           {expanded && <span className=" text-base text-base-300">{text}</span>}
         </Link>

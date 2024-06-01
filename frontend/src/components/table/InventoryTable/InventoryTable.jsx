@@ -1,17 +1,61 @@
-import React from "react";
+import React, { useState } from "react";
 import { gameboytest } from "../../../assets";
 import { inventory } from "../../../constants";
+import { KebabHorizontalIcon, SearchIcon } from "@primer/octicons-react";
+import InventoryEditForm from "../../forms/InventoryEditForm/InventoryEditForm";
+import AddProductForm from "../../forms/AddProductForm/AddProductForm";
 
 const InventoryTable = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [addProduct, setAddProduct] = useState(false)
+
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const filteredInventory = inventory.filter((item) =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.sku.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="overflow-x-auto">
-      <table className="daisy-table">
+      <div className="flex items-center justify-center">
+        <SearchIcon size={20} className="text-white mr-3"></SearchIcon>
+        <input
+          type="text"
+          placeholder="Search..."
+          value={searchTerm}
+          onChange={handleSearchChange}
+          className="input input-bordered text-white bg-neutral w-full max-w-lg"
+        />
+      </div>
+      <button
+        onClick={() => setAddProduct((prev) => !prev)}
+        className="btn text-white bg-secondary border-none"
+      >
+        Add Product
+      </button>
+      {addProduct && (
+  <div className="fixed inset-0 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black opacity-50 pointer-events-none z-0"></div>
+    <div className="p-6 rounded shadow-lg z-10">
+      <AddProductForm />
+    </div>
+    
+  </div>
+)}
+      
+      <table className="table table-pin-rows">
         {/* head */}
         <thead>
-          <tr>
+          <tr className="border-none text-white">
             <th>
               <label>
-                <input type="checkbox" className="daisy-checkbox" />
+                <input
+                  type="checkbox"
+                  className="checkbox checkbox-secondary"
+                />
               </label>
             </th>
             <th>SKU</th>
@@ -26,19 +70,17 @@ const InventoryTable = () => {
           </tr>
         </thead>
         <tbody>
-        {inventory.map((item, index) => (
+          {filteredInventory.map((item, index) => (
             <TableContents key={index} {...item} />
           ))}
         </tbody>
       </table>
       <div className="flex justify-center mt-4">
-        <div className="daisy-join">
-          <button className="daisy-join-item daisy-btn daisy-btn-active">
-            1
-          </button>
-          <button className="daisy-join-item daisy-btn">2</button>
-          <button className="daisy-join-item daisy-btn">3</button>
-          <button className="daisy-join-item daisy-btn">4</button>
+        <div className="join">
+          <button className="join-item btn btn-active">1</button>
+          <button className="join-item btn">2</button>
+          <button className="join-item btn">3</button>
+          <button className="join-item btn">4</button>
         </div>
       </div>
     </div>
@@ -60,17 +102,19 @@ const TableContents = ({
   height,
   quantity,
 }) => {
+  const [productInfo, setProductInfo] = useState(false)
+
   return (
-    <tr>
+    <tr className="border-none text-white bg-base-content">
       <th>
         <label>
-          <input type="checkbox" className="daisy-checkbox" />
+          <input type="checkbox" className="checkbox checkbox-secondary" />
         </label>
       </th>
       <td>
         <div className="flex items-center gap-3">
-          <div className="daisy-avatar">
-            <div className="daisy-mask daisy-mask-squircle w-12 h-12">
+          <div className="avatar">
+            <div className="mask mask-squircle w-12 h-12">
               <img src={image} alt={name} />
             </div>
           </div>
@@ -90,8 +134,13 @@ const TableContents = ({
         <span>{width}</span>
         <span> x </span>
         <span>{height}</span>
+        <span> cm</span>
       </td>
       <td>{quantity}</td>
+      <td className="relative">
+        <button onClick={() => setProductInfo((prev) => !prev)}><KebabHorizontalIcon className=" rotate-90"/></button>
+        {productInfo ? (<InventoryEditForm/>) : ""}
+      </td>
     </tr>
   );
 };
