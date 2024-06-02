@@ -48,7 +48,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // update
-router.put('/editWarehouse/:id', async (req, res) => {
+router.put('/EditWarehouse/:id', async (req, res) => {
     try {
         const {id} = req.params;
         const warehouseToEdit = await warehouseModel.findByIdAndUpdate(id, req.body);
@@ -65,7 +65,7 @@ router.put('/editWarehouse/:id', async (req, res) => {
 });
 
 // delete
-router.delete('/deleteWarehouse/:id', async (req, res) => {
+router.delete('/DeleteWarehouse/:id', async (req, res) => {
     try {
         const {id} = req.params;
         const warehouseToDelete = await warehouseModel.findByIdAndDelete(id);
