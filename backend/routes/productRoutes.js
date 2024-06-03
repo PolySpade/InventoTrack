@@ -2,45 +2,14 @@ import express from 'express';
 import mongoose from 'mongoose';
 const router = express.Router();
 import { productModel } from '../models/productModel.js';
-import { warehouseModel } from '../models/warehouseModel.js';
 
-const schemas = {
-    warehouses: warehouseModel,
-  };
-  
-  async function findObjectID(schem, keyName, keyValue) {
+// Create Product Route
+router.post('/AddProduct', async (req, res) => {
     try {
-      const schema = schemas[schem];
-      const query = {};
-      query[keyName] = keyValue; // Using computed property names to set the key and value
-      const result = await schema.findOne(query).exec();
-      if (result) {
-        return result._id.toString();
-      } else {
-        console.log('No object found with that key and value');
-        return null;
-      }
-    } catch (err) {
-      console.error('Error finding object:', err);
-      return null;
-    }
-  }
-  
-  // create
-  router.post('/AddProduct', async (req, res) => {
-    try {
-        const { name, category, unitCost, weightKG, warehouseName, dimensions, stockLeft } = req.body;
+        const { name, category, unitCost, weightKG, warehouse, dimensions, stockLeft } = req.body;
 
-        console.log("Request Body:", req.body);
-
-        if (!name || !category || !unitCost || !weightKG || !warehouseName || !dimensions || !dimensions.lengthCM || !dimensions.widthCM || !dimensions.heightCM || !stockLeft) {
+        if (!name || !category || !unitCost || !weightKG || !warehouse || !dimensions || !dimensions.lengthCM || !dimensions.widthCM || !dimensions.heightCM || !stockLeft) {
             return res.status(400).send({ message: "Send all fields!" });
-        }
-
-        const warehouseID = await findObjectID('warehouses', 'name', warehouseName);
-
-        if (!warehouseID) {
-            return res.status(400).send({ message: "Warehouse not found!" });
         }
 
         const newProduct = {
@@ -48,7 +17,7 @@ const schemas = {
             category,
             unitCost,
             weightKG,
-            warehouse: mongoose.Types.ObjectId(warehouseID),
+            warehouse: new mongoose.Types.ObjectId(warehouse),
             dimensions,
             stockLeft
         };
@@ -78,7 +47,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const product = await productModel.findById(id).populate('warehouse');
+        const product = await productModel.findById(id);
 
         if (!product) {
             return res.status(404).send({ message: "Product not found" });
@@ -95,20 +64,7 @@ router.get('/:id', async (req, res) => {
 router.put('/EditProduct/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { warehouse } = req.body;
-
-        if (warehouse && !mongoose.Types.ObjectId.isValid(warehouse)) {
-            return res.status(400).send({ message: "Invalid warehouse ID!" });
-        }
-
-        if (warehouse) {
-            const warehouseExists = await warehouseModel.findById(warehouse);
-            if (!warehouseExists) {
-                return res.status(400).send({ message: "Warehouse not found!" });
-            }
-        }
-
-        const productToEdit = await productModel.findByIdAndUpdate(id, req.body, { new: true });
+        const productToEdit = await productModel.findByIdAndUpdate(id, req.body);
 
         if (!productToEdit) {
             return res.status(404).json({ message: "Product not found" });

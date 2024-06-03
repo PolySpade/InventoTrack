@@ -1,27 +1,32 @@
 import express from 'express';
+import mongoose from 'mongoose';
 const router = express.Router();
-import { supplierModel } from '../models/supplierModel';
+import { supplierModel } from '../models/supplierModel.js';
 
-// create
 router.post('/RegisterSupplier', async (req, res) => {
     try {
         const { supplierName, website, phoneNo, productList } = req.body;
+
+        console.log(req.body)
 
         if (!supplierName || !phoneNo || !productList || productList.length === 0) {
             return res.status(400).send({ message: "Send all fields!" });
         }
 
+        const productIds = productList.map(productId => new mongoose.Types.ObjectId(productId));
+
         const newSupplier = {
             supplierName,
             website,
             phoneNo,
-            productList
-        }
+            productList: productIds
+        };
+
         const supplier = await supplierModel.create(newSupplier);
         return res.status(201).send(supplier);
     } catch(err) {
         console.log(err.message);
-        res.status(500).send({message: err.message});
+        res.status(500).send({ message: err.message });
     }
 });
 
@@ -29,6 +34,7 @@ router.post('/RegisterSupplier', async (req, res) => {
 router.get('/', async (req, res) => {
     try {
         const suppliers = await supplierModel.find({});
+
         return res.status(200).json(suppliers);
     } catch(err) {
         console.log(err.message);
