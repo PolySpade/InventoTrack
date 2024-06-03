@@ -1,5 +1,5 @@
 import React from 'react'
-import InventoryTable from '../components/table/InventoryTable/InventoryTable'
+import InventoryTable from '../components/table/InventoryTable'
 
 
 const Inventory = () => {
