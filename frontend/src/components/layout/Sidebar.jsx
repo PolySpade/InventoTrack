@@ -46,11 +46,12 @@ const Sidebar = () => {
 const SidebarItem = ({ icon, text, link }) => {
   const { expanded } = useContext(SidebarContext);
   const { pathname } = useContext(SidebarContext);
+  const isActive = pathname === link;
 
   return (
     <div className="static flex group items-center text-base-300">
       <li className="py-2 w-full">
-        <Link to={link} className={`p-3 text-base-300 ${pathname === link ? `bg-base-100` : `group-hover:bg-base-100`}`}>
+        <Link to={link} className={`p-3 text-base-300 ${isActive ? `bg-base-100` : `group-hover:bg-base-100`}`}>
           <div className="m-0 text-base-300">{icon}</div>
           {expanded && <span className=" text-base text-base-300">{text}</span>}
         </Link>

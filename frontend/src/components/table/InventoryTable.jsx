@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { gameboytest } from "../../../assets";
-import { inventory } from "../../../constants";
+import { gameboytest } from "../../assets";
+import { inventory } from "../../constants";
 import { KebabHorizontalIcon, SearchIcon } from "@primer/octicons-react";
-import InventoryEditForm from "../../forms/InventoryEditForm/InventoryEditForm";
-import AddProductForm from "../../forms/AddProductForm/AddProductForm";
+import InventoryEditForm from "../forms/InventoryEditForm/InventoryEditForm";
+import AddProductForm from "../forms/AddProductForm/AddProductForm";
 
-const OrdersTable = () => {
+const InventoryTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [addProduct, setAddProduct] = useState(false)
 
@@ -13,13 +13,10 @@ const OrdersTable = () => {
     setSearchTerm(event.target.value);
   };
 
-  //Search
-  const filteredInventory = inventory.filter((order) =>
-    order.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    order.sku.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredInventory = inventory.filter((item) =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.sku.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-
 
   return (
     <div className="overflow-x-auto overflow-y-hidden">
@@ -90,7 +87,7 @@ const OrdersTable = () => {
   );
 };
 
-export default OrdersTable;
+export default InventoryTable;
 
 const TableContents = ({
   image,
