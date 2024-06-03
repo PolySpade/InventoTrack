@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const warehouseSchema = new mongooose.Schema({
+const warehouseSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true
@@ -11,4 +11,4 @@ const warehouseSchema = new mongooose.Schema({
     }
 });
 
-export const warehouseModel = mongoose.model("warehouse", warehouseSchema, "warehouse");
+export const warehouseModel = mongoose.model("warehouses", warehouseSchema);
