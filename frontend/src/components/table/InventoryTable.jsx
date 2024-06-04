@@ -1,19 +1,38 @@
 import React, { useState } from "react";
 import { gameboytest } from "../../assets";
-import { inventory } from "../../constants";
+import { category, products, warehouse } from "../../constants";
 import { KebabHorizontalIcon, SearchIcon } from "@primer/octicons-react";
-import InventoryEditForm from "../forms/InventoryEditForm/InventoryEditForm";
-import AddProductForm from "../forms/AddProductForm/AddProductForm";
+import InventoryEditForm from "../forms/InventoryEditForm";
+import AddProductForm from "../forms/AddProductForm";
+
+const getCategoryNameById = (id) => {
+  const cat = category.find(category => category.id === id);
+  return cat ? cat.name : 'Unknown Category';
+};
+
+const getWarehouseNameById = (id) => {
+  const ware = warehouse.find(warehouse => warehouse.id === id);
+  return ware ? ware.name : 'Unknown Warehouse';
+};
 
 const InventoryTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [addProduct, setAddProduct] = useState(false)
+  const [addProduct, setAddProduct] = useState(false);
+  const [checkedItems, setCheckedItems] = useState([]);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
 
-  const filteredInventory = inventory.filter((item) =>
+  const handleCheckboxChange = (sku) => {
+    setCheckedItems((prev) =>
+      prev.includes(sku) ? prev.filter((item) => item !== sku) : [...prev, sku]
+    );
+  };
+
+  const isChecked = (sku) => checkedItems.includes(sku);
+
+  const filteredProducts = products.filter((item) =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.sku.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -37,15 +56,14 @@ const InventoryTable = () => {
         Add Product
       </button>
       {addProduct && (
-  <div className="fixed inset-0 flex items-center justify-center z-50">
-    <div className="fixed inset-0 bg-black opacity-50 pointer-events-none z-0"></div>
-    <div className="p-6 rounded shadow-lg z-10">
-      <AddProductForm />
-    </div>
-    
-  </div>
-)}
-      
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black opacity-50 pointer-events-none z-0"></div>
+          <div className="p-6 rounded shadow-lg z-10">
+            <AddProductForm />
+          </div>
+        </div>
+      )}
+
       <table className="table table-pin-rows flex-1">
         {/* head */}
         <thead>
@@ -55,6 +73,7 @@ const InventoryTable = () => {
                 <input
                   type="checkbox"
                   className="checkbox checkbox-secondary"
+                 
                 />
               </label>
             </th>
@@ -70,8 +89,13 @@ const InventoryTable = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredInventory.map((item, index) => (
-            <TableContents key={index} {...item} />
+          {filteredProducts.map((item, index) => (
+            <TableContents
+              key={index}
+              {...item}
+              isChecked={isChecked(item.sku)}
+              onCheckboxChange={handleCheckboxChange}
+            />
           ))}
         </tbody>
       </table>
@@ -93,25 +117,36 @@ const TableContents = ({
   image,
   sku,
   name,
-  category,
+  category_id,
   cost,
   weight,
-  warehouse,
+  warehouse_id,
   length,
   width,
   height,
   quantity,
+  isChecked,
+  onCheckboxChange
 }) => {
-  const [productInfo, setProductInfo] = useState(false)
+  const [productInfo, setProductInfo] = useState(false);
+  const categoryName = getCategoryNameById(category_id);
+  const warehouseName = getWarehouseNameById(warehouse_id);
 
   return (
     <tr className="border-none text-white bg-base-content">
       <th>
         <label>
-          <input type="checkbox" className="checkbox checkbox-secondary" />
+          <input
+            type="checkbox"
+            className="checkbox checkbox-secondary"
+            checked={isChecked}
+            onChange={() => onCheckboxChange(sku)}
+          />
         </label>
       </th>
-      {/* //external feature, add image <td>
+      {/* Uncomment and adjust the following block if you want to display the product image */}
+      {/* 
+      <td>
         <div className="flex items-center gap-3">
           <div className="avatar">
             <div className="mask mask-squircle w-12 h-12">
@@ -122,13 +157,14 @@ const TableContents = ({
             <div className="font-bold">{sku}</div>
           </div>
         </div>
-      </td> */}
+      </td> 
+      */}
       <td>{sku}</td>
       <td>{name}</td>
-      <td>{category}</td>
-      <td>{cost}</td>
-      <td>{weight}</td>
-      <td>{warehouse}</td>
+      <td>{categoryName}</td>
+      <td>₱{cost}</td>
+      <td>{weight} kg</td>
+      <td>{warehouseName}</td>
       <td>
         <span>{length}</span>
         <span> x </span>
@@ -139,8 +175,10 @@ const TableContents = ({
       </td>
       <td>{quantity}</td>
       <td className="relative">
-        <button onClick={() => setProductInfo((prev) => !prev)}><KebabHorizontalIcon className=" rotate-90"/></button>
-        {productInfo ? (<InventoryEditForm/>) : ""}
+        <button onClick={() => setProductInfo((prev) => !prev)}>
+          <KebabHorizontalIcon className="rotate-90" />
+        </button>
+        {productInfo && <InventoryEditForm />}
       </td>
     </tr>
   );

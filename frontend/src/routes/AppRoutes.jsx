@@ -8,10 +8,8 @@ import Inventory from '../pages/Inventory';
 import Orders from '../pages/Orders';
 
 const Layout = () => {
-    const location = useLocation();
-    console.log(location.hash)
     return (
-        <div className='flex flex-row h-full z-10'>
+        <div className='flex flex-row min-h-full z-10'>
             <Sidebar />
             <div className="flex-1 z-0">
                 <Outlet />
