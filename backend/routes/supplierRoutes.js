@@ -3,17 +3,16 @@ import mongoose from 'mongoose';
 const router = express.Router();
 import { supplierModel } from '../models/supplierModel.js';
 
+// create
 router.post('/RegisterSupplier', async (req, res) => {
     try {
         const { supplierName, website, phoneNo, productList } = req.body;
 
-        console.log(req.body)
-
-        if (!supplierName || !phoneNo || !productList || productList.length === 0) {
+        if (!supplierName || !phoneNo || productList === 0) {
             return res.status(400).send({ message: "Send all fields!" });
         }
 
-        const productIds = productList.map(productId => new mongoose.Types.ObjectId(productId));
+        const productIds = productList.map(product => new mongoose.Types.ObjectId(product));
 
         const newSupplier = {
             supplierName,
