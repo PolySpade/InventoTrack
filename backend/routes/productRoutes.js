@@ -2,9 +2,8 @@ import express from 'express';
 import mongoose from 'mongoose';
 const router = express.Router();
 import { productModel } from '../models/productModel.js';
-import { warehouseModel } from '../models/warehouseModel.js';
 
-// create
+// Create Product Route
 router.post('/AddProduct', async (req, res) => {
     try {
         const { name, category, unitCost, weightKG, warehouse, dimensions, stockLeft } = req.body;
@@ -13,21 +12,12 @@ router.post('/AddProduct', async (req, res) => {
             return res.status(400).send({ message: "Send all fields!" });
         }
 
-        if (!mongoose.Types.ObjectId.isValid(warehouse)) {
-            return res.status(400).send({ message: "Invalid warehouse ID!" });
-        }
-
-        const warehouseExists = await warehouseModel.findById(warehouse);
-        if (!warehouseExists) {
-            return res.status(400).send({ message: "Warehouse not found!" });
-        }
-
         const newProduct = {
             name,
             category,
             unitCost,
             weightKG,
-            warehouse: mongoose.Types.ObjectId(warehouse),
+            warehouse: new mongoose.Types.ObjectId(warehouse),
             dimensions,
             stockLeft
         };
@@ -39,6 +29,7 @@ router.post('/AddProduct', async (req, res) => {
         res.status(500).send({ message: err.message });
     }
 });
+
 
 // read all products
 router.get('/', async (req, res) => {
@@ -56,7 +47,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const product = await productModel.findById(id).populate('warehouse');
+        const product = await productModel.findById(id);
 
         if (!product) {
             return res.status(404).send({ message: "Product not found" });
@@ -73,20 +64,7 @@ router.get('/:id', async (req, res) => {
 router.put('/EditProduct/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { warehouse } = req.body;
-
-        if (warehouse && !mongoose.Types.ObjectId.isValid(warehouse)) {
-            return res.status(400).send({ message: "Invalid warehouse ID!" });
-        }
-
-        if (warehouse) {
-            const warehouseExists = await warehouseModel.findById(warehouse);
-            if (!warehouseExists) {
-                return res.status(400).send({ message: "Warehouse not found!" });
-            }
-        }
-
-        const productToEdit = await productModel.findByIdAndUpdate(id, req.body, { new: true });
+        const productToEdit = await productModel.findByIdAndUpdate(id, req.body);
 
         if (!productToEdit) {
             return res.status(404).json({ message: "Product not found" });
