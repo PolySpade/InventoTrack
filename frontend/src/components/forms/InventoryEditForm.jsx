@@ -3,7 +3,7 @@ import React from "react";
 const InventoryEditForm = () => {
   // TODO prevent multiple forms opened
   return (
-    <div className="absolute right-full -mt-4 w-96 bg-neutral rounded-lg max-h-80 overflow-auto  shadow-lg">
+    <div className="absolute right-full -mt-4 w-96 mx-6 bg-neutral rounded-lg max-h-80 overflow-auto  shadow-lg">
       <form className="flex flex-col justify-center m-8 space-y-4">
         <h1 className=" text-lg pb-1 justify-center flex">Edit Product</h1>
         <h2 className="text-base"> Product Name </h2>
@@ -25,7 +25,7 @@ const InventoryEditForm = () => {
         <hr className="h-px border-0 bg-white" />
         <div className='my-2 flex flex-col'>
                   <label className='text-xs' htmlFor='category'>Category</label>
-                  <select id="category" className="input input-bordered input-base w-full max-w-xs">
+                  <select id="category" className="input input-bordered  w-full max-w-xs">
                     <option value="">Select a category</option>
                     <option value="electronics">Electronics</option>
                     <option value="fashion">Fashion</option>
@@ -36,7 +36,7 @@ const InventoryEditForm = () => {
             </div>
             <div className='my-2 flex flex-col'>
                   <label className='text-xs' htmlFor='category'>Category</label>
-                  <select id="category" className="input input-bordered input-base w-full max-w-xs">
+                  <select id="category" className="input input-bordered  w-full max-w-xs">
                     <option value="">Select a warehouse</option>
                     <option value="electronics">Warehouse A</option>
                   </select>

@@ -1,30 +1,32 @@
 import React, { useState } from "react";
-import { gameboytest } from "../../assets";
-import { inventory } from "../../constants";
 import { KebabHorizontalIcon, SearchIcon } from "@primer/octicons-react";
-import InventoryEditForm from "../forms/InventoryEditForm/InventoryEditForm";
-import AddProductForm from "../forms/AddProductForm/AddProductForm";
+import { orders } from "../../constants";
+import AddOrderForm from "../forms/AddOrderForm";
+import OrderDetailsForm from "../forms/OrderDetailsForm";
 
 const OrdersTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [addProduct, setAddProduct] = useState(false)
+  const [addOrder, setAddOrder] = useState(false);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
 
-  //Search
-  const filteredInventory = inventory.filter((order) =>
-    order.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    order.sku.toLowerCase().includes(searchTerm.toLowerCase())
+  // Search
+  const filteredOrders = orders.filter(
+    (order) =>
+      order.products.some((product) =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase())
+      ) ||
+      order.courierName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.trackingNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.sellingPlatform.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-
 
   return (
     <div className="overflow-x-auto overflow-y-hidden">
-      <div className="flex items-center justify-center">
-        <SearchIcon size={20} className="text-white mr-3"></SearchIcon>
+      <div className="flex items-center justify-center mb-4">
+        <SearchIcon size={20} className="text-white mr-3" />
         <input
           type="text"
           placeholder="Search..."
@@ -34,47 +36,35 @@ const OrdersTable = () => {
         />
       </div>
       <button
-        onClick={() => setAddProduct((prev) => !prev)}
-        className="btn text-white bg-secondary border-none"
+        onClick={() => setAddOrder((prev) => !prev)}
+        className="btn text-white bg-secondary border-none mb-4"
       >
-        Add Product
+        Create Order
       </button>
-      {addProduct && (
-  <div className="fixed inset-0 flex items-center justify-center z-50">
-    <div className="fixed inset-0 bg-black opacity-50 pointer-events-none z-0"></div>
-    <div className="p-6 rounded shadow-lg z-10">
-      <AddProductForm />
-    </div>
-    
-  </div>
-)}
-      
-      <table className="table table-pin-rows flex-1">
+      {addOrder && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black opacity-50 pointer-events-none z-0"></div>
+          <div className="p-6 rounded shadow-lg z-10">
+            <AddOrderForm />
+          </div>
+        </div>
+      )}
+
+      <table className="table w-full">
         {/* head */}
         <thead>
           <tr className="border-none text-white">
-            <th>
-              <label>
-                <input
-                  type="checkbox"
-                  className="checkbox checkbox-secondary"
-                />
-              </label>
-            </th>
-            <th>SKU</th>
-            <th>Name</th>
-            <th>Category</th>
-            <th>Unit Cost</th>
-            <th>Weight</th>
-            <th>Warehouse</th>
-            <th>Product Dimensions</th>
-            <th>Stock Quantity</th>
+            <th>Order ID</th>
+            <th>Products</th>
+            <th>Courier Name</th>
+            <th>Tracking Number</th>
+            <th>Selling Platform</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
-          {filteredInventory.map((item, index) => (
-            <TableContents key={index} {...item} />
+          {filteredOrders.map((order) => (
+            <TableContents key={order.id} {...order} />
           ))}
         </tbody>
       </table>
@@ -92,59 +82,79 @@ const OrdersTable = () => {
 
 export default OrdersTable;
 
+
 const TableContents = ({
-  image,
-  sku,
-  name,
-  category,
-  cost,
-  weight,
-  warehouse,
-  length,
-  width,
-  height,
-  quantity,
+  id,
+  products,
+  courierName,
+  trackingNumber,
+  sellingPlatform,
+  buyerName,
+  buyerEmail,
+  buyerPhone
 }) => {
-  const [productInfo, setProductInfo] = useState(false)
+  const [showProducts, setShowProducts] = useState(false);
+  const [orderDetails, setOrderDetails] = useState(false);
+
+  // for transfering order to order details
+  const order = {
+    id,
+    products,
+    courierName,
+    trackingNumber,
+    sellingPlatform,
+    buyerName,
+    buyerEmail,
+    buyerPhone
+  };
+
+
 
   return (
-    <tr className="border-none text-white bg-base-content">
-      <th>
-        <label>
-          <input type="checkbox" className="checkbox checkbox-secondary" />
-        </label>
-      </th>
-      {/* //external feature, add image <td>
-        <div className="flex items-center gap-3">
-          <div className="avatar">
-            <div className="mask mask-squircle w-12 h-12">
-              <img src={image} alt={name} />
-            </div>
-          </div>
-          <div>
-            <div className="font-bold">{sku}</div>
-          </div>
-        </div>
-      </td> */}
-      <td>{sku}</td>
-      <td>{name}</td>
-      <td>{category}</td>
-      <td>{cost}</td>
-      <td>{weight}</td>
-      <td>{warehouse}</td>
-      <td>
-        <span>{length}</span>
-        <span> x </span>
-        <span>{width}</span>
-        <span> x </span>
-        <span>{height}</span>
-        <span> cm</span>
-      </td>
-      <td>{quantity}</td>
-      <td className="relative">
-        <button onClick={() => setProductInfo((prev) => !prev)}><KebabHorizontalIcon className=" rotate-90"/></button>
-        {productInfo ? (<InventoryEditForm/>) : ""}
-      </td>
-    </tr>
+    <>
+      <tr className="border-none text-white bg-base-content">
+        <td>{id}</td>
+        <td>
+          <button className="btn text-white" onClick={() => setShowProducts((prev) => !prev)}>
+            {showProducts ? "Hide List" : "View List"}
+          </button>
+        </td>
+        <td>{courierName}</td>
+        <td>{trackingNumber}</td>
+        <td>{sellingPlatform}</td>
+        <td className="relative">
+          <button onClick={() => setOrderDetails((prev) => !prev)}>
+            <KebabHorizontalIcon className="rotate-90" />
+          </button>
+          {orderDetails ? <OrderDetailsForm order={order} /> : ""}
+        </td>
+      </tr>
+      {showProducts && (
+        <tr className="border-none text-white bg-secondary">
+          <td colSpan="6">
+            <table className="table w-full">
+              <thead className="text-white">
+                <tr className="border-opacity-50">
+                  <th>SKU</th>
+                  <th>Product Name</th>
+                  <th>Price</th>
+                  <th>Quantity</th>
+                </tr>
+              </thead>
+              <tbody>
+                {products.map((product, index) => (
+                  <tr key={index} className="border-none">
+                    <td>{product.sku}</td>
+                    <td>{product.name}</td>
+                    <td className="font-semibold">₱{product.price}</td>
+                    <td>{product.quantity}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      )}
+    </>
   );
 };
