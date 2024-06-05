@@ -118,7 +118,6 @@ export const orders = [
   }
 ];
 
-
 export const courier = [
   {
     id: 1,

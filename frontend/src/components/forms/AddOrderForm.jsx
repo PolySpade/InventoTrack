@@ -45,9 +45,9 @@ const AddOrderForm = () => {
   const isChecked = (sku) => checkedItems.includes(sku);
 
 
-  console.log(checkedProducts.map((item) => `${document.getElementById(`${item.sku}-price`).value}`));
+  //console.log(checkedProducts.map((item) => `${document.getElementById(`${item.sku}-price`).value}`));
 
-
+  //TODO add total price , add confirm
   return (
     <div className="flex flex-row overflow-y-auto min-w-full bg-neutral rounded shadow-lg text-white">
       <form
