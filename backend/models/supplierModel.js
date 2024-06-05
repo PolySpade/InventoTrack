@@ -13,12 +13,11 @@ const supplierSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    productList: [{
-        SKU: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'products',
-            required: true
-        }
+    productList: [{ 
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'products',
+        required: true
+        
     }]
 });
 

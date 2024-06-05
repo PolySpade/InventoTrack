@@ -6,13 +6,14 @@ import { productModel } from '../models/productModel.js';
 // Create Product Route
 router.post('/AddProduct', async (req, res) => {
     try {
-        const { name, category, unitCost, weightKG, warehouse, dimensions, stockLeft } = req.body;
+        const { name, category, unitCost, weightKG, warehouse, dimensions, stockLeft, sku } = req.body;
 
-        if (!name || !category || !unitCost || !weightKG || !warehouse || !dimensions || !dimensions.lengthCM || !dimensions.widthCM || !dimensions.heightCM || !stockLeft) {
+        if (!name || !category || !unitCost || !weightKG || !warehouse || !dimensions || !dimensions.lengthCM || !dimensions.widthCM || !dimensions.heightCM || !stockLeft || !sku) {
             return res.status(400).send({ message: "Send all fields!" });
         }
 
         const newProduct = {
+            sku,
             name,
             category,
             unitCost,

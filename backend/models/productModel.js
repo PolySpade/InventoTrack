@@ -1,6 +1,11 @@
 import mongoose from 'mongoose';
 
 const productSchema = new mongoose.Schema({
+    sku: {
+        type: String,
+        unique: true,
+        required: true
+    },
     name: {
         type: String,
         required: true
