@@ -294,5 +294,17 @@ export const products = [
       width: 101,
       height: 17.2,
       quantity: 80
-  }
+  },
+  {
+    sku: 'GB-006',
+    name: 'Gameboy SP',
+    category_id: 6,
+    cost: 49.99,
+    weight: 0.08,
+    warehouse_id: 1,
+    length: 50,
+    width: 101,
+    height: 17.2,
+    quantity: 80
+}
 ];
