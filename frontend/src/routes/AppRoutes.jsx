@@ -6,6 +6,7 @@ import CreateAccount from '../pages/CreateAccount';
 import Sidebar from '../components/layout/Sidebar';
 import Inventory from '../pages/Inventory';
 import Orders from '../pages/Orders';
+import Expenses from '../pages/Expenses';
 
 const Layout = () => {
     return (
@@ -28,6 +29,7 @@ const AppRoutes = () => {
                     <Route path="*" element={<Home />} />
                     <Route path="/inventory" element={<Inventory />} />
                     <Route path="/orders" element={<Orders />} />
+                    <Route path="/expenses" element={<Expenses />}/>
                 </Route>
             </Routes>
         </Router>
