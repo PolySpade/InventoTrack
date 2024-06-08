@@ -14,8 +14,8 @@ router.post('/AddOrderedProduct', async (req, res) => {
 
         const newOrderedProduct = {
             productId: new mongoose.Types.ObjectId(productId),
-            quantity: quantity,
-            price: price
+            quantity,
+            price
         }
 
         const orderedProduct = await orderedProductModel.create(newOrderedProduct);
@@ -78,7 +78,7 @@ router.delete('/DeleteOrderedProduct/:id', async (req, res) => {
         const orderedProductToDelete = await orderedProductModel.findByIdAndDelete(id);
 
         if (!orderedProductToDelete){
-            return res.status(404).json({ message: "Product not found!" });
+            return res.status(404).json({ message: "Ordered product not found!" });
         }
 
         return res.status(200).send({ message: "Delete Successful!" });
