@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const router = express.Router();
 import { productModel } from '../models/productModel.js';
 
-// Create Product Route
+// Create 
 router.post('/AddProduct', async (req, res) => {
     try {
         const { name, category, unitCost, weightKG, warehouse, dimensions, stockLeft, sku } = req.body;
@@ -65,7 +65,7 @@ router.get('/:id', async (req, res) => {
 router.put('/EditProduct/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const productToEdit = await productModel.findByIdAndUpdate(id, req.body);
+        const productToEdit = await productModel.findByIdAndUpdate(id, req.body, {new: true});
 
         if (!productToEdit) {
             return res.status(404).json({ message: "Product not found" });
