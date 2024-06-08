@@ -22,7 +22,8 @@ export const orders = [
     sellingPlatform: "Shopee",
     buyerName: "John Doe",
     buyerEmail: "john.doe@example.com",
-    buyerPhone: "+63 998 012 3456"
+    buyerPhone: "+63 998 012 3456",
+    status: "Shipped"
   },
   {
     id: 2,
@@ -45,7 +46,8 @@ export const orders = [
     sellingPlatform: "Lazada",
     buyerName: "Jane Smith",
     buyerEmail: "jane.smith@example.com",
-    buyerPhone: "+63 987 654 3210"
+    buyerPhone: "+63 987 654 3210",
+    status: "Processing"
   },
   {
     id: 3,
@@ -68,7 +70,8 @@ export const orders = [
     sellingPlatform: "Facebook",
     buyerName: "Alice Johnson",
     buyerEmail: "alice.johnson@example.com",
-    buyerPhone: "+63 956 789 0123"
+    buyerPhone: "+63 956 789 0123",
+    status: "Delivered"
   },
   {
     id: 4,
@@ -91,7 +94,8 @@ export const orders = [
     sellingPlatform: "Tiktok",
     buyerName: "Bob Williams",
     buyerEmail: "bob.williams@example.com",
-    buyerPhone: "+63 945 678 9012"
+    buyerPhone: "+63 945 678 9012",
+    status: "Pending"
   },
   {
     id: 5,
@@ -114,7 +118,8 @@ export const orders = [
     sellingPlatform: "Others",
     buyerName: "Charlie Brown",
     buyerEmail: "charlie.brown@example.com",
-    buyerPhone: "+63 934 567 8901"
+    buyerPhone: "+63 934 567 8901",
+    status: "Cancelled"
   }
 ];
 
@@ -295,5 +300,118 @@ export const products = [
       width: 101,
       height: 17.2,
       quantity: 80
+  },
+  {
+    sku: 'GB-006',
+    name: 'Gameboy SP',
+    category_id: 6,
+    cost: 49.99,
+    weight: 0.08,
+    warehouse_id: 1,
+    length: 50,
+    width: 101,
+    height: 17.2,
+    quantity: 80
+}
+];
+
+
+export const expenses = [
+  {
+      id: 1,
+      date: '2024-06-01',
+      amount: 199.99,
+      currency: 'USD',
+      type: 'Purchase',
+      description: 'Smartphone'
+  },
+  {
+      id: 2,
+      date: '2024-06-02',
+      amount: 49.99,
+      currency: 'USD',
+      type: 'Purchase',
+      description: 'Wireless Mouse'
+  },
+  {
+      id: 3,
+      date: '2024-06-03',
+      amount: 5000.00,
+      currency: 'USD',
+      type: 'Stock Purchase',
+      description: 'New Inventory of Laptops'
+  },
+  {
+      id: 4,
+      date: '2024-06-04',
+      amount: 300.00,
+      currency: 'USD',
+      type: 'Ad Expense',
+      description: 'Google Ads Campaign'
+  },
+  {
+      id: 5,
+      date: '2024-06-05',
+      amount: 120.00,
+      currency: 'USD',
+      type: 'Office Supplies',
+      description: 'Printer Ink'
+  },
+  {
+      id: 6,
+      date: '2024-06-06',
+      amount: 150.00,
+      currency: 'USD',
+      type: 'Utilities',
+      description: 'Electricity Bill'
+  },
+  {
+      id: 7,
+      date: '2024-06-07',
+      amount: 29.99,
+      currency: 'USD',
+      type: 'Purchase',
+      description: 'Wireless Charger'
+  },
+  {
+      id: 8,
+      date: '2024-06-08',
+      amount: 10000.00,
+      currency: 'USD',
+      type: 'Stock Purchase',
+      description: 'New Inventory of Smartphones'
+  },
+  {
+      id: 9,
+      date: '2024-06-09',
+      amount: 500.00,
+      currency: 'USD',
+      type: 'Ad Expense',
+      description: 'Facebook Ads Campaign'
+  },
+  {
+      id: 10,
+      date: '2024-06-10',
+      amount: 3000.00,
+      currency: 'USD',
+      type: 'Purchase',
+      description: 'Bulk Purchase of Keyboards'
+  },
+  {
+      id: 11,
+      date: '2024-06-11',
+      amount: 150.00,
+      currency: 'USD',
+      type: 'Maintenance',
+      description: 'Website Hosting'
+  },
+  {
+      id: 12,
+      date: '2024-06-12',
+      amount: 400.00,
+      currency: 'USD',
+      type: 'Miscellaneous',
+      description: 'Team Lunch'
   }
 ];
+

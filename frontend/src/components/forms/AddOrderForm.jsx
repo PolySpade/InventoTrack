@@ -9,6 +9,9 @@ const AddOrderForm = () => {
   const [additembox, setAdditembox] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
 
+  const [fees, setFees] = useState(0);
+  const [totalPrice, setTotalPrice] = useState(0);
+
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
@@ -44,10 +47,19 @@ const AddOrderForm = () => {
 
   const isChecked = (sku) => checkedItems.includes(sku);
 
+  const getTotalPrice = () => {
+    let total = 0;
+    checkedProducts.forEach((item) => {
+      const quantity = document.getElementById(`${item.sku}-quantity`).value;
+      const price = document.getElementById(`${item.sku}-price`).value;
+      total += quantity * price;
+    });
+    setTotalPrice(total - fees);
+  };
 
-  console.log(checkedProducts.map((item) => `${document.getElementById(`${item.sku}-price`).value}`));
+  //console.log(checkedProducts.map((item) => `${document.getElementById(`${item.sku}-price`).value}`));
 
-
+  //TODO add total price , add confirm
   return (
     <div className="flex flex-row overflow-y-auto min-w-full bg-neutral rounded shadow-lg text-white">
       <form
@@ -174,10 +186,14 @@ const AddOrderForm = () => {
         <hr className="mx-4 bg-white w-px h-full"></hr>
         <div className="relative flex flex-col w-fit">
           Items Ordered
-          <button className="btn text-gray-200" type="button" onClick={handleAddItem}>
+          <button
+            className="btn text-gray-200"
+            type="button"
+            onClick={handleAddItem}
+          >
             Add Item
           </button>
-          <div className="absolute z-20 w-full ">
+          <div className="absolute block z-20 w-full ">
             <div
               className={` bg-base-200 z-20 shadow-lg opacity-95 p-3 rounded-lg overflow-y-auto max-h-96 ${
                 additembox ? "" : "hidden"
@@ -238,12 +254,12 @@ const AddOrderForm = () => {
                     total base from item quantity * price
                     , total can be modified show fees
                  */}
-            <table>
-              <div className="overflow-x-auto">
-                <table className="table w-96">
+            
+              <div className="table-wrp block overflow-y-auto max-h-96">
+                <table className="table max-w-96">
                   {/* head */}
-                  <thead className="text-white">
-                    <tr>
+                  <thead className=" bg-neutral sticky top-0 text-white">
+                    <tr className=" ">
                       <th>SKU</th>
                       <th>Product Name</th>
                       <th className="w-12">Quantity</th>
@@ -258,7 +274,7 @@ const AddOrderForm = () => {
                       </th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className=" max-h-96 overflow-x-hidden overflow-y-auto">
                     {/* row 1 */}
                     {checkedProducts.map((item, index) => (
                       <TableContents
@@ -271,17 +287,23 @@ const AddOrderForm = () => {
                   </tbody>
                 </table>
               </div>
-            </table>
+            
           </div>
-
           <div className="absolute bottom-0 z-10 w-full flex flex-col items-end">
-              <div>
-                Total Price: 0
-              </div>
-              <div className="mt-3">
-                Other Fees: 
-                <input type="text" id="fees" placeholder="" className="input w-16 px-2"/>
-              </div>
+            <div>
+              <button className="btn btn-success mb-4">Confirm</button>
+            </div>
+            <div>Total Price: {totalPrice}</div>
+            <div className="mt-3">
+              Other Fees:
+              <input
+                type="text"
+                id="fees"
+                placeholder=""
+                onChange={(e) => setFees(e.target.value)}
+                className="input w-16 px-2"
+              />
+            </div>
           </div>
         </div>
       </form>
