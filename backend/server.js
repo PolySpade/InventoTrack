@@ -6,6 +6,7 @@ import productRoutes from './routes/productRoutes.js';
 import supplierRoutes from './routes/supplierRoutes.js';
 import orderedProductRoutes from './routes/orderedProductRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
+import accountRoutes from './routes/accountRoutes.js';
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use('/products', productRoutes);
 app.use('/suppliers', supplierRoutes);
 app.use('/orderedProducts', orderedProductRoutes);
 app.use('/orders', orderRoutes);
+app.use('/accounts', accountRoutes);
 
 mongoose.connect(mongodbURL)
 .then(() => {
