@@ -1,7 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 const router = express.Router();
-import { orderedProductModel } from '../models/orderedProductModel.js';
+import { orderedProductModel } from '../models/orderModel.js';
 
 // create
 router.post('/AddOrderedProduct', async (req, res) => {

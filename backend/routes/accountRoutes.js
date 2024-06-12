@@ -6,15 +6,15 @@ import { accountModel } from '../models/accountModel.js';
 // create
 router.post('/CreateAccount', async (req, res) => {
     try {
-        const {email, username, password, role} = req.body;
+        const {email, name, password, role} = req.body;
 
-        if (!email || !username || !password || !role){
+        if (!email || !name || !password || !role){
             return res.status(400).send({ message: "Send all fields!" });
         }
 
         const newAccount = {
             email,
-            username,
+            name,
             password,
             role: new mongoose.Types.ObjectId(role)
         }

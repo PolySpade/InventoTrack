@@ -56,3 +56,4 @@ const orderSchema = new mongoose.Schema({
   });
   
 export const orderModel = mongoose.model('orders', orderSchema);
+export const orderedProductModel = mongoose.model('orderedprducts', orderedProductSchema);
