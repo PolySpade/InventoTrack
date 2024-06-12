@@ -133,7 +133,7 @@ const TableContents = ({
           {orderDetails ? (
             <div className={`fixed inset-4 flex items-center justify-end z-50`}>
               <div className="fixed inset-0 bg-black opacity-50 z-0"></div>
-              <div className="flex flex-col relative bg-base-100 bg-opacity-80 text-white rounded-l-lg shadow-lg z-10 w-full max-w-md h-full">
+              <div className="flex flex-col relative bg-base-100 bg-opacity-80 text-white rounded-l-lg shadow-lg z-10 w-full max-w-md h-full overflow-y-auto">
                 <div className="bg-primary w-full p-6">
                   <button
                     onClick={() => setOrderDetails((prev) => !prev)}
@@ -221,7 +221,7 @@ const TableContents = ({
       </tr>
       {showProducts && (
         <tr className="border-none text-white bg-secondary">
-          <td colSpan="6">
+          <td colSpan="7">
             <table className="table w-full">
               <thead className="text-white">
                 <tr className="border-opacity-50">
