@@ -8,6 +8,7 @@ import {
   EyeClosedIcon,
   PersonIcon,
 } from "@primer/octicons-react";
+import { roles } from "../constants";
 
 const CreateAccount = () => {
   const [hidePass, setHidePass] = useState(true);
@@ -45,11 +46,19 @@ const CreateAccount = () => {
               Create Account
             </div>
 
+
+            <div className='my-2 flex flex-col'>
+              <label className='text-xs' htmlFor='warehouse'>Role</label>
+              <select id="warehouse" className="input input-bordered w-full max-w-xs bg-white">
+                <option disabled selected value="">Select a Role</option>
+                {roles.map((item) => <option key={item.id} value={item.id}>{item.roleName}</option>)}
+              </select>
+            </div>
+
             <label className="input input-bordered flex items-center gap-2 bg-white">
               <PersonIcon size={16} />
-              <input type="name" className="grow border-none" placeholder="Username" />
+              <input type="name" className="grow border-none" placeholder="Name" />
             </label>
-
 
             <label className="input input-bordered flex items-center gap-2 bg-white">
               <MailIcon size={16} />
