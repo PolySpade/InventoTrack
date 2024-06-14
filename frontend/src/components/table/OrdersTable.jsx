@@ -12,7 +12,8 @@ import {
 } from "@primer/octicons-react";
 import { orders } from "../../constants";
 import AddOrderForm from "../forms/AddOrderForm";
-import OrderDetailsForm from "../forms/OrderDetailsForm";
+import { formatTimestamp } from "../../utils";
+// import OrderDetailsForm from "../forms/OrderDetailsForm";
 
 const OrdersTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -103,6 +104,8 @@ const TableContents = ({
   buyerEmail,
   buyerPhone,
   status,
+  timestamp,
+  timeline
 }) => {
   const [showProducts, setShowProducts] = useState(false);
   const [orderDetails, setOrderDetails] = useState(false);
@@ -142,7 +145,11 @@ const TableContents = ({
                     <XIcon size={20} />
                   </button>
                   <h2 className="text-xl font-bold mb-2"># {id} </h2>
+                  <div className=" flex justify-between flex-row">
                   <h3 className="text-sm">Order Details</h3>
+                  <h3 className="text-sm">{formatTimestamp(timestamp)}</h3>
+                  </div>
+                  
                 </div>
                 <div className=" w-full p-6">
                   <div>
@@ -171,7 +178,7 @@ const TableContents = ({
                   <hr className=" bg-white w-full h-px my-3"></hr>
                   <div>
                     <h1 className="font-bold text-md my-2">Timeline</h1>
-                    <Timeline/>
+                    <Timeline data={timeline}/>
                   </div>
                   {/* <div className="mb-4 ">
               <h4 className="text-md font-semibold">Products</h4>
@@ -283,7 +290,12 @@ const Alerts = (orderid) => {
   );
 };
 
-const Timeline = (orderid) => {
+const Timeline = ({data}) => {
+
+  //const empty = data.length === 0
+  const next_data = data.slice(1)
+  console.log(next_data)
+
   return (
     <ol className="relative mb-3">
       <li className="ms-4 flex items-center">
@@ -292,40 +304,43 @@ const Timeline = (orderid) => {
         </div>
         <div className="flex flex-row justify-between w-full">
           <div className="flex flex-col">
-          <div className="font-bold">Out for Delivery</div>
+          <div className="font-bold">{data[0].status}</div>
           <div className="text-xs">
-            Message
+            {data[0].details}
           </div>
           </div>
           <div>
-            <date className=" font-medium text-md">June 7, 2024</date>
+            <div className=" font-medium text-md">{formatTimestamp(data[0].timestamp)}</div>
           </div>
-          
-
         </div>
-        
       </li>
+      {next_data.map((item) => (
+        <div>
       <li className="border-s h-8 -mt-1.5" />
 
-      <li className="-mt-1.5 ms-4 flex items-center">
-        <div className="flex items-center absolute w-4 h-4 rounded-full -start-[0.425rem]">
-          <CheckCircleFillIcon size={16} className="text-success"/>
-        </div>
-        <div className="flex flex-row justify-between w-full">
-          <div className="flex flex-col">
-          <div className="font-bold">Arrived to warehouse A</div>
-          <div className="text-xs">
-            Message
-          </div>
-          </div>
-          <div>
-            <date className=" font-medium text-md">June 6, 2024</date>
-          </div>
-          
+<li className="-mt-1.5 ms-4 flex items-center">
+  <div className="flex items-center absolute w-4 h-4 rounded-full -start-[0.425rem]">
+    <CheckCircleFillIcon size={16} className="text-success"/>
+  </div>
+  <div className="flex flex-row justify-between w-full">
+    <div className="flex flex-col">
+    <div className="font-bold">{item.status}</div>
+    <div className="text-xs">
+      {item.details}
+    </div>
+    </div>
+    <div>
+      <date className=" font-medium text-md">{formatTimestamp(item.timestamp)}</date>
+    </div>
 
+  </div>
+  
+</li>
         </div>
-        
-      </li>
+
+
+
+      ))}
 
     </ol>
   );
