@@ -1,19 +1,19 @@
 import React, { useState } from "react";
-import { gameboytest } from "../../assets";
 import { expenses } from "../../constants";
 import { KebabHorizontalIcon, SearchIcon } from "@primer/octicons-react";
-import InventoryEditForm from "../forms/InventoryEditForm";
+import EditExpenseForm from "../forms/EditExpenseForm";
 import AddExpenseForm from "../forms/AddExpenseForm";
 
 const ExpensesTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [addProduct, setAddProduct] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
+  const [openEditFormId, setOpenEditFormId] = useState(null);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
-  // TODO Fix
+
   const handleCheckboxChange = (id) => {
     setCheckedItems((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
@@ -29,7 +29,7 @@ const ExpensesTable = () => {
   );
 
   return (
-    <div className="overflow-x-auto overflow-y-hidden">
+    <div className="overflow-x-auto">
       <div className="flex items-center justify-center">
         <SearchIcon size={20} className="text-white mr-3"></SearchIcon>
         <input
@@ -48,15 +48,14 @@ const ExpensesTable = () => {
       </button>
       {addProduct && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="fixed inset-0 bg-black opacity-50 pointer-events-none z-0"></div>
+          <div className="fixed inset-0 bg-black opacity-50" onClick={() => setAddProduct(false)}></div>
           <div className="p-6 rounded shadow-lg z-10">
-            <AddExpenseForm />
+            <AddExpenseForm onClose={() => setAddProduct(false)} />
           </div>
         </div>
       )}
 
       <table className="table table-pin-rows flex-1">
-        {/* head */}
         <thead>
           <tr className="border-none text-white">
             <th>
@@ -72,6 +71,7 @@ const ExpensesTable = () => {
             <th>Currency</th>
             <th>Type</th>
             <th>Description</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -81,6 +81,8 @@ const ExpensesTable = () => {
               {...item}
               isChecked={isChecked(item.id)}
               onCheckboxChange={handleCheckboxChange}
+              openEditFormId={openEditFormId}
+              setOpenEditFormId={setOpenEditFormId}
             />
           ))}
         </tbody>
@@ -93,14 +95,30 @@ const ExpensesTable = () => {
           <button className="join-item btn">4</button>
         </div>
       </div>
+      {openEditFormId && (
+        <EditExpenseForm onClose={() => setOpenEditFormId(null)} />
+      )}
     </div>
   );
 };
 
 export default ExpensesTable;
 
-const TableContents = ({ id, date, amount, currency, type, description, isChecked}) => {
-  const [productInfo, setProductInfo] = useState(false);
+const TableContents = ({
+  id,
+  date,
+  amount,
+  currency,
+  type,
+  description,
+  isChecked,
+  onCheckboxChange,
+  openEditFormId,
+  setOpenEditFormId,
+}) => {
+  const handleEditClick = () => {
+    setOpenEditFormId(openEditFormId === id ? null : id);
+  };
 
   return (
     <tr className="border-none text-white bg-base-content">
@@ -114,31 +132,15 @@ const TableContents = ({ id, date, amount, currency, type, description, isChecke
           />
         </label>
       </th>
-      {/* Uncomment and adjust the following block if you want to display the product image */}
-      {/* 
-      <td>
-        <div className="flex items-center gap-3">
-          <div className="avatar">
-            <div className="mask mask-squircle w-12 h-12">
-              <img src={image} alt={name} />
-            </div>
-          </div>
-          <div>
-            <div className="font-bold">{sku}</div>
-          </div>
-        </div>
-      </td> 
-      */}
       <td>{date}</td>
       <td>{amount}</td>
       <td>{currency}</td>
       <td>{type}</td>
       <td>{description}</td>
       <td className="relative">
-        <button onClick={() => setProductInfo((prev) => !prev)}>
+        <button onClick={handleEditClick}>
           <KebabHorizontalIcon className="rotate-90" />
         </button>
-        {productInfo && <InventoryEditForm />}
       </td>
     </tr>
   );

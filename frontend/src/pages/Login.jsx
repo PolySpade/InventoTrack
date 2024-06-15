@@ -42,14 +42,14 @@ const Login = () => {
             <div className="pt-4 space-y-4 w-full max-w-xs">
               <label className="input input-bordered flex items-center gap-2 bg-white">
                 <MailIcon size={16} />
-                <input type="email" className="grow" placeholder="Email" />
+                <input type="email" className="grow border-none" placeholder="Email" />
               </label>
 
               <label className="input input-bordered flex items-center gap-2 bg-white">
                 <KeyIcon size={16} />
                 <input
                   type={hidePass ? "password" : "text"}
-                  className="grow"
+                  className="grow border-none"
                   placeholder="Password"
                 />
                 <button type="button" onClick={handleHide} className="mb-1">

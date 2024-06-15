@@ -1,21 +1,21 @@
-import React from 'react';
+import React from "react";
 import { category, warehouse } from '../../constants';
 
-const AddProductForm = ({ onClose }) => {
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    // Add your form submission logic here
+const EditInventoryForm = ({ onClose }) => {
+  const handleCancel = () => {
     onClose();
   };
 
-  const handleCancel = () => {
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    // Implement your submit logic here
     onClose();
   };
 
   return (
     <div className='overflow-y-auto min-w-full bg-neutral rounded shadow-lg text-white'>
       <form onSubmit={handleSubmit} method='get' className='p-6 flex flex-col min-w-full'>
-        <h1 className='p-3 text-xl font-semibold'>Add Products</h1>
+        <h1 className='p-3 text-xl font-semibold'>Edit Product</h1>
         <div className='flex flex-row'>
           <div className='flex flex-col justify-start'>
             <div className='my-2 flex flex-col'>
@@ -41,7 +41,7 @@ const AddProductForm = ({ onClose }) => {
           <div className='ml-2 flex flex-col justify-start'>
             <div className='my-2 flex flex-col'>
               <label className='text-xs' htmlFor='sku'>SKU</label>
-              <input id="sku" type="text" placeholder="Type here" className="input input-bordered w-full max-w-xs" />
+              <input disabled id="sku" type="text" placeholder="Type here" defaultValue="GB" className="input input-bordered w-full max-w-xs disabled:text-white" />
             </div>
             <div className='my-2 flex flex-col'>
               <label className='text-xs' htmlFor='unit_cost'>Unit Cost</label>
@@ -79,11 +79,11 @@ const AddProductForm = ({ onClose }) => {
 
         <div className='pt-4 flex flex-row justify-around'>
           <button type="button" onClick={handleCancel} className='btn text-white'>Cancel</button>
-          <button type="submit" className='btn text-white'>Publish</button>
+          <button type="submit" className='btn text-white'>Save</button>
         </div>
       </form>
     </div>
   );
 };
 
-export default AddProductForm;
+export default EditInventoryForm;

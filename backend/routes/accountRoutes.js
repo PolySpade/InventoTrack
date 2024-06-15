@@ -12,10 +12,12 @@ router.post('/CreateAccount', async (req, res) => {
             return res.status(400).send({ message: "Send all fields!" });
         }
 
+        const hashedPasword = await bcrypt.hash(password,10)
+
         const newAccount = {
             email,
-            name,
-            password,
+            username,
+            password: hashedPasword,
             role: new mongoose.Types.ObjectId(role)
         }
 
@@ -87,6 +89,20 @@ router.delete('/DeleteAccount/:id', async (req, res) => {
         console.log(err.message);
         res.status(500).send({ message: err.message });
     }
+});
+
+
+router.post('/login', passport.authenticate('local'), (req, res) => {
+    res.status(200).send({ message: 'Login successful!' });
+});
+
+router.get('/logout', (req, res) => {
+    req.logout();
+    res.status(200).send({ message: 'Logout successful!' });
+});
+
+router.get('/current_user', (req, res) => {
+    res.send(req.user);
 });
 
 export default router;

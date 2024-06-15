@@ -47,20 +47,20 @@ const CreateAccount = () => {
 
             <label className="input input-bordered flex items-center gap-2 bg-white">
               <PersonIcon size={16} />
-              <input type="name" className="grow" placeholder="Username" />
+              <input type="name" className="grow border-none" placeholder="Username" />
             </label>
 
 
             <label className="input input-bordered flex items-center gap-2 bg-white">
               <MailIcon size={16} />
-              <input type="email" className="grow" placeholder="Email" />
+              <input type="email" className="grow border-none" placeholder="Email" />
             </label>
 
             <label className="input input-bordered flex items-center gap-2 bg-white">
               <KeyIcon size={16} />
               <input
                 type={hidePass ? "password" : "text"}
-                className="grow"
+                className="grow border-none"
                 placeholder="Password"
               />
               <button type="button" onClick={handleHide} className="mb-1">
@@ -76,7 +76,7 @@ const CreateAccount = () => {
               <KeyIcon size={16} />
               <input
                 type={hidePass ? "password" : "text"}
-                className="grow"
+                className="grow border-none"
                 placeholder="Confirm Password"
               />
               <button type="button" onClick={handleHide} className="mb-1">

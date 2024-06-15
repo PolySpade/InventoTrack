@@ -415,3 +415,92 @@ export const expenses = [
   }
 ];
 
+export const expense_types = [
+  {
+    id: 1,
+    name: 'Purchase'
+  },
+  {
+    id: 2,
+    name: 'Stock Purchase'
+  },
+  {
+    id: 3,
+    name: 'Ad Expense'
+  },
+  {
+    id: 4,
+    name: 'Office Supplies'
+  },
+  {
+    id: 5,
+    name: 'Utilities'
+  },
+  {
+    id: 6,
+    name: 'Maintenance'
+  },
+  {
+    id: 7,
+    name: 'Miscellaneous'
+  }
+];
+
+export const currency_types = [
+  {
+    id: 1,
+    name: 'PHP',
+    description: 'Philippine Peso'
+  },
+  {
+    id: 2,
+    name: 'CNY',
+    description: 'Chinese Yuan'
+  },
+  {
+    id: 3,
+    name: 'USD',
+    description: 'United States Dollar'
+  },
+  {
+    id: 4,
+    name: 'EUR',
+    description: 'Euro'
+  },
+  {
+    id: 5,
+    name: 'GBP',
+    description: 'British Pound Sterling'
+  },
+  {
+    id: 6,
+    name: 'JPY',
+    description: 'Japanese Yen'
+  },
+  {
+    id: 7,
+    name: 'AUD',
+    description: 'Australian Dollar'
+  },
+  {
+    id: 8,
+    name: 'CAD',
+    description: 'Canadian Dollar'
+  },
+  {
+    id: 9,
+    name: 'CHF',
+    description: 'Swiss Franc'
+  },
+  {
+    id: 10,
+    name: 'INR',
+    description: 'Indian Rupee'
+  },
+  {
+    id: 11,
+    name: 'MXN',
+    description: 'Mexican Peso'
+  }
+];
+
