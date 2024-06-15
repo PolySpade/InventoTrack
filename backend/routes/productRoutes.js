@@ -15,7 +15,7 @@ router.post('/AddProduct', async (req, res) => {
         const newProduct = {
             sku,
             name,
-            category,
+            category: new mongoose.Types.ObjectId(category),
             unitCost,
             weightKG,
             warehouse: new mongoose.Types.ObjectId(warehouse),

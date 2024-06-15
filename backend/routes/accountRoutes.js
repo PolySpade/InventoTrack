@@ -12,7 +12,7 @@ router.post('/CreateAccount', async (req, res) => {
             return res.status(400).send({ message: "Send all fields!" });
         }
 
-        const hashedPasword = await bcrypt.hash(password,10)
+        //const hashedPasword = await bcrypt.hash(password,10)
 
         const newAccount = {
             email,
@@ -92,7 +92,7 @@ router.delete('/DeleteAccount/:id', async (req, res) => {
 });
 
 
-router.post('/login', passport.authenticate('local'), (req, res) => {
+/*router.post('/login', passport.authenticate('local'), (req, res) => {
     res.status(200).send({ message: 'Login successful!' });
 });
 
@@ -103,6 +103,6 @@ router.get('/logout', (req, res) => {
 
 router.get('/current_user', (req, res) => {
     res.send(req.user);
-});
+});*/
 
 export default router;

@@ -6,9 +6,9 @@ import { orderModel } from '../models/orderModel.js';
 // create
 router.post('/CreateOrder', async (req, res) => {
     try {
-        const {id, products, courierName, trackingNumber, sellingPlatform, buyerName, buyerEmail, buyerPhone} = req.body;
+        const {id, timestamp, products, courier, trackingNumber, sellingPlatform, buyer, totalPaid, otherFees, status, timeline, notes} = req.body;
 
-        if (!id || products === 0 || !courierName || !trackingNumber || !sellingPlatform || !buyerName || !buyerEmail || !buyerPhone){
+        if (!id || !timestamp || products === 0 || !courier || !trackingNumber || !sellingPlatform || !buyer || !totalPaid || !otherFees || !status || !timeline || !notes){
             return res.status(400).send({ message: "Send all fields!" });
         }
 
@@ -26,13 +26,17 @@ router.post('/CreateOrder', async (req, res) => {
 
         const newOrder = {
             id,
+            timestamp,
             products: productObjects,
-            courierName,
+            courier: new mongoose.Types.ObjectId(courier),
             trackingNumber,
-            sellingPlatform,
-            buyerName,
-            buyerEmail,
-            buyerPhone
+            sellingPlatform: new mongoose.Types.ObjectId(sellingPlatform),
+            buyer,
+            totalPaid,
+            otherFees,
+            status,
+            timeline,
+            notes
         }
 
         const order = await orderModel.create(newOrder);
