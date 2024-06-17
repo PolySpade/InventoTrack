@@ -3,6 +3,7 @@ import { category, products, warehouse } from "../../constants";
 import { KebabHorizontalIcon, SearchIcon } from "@primer/octicons-react";
 import EditInventoryForm from "../forms/EditInventoryForm";
 import AddProductForm from "../forms/AddProductForm";
+import StockInForm from "../forms/StockInForm";
 
 const getCategoryNameById = (id) => {
   const cat = category.find(category => category.id === id);
@@ -17,6 +18,8 @@ const getWarehouseNameById = (id) => {
 const InventoryTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [addProduct, setAddProduct] = useState(false);
+  const [stockIn, setStockIn] = useState(false);
+  const [stockOut, setStockOut] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
   const [openEditFormId, setOpenEditFormId] = useState(null);
 
@@ -49,12 +52,23 @@ const InventoryTable = () => {
           className="input input-bordered text-white bg-neutral w-full max-w-lg"
         />
       </div>
+      <div className="flex justify-between">
       <button
         onClick={() => setAddProduct((prev) => !prev)}
         className="btn text-white bg-secondary border-none"
       >
         Add Product
       </button>
+      <div className="flex flex-row">
+        <button onClick={() => setStockIn((prev) => !prev)} className="btn text-white bg-secondary border-none mr-4">
+          Stock-In
+        </button>
+        <button onClick={() => setStockIn((prev) => !prev)} className="btn text-white bg-secondary border-none">
+          Stock-Out
+        </button>
+      </div>
+      
+      </div>
       {addProduct && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
           <div className="fixed inset-0 bg-black opacity-50" onClick={() => setAddProduct(false)}></div>
@@ -62,6 +76,9 @@ const InventoryTable = () => {
             <AddProductForm onClose={() => setAddProduct(false)} />
           </div>
         </div>
+      )}
+      {stockIn && (
+        <StockInForm onClose={() => setStockIn(false)} />
       )}
 
       <table className="table table-pin-rows flex-1">

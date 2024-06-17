@@ -54,9 +54,9 @@ const OrdersTable = () => {
       </button>
       {addOrder && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="fixed inset-0 bg-black opacity-50 pointer-events-none z-0"></div>
+          <div className="fixed inset-0 bg-black opacity-50" onClick={() => setAddOrder(false)}></div>
           <div className="p-6 rounded shadow-lg z-10">
-            <AddOrderForm />
+            <AddOrderForm onClose={() => setAddOrder(false)} />
           </div>
         </div>
       )}
@@ -135,7 +135,7 @@ const TableContents = ({
           {/* // order details form */}
           {orderDetails ? (
             <div className={`fixed inset-4 flex items-center justify-end z-50`}>
-              <div className="fixed inset-0 bg-black opacity-50 z-0"></div>
+              <div className="fixed inset-0 bg-black opacity-50 z-0" onClick={() => setOrderDetails(false)}></div>
               <div className="flex flex-col relative bg-base-100 bg-opacity-80 text-white rounded-l-lg shadow-lg z-10 w-full max-w-md h-full overflow-y-auto">
                 <div className="bg-primary w-full p-6">
                   <button

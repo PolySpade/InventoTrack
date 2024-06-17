@@ -4,7 +4,7 @@ import { courier, salesplatform } from "../../constants";
 import { products } from "../../constants";
 import { SearchIcon, XCircleFillIcon } from "@primer/octicons-react";
 
-const AddOrderForm = () => {
+const AddOrderForm =  ({onClose}) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [additembox, setAdditembox] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
@@ -28,7 +28,7 @@ const AddOrderForm = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    window.location.reload();
+    onClose();
   };
 
   const handleAddItem = () => {
@@ -36,7 +36,7 @@ const AddOrderForm = () => {
   };
 
   const handleCancel = () => {
-    window.location.reload();
+    onClose();
   };
 
   const handleCheckboxChange = (sku) => {
