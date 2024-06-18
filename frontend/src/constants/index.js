@@ -611,3 +611,33 @@ export const roles = [
     ]
   }
 ];
+
+export const supplier = [
+  {
+    id: 1,
+    supplierName: "Supplier One",
+    website: "http://www.supplierone.com",
+    phoneNo: "+63 912 345 6789",
+    productList: [
+      
+    ]
+  },
+  {
+    id: 2,
+    supplierName: "Supplier Two",
+    website: "http://www.suppliertwo.com",
+    phoneNo: "+63 987 654 3210",
+    productList: [
+     
+    ]
+  },
+  {
+    id: 3,
+    supplierName: "Supplier Three",
+    website: "Supplier has no website",
+    phoneNo: "+63 923 456 7890",
+    productList: [
+      
+    ]
+  }
+];
