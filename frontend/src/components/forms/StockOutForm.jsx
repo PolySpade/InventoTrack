@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { products,supplier } from "../../constants";
+import { products } from "../../constants";
 import { SearchIcon, XCircleFillIcon } from "@primer/octicons-react";
 
-const StockInForm = ({ onClose }) => {
+const StockOutForm = ({ onClose }) => {
   
   const [searchTerm, setSearchTerm] = useState("");
   const [additembox, setAdditembox] = useState(false);
@@ -52,27 +52,9 @@ const StockInForm = ({ onClose }) => {
             method="get"
             className="p-6 flex flex-col min-w-full"
           >
-            <h1 className="text-xl font-semibold">Stock In</h1>
-            <div className="my-2 flex flex-col">
-              <label className="text-xs" htmlFor="warehouse">
-                Supplier
-              </label>
-              <select
-                id="warehouse"
-                className="input input-bordered w-full"
-              >
-                <option disabled selected value="">
-                  Select a supplier
-                </option>
-                {supplier.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.supplierName}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <h1 className="text-xl font-semibold">Stock Out</h1>
+            
             <div className="relative flex flex-col w-fit">
-                
               <button
                 className="btn text-gray-200"
                 type="button"
@@ -185,7 +167,7 @@ const StockInForm = ({ onClose }) => {
   );
 };
 
-export default StockInForm;
+export default StockOutForm;
 
 
 const SearchContents = ({ sku, name, isChecked, onCheckboxChange }) => {

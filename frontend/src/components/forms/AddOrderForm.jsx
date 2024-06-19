@@ -256,12 +256,12 @@ const AddOrderForm =  ({onClose}) => {
                  */}
             
               <div className="table-wrp block overflow-y-auto max-h-96">
-                <table className="table max-w-96">
+                <table className="table overflow-clip max-w-96">
                   {/* head */}
                   <thead className=" bg-neutral sticky top-0 text-white">
                     <tr className=" ">
                       <th>SKU</th>
-                      <th>Product Name</th>
+                      <th className="pr-12">Product Name</th>
                       <th className="w-12">Quantity</th>
                       <th className="w-14">Unit Price</th>
                       <th>

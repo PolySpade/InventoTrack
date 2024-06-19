@@ -4,6 +4,7 @@ import { KebabHorizontalIcon, SearchIcon } from "@primer/octicons-react";
 import EditInventoryForm from "../forms/EditInventoryForm";
 import AddProductForm from "../forms/AddProductForm";
 import StockInForm from "../forms/StockInForm";
+import StockOutForm from "../forms/StockOutForm";
 
 const getCategoryNameById = (id) => {
   const cat = category.find(category => category.id === id);
@@ -63,7 +64,7 @@ const InventoryTable = () => {
         <button onClick={() => setStockIn((prev) => !prev)} className="btn text-white bg-secondary border-none mr-4">
           Stock-In
         </button>
-        <button onClick={() => setStockIn((prev) => !prev)} className="btn text-white bg-secondary border-none">
+        <button onClick={() => setStockOut((prev) => !prev)} className="btn text-white bg-secondary border-none">
           Stock-Out
         </button>
       </div>
@@ -79,6 +80,9 @@ const InventoryTable = () => {
       )}
       {stockIn && (
         <StockInForm onClose={() => setStockIn(false)} />
+      )}
+      {stockOut && (
+        <StockOutForm onClose={() => setStockOut(false)} />
       )}
 
       <table className="table table-pin-rows flex-1">
