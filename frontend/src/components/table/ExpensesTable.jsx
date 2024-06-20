@@ -28,6 +28,8 @@ const ExpensesTable = () => {
       item.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const expenseToEdit = expenses.find((expense) => expense.id === openEditFormId);
+
   return (
     <div className="overflow-x-auto">
       <div className="flex items-center justify-center">
@@ -95,8 +97,11 @@ const ExpensesTable = () => {
           <button className="join-item btn">4</button>
         </div>
       </div>
-      {openEditFormId && (
-        <EditExpenseForm onClose={() => setOpenEditFormId(null)} />
+      {openEditFormId && expenseToEdit && (
+        <EditExpenseForm
+          onClose={() => setOpenEditFormId(null)}
+          {...expenseToEdit}
+        />
       )}
     </div>
   );

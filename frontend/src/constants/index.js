@@ -43,7 +43,7 @@ export const orders = [
   },
   {
     id: 2,
-    timestamp: "2024-06-15T09:00:00Z",
+    timestamp: "2024-06-14T12:00:00Z",
     products: [
       {
         sku: "GB-02",
@@ -195,6 +195,206 @@ export const orders = [
       }
     ],
     notes: "Customer requested cancellation."
+  },
+  {
+    id: 6,
+    timestamp: "2024-06-19T10:30:00Z",
+    products: [
+      {
+        sku: "GB-011",
+        name: "Gameboy XL",
+        quantity: 1,
+        price: 100.0,
+      },
+      {
+        sku: "GB-012",
+        name: "Gameboy Pro",
+        quantity: 2,
+        price: 150.0,
+      },
+    ],
+    courierName: "Courier 6",
+    trackingNumber: "TRACK44567",
+    sellingPlatform: "Shopify",
+    buyerName: "David Lee",
+    buyerEmail: "david.lee@example.com",
+    buyerPhone: "+63 999 111 2222",
+    totalPaid: 400.0,
+    otherFees: 10.0,
+    status: "Shipped",
+    timeline: [
+      {
+        status: "Order Placed",
+        timestamp: "2024-06-19T10:30:00Z",
+        details: "Order placed by customer."
+      },
+      {
+        status: "Payment Confirmed",
+        timestamp: "2024-06-19T10:35:00Z",
+        details: "Payment received and confirmed."
+      },
+      {
+        status: "Shipped",
+        timestamp: "2024-06-19T11:00:00Z",
+        details: "Order shipped by Courier 6."
+      }
+    ],
+    notes: "Fragile."
+  },
+  {
+    id: 7,
+    timestamp: "2024-06-20T08:45:00Z",
+    products: [
+      {
+        sku: "GB-013",
+        name: "Gameboy Ultra",
+        quantity: 1,
+        price: 200.0,
+      },
+      {
+        sku: "GB-014",
+        name: "Gameboy Lite XL",
+        quantity: 3,
+        price: 300.0,
+      },
+    ],
+    courierName: "Courier 7",
+    trackingNumber: "TRACK55678",
+    sellingPlatform: "Store",
+    buyerName: "Emma Clark",
+    buyerEmail: "emma.clark@example.com",
+    buyerPhone: "+63 988 222 3333",
+    totalPaid: 1100.0,
+    otherFees: 25.0,
+    status: "Processing",
+    timeline: [
+      {
+        status: "Order Placed",
+        timestamp: "2024-06-20T08:45:00Z",
+        details: "Order placed by customer."
+      }
+    ],
+    notes: "Urgent delivery."
+  },
+  {
+    id: 8,
+    timestamp: "2024-06-21T12:15:00Z",
+    products: [
+      {
+        sku: "GB-015",
+        name: "Gameboy Color Pro",
+        quantity: 1,
+        price: 250.0,
+      },
+      {
+        sku: "GB-016",
+        name: "Gameboy Color Ultra",
+        quantity: 1,
+        price: 300.0,
+      },
+    ],
+    courierName: "Courier 8",
+    trackingNumber: "TRACK66789",
+    sellingPlatform: "Shopee",
+    buyerName: "Olivia Smith",
+    buyerEmail: "olivia.smith@example.com",
+    buyerPhone: "+63 977 333 4444",
+    totalPaid: 550.0,
+    otherFees: 20.0,
+    status: "Delivered",
+    timeline: [
+      {
+        status: "Order Placed",
+        timestamp: "2024-06-21T12:15:00Z",
+        details: "Order placed by customer."
+      },
+      {
+        status: "Shipped",
+        timestamp: "2024-06-21T13:00:00Z",
+        details: "Order shipped by Courier 8."
+      },
+      {
+        status: "Delivered",
+        timestamp: "2024-06-22T09:00:00Z",
+        details: "Order delivered to customer."
+      }
+    ],
+    notes: "Leave at the front door."
+  },
+  {
+    id: 9,
+    timestamp: "2024-06-22T14:00:00Z",
+    products: [
+      {
+        sku: "GB-001",
+        name: "Gameboy Original",
+        quantity: 4,
+        price: 50.0,
+      },
+      {
+        sku: "GB-002",
+        name: "Gameboy Color",
+        quantity: 2,
+        price: 80.0,
+      },
+    ],
+    courierName: "Courier 9",
+    trackingNumber: "TRACK77890",
+    sellingPlatform: "Lazada",
+    buyerName: "William Johnson",
+    buyerEmail: "william.johnson@example.com",
+    buyerPhone: "+63 966 444 5555",
+    totalPaid: 380.0,
+    otherFees: 15.0,
+    status: "Cancelled",
+    timeline: [
+      {
+        status: "Order Placed",
+        timestamp: "2024-06-22T14:00:00Z",
+        details: "Order placed by customer."
+      },
+      {
+        status: "Cancelled",
+        timestamp: "2024-06-22T14:30:00Z",
+        details: "Order cancelled by customer."
+      }
+    ],
+    notes: "Wrong item ordered."
+  },
+  {
+    id: 10,
+    timestamp: "2024-06-23T11:25:00Z",
+    products: [
+      {
+        sku: "GB-003",
+        name: "Gameboy Advance",
+        quantity: 1,
+        price: 120.0,
+      },
+      {
+        sku: "GB-004",
+        name: "Gameboy SP",
+        quantity: 2,
+        price: 180.0,
+      },
+    ],
+    courierName: "Courier 10",
+    trackingNumber: "TRACK88901",
+    sellingPlatform: "Facebook",
+    buyerName: "Sophia Brown",
+    buyerEmail: "sophia.brown@example.com",
+    buyerPhone: "+63 955 555 6666",
+    totalPaid: 480.0,
+    otherFees: 10.0,
+    status: "Pending",
+    timeline: [
+      {
+        status: "Order Placed",
+        timestamp: "2024-06-23T11:25:00Z",
+        details: "Order placed by customer."
+      }
+    ],
+    notes: ""
   }
 ];
 

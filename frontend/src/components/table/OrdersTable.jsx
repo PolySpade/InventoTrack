@@ -9,6 +9,9 @@ import {
   StopIcon,
   CheckCircleIcon,
   CheckCircleFillIcon,
+  ArchiveIcon,
+  XCircleFillIcon,
+  TrashIcon,
 } from "@primer/octicons-react";
 import { orders } from "../../constants";
 import AddOrderForm from "../forms/AddOrderForm";
@@ -54,7 +57,10 @@ const OrdersTable = () => {
       </button>
       {addOrder && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="fixed inset-0 bg-black opacity-50" onClick={() => setAddOrder(false)}></div>
+          <div
+            className="fixed inset-0 bg-black opacity-50"
+            onClick={() => setAddOrder(false)}
+          ></div>
           <div className="p-6 rounded shadow-lg z-10">
             <AddOrderForm onClose={() => setAddOrder(false)} />
           </div>
@@ -71,6 +77,7 @@ const OrdersTable = () => {
             <th>Tracking Number</th>
             <th>Selling Platform</th>
             <th>Status</th>
+            <th>Total Paid</th>
             <th></th>
           </tr>
         </thead>
@@ -104,11 +111,30 @@ const TableContents = ({
   buyerEmail,
   buyerPhone,
   status,
+  totalPaid,
+  otherFees,
   timestamp,
-  timeline
+  timeline,
+  notes,
 }) => {
   const [showProducts, setShowProducts] = useState(false);
   const [orderDetails, setOrderDetails] = useState(false);
+  const [editNotes, setEditNotes] = useState(false);
+  const [noteText, setNoteText] = useState(notes);
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
+  
+  const savenotes = () => {
+    setEditNotes(false)
+  }
+
+  const cancelnotes = () => {
+    setEditNotes(false)
+    setNoteText(notes)
+  }
+
+  const deleterecord = () => {
+    // insert delete record 
+  }
 
   // for transfering order to order details
 
@@ -128,14 +154,24 @@ const TableContents = ({
         <td>{trackingNumber}</td>
         <td>{sellingPlatform}</td>
         <td>{status}</td>
-        <td className="relative">
-          <button onClick={() => setOrderDetails((prev) => !prev)}>
-            <KebabHorizontalIcon className="rotate-90" />
-          </button>
+        <td>{totalPaid}</td>
+        <td>
+        <div className="relative inline-block text-left">
+      <button
+        onClick={() => setOrderDetails((prev) => !prev)}
+        className="flex items-center justify-center p-2"
+      >
+        <KebabHorizontalIcon className="rotate-90" />
+      </button>
+      
+    </div>
           {/* // order details form */}
           {orderDetails ? (
             <div className={`fixed inset-4 flex items-center justify-end z-50`}>
-              <div className="fixed inset-0 bg-black opacity-50 z-0" onClick={() => setOrderDetails(false)}></div>
+              <div
+                className="fixed inset-0 bg-black opacity-50 z-0"
+                onClick={() => setOrderDetails(false)}
+              ></div>
               <div className="flex flex-col relative bg-base-100 bg-opacity-80 text-white rounded-l-lg shadow-lg z-10 w-full max-w-md h-full overflow-y-auto">
                 <div className="bg-primary w-full p-6">
                   <button
@@ -146,10 +182,9 @@ const TableContents = ({
                   </button>
                   <h2 className="text-xl font-bold mb-2"># {id} </h2>
                   <div className=" flex justify-between flex-row">
-                  <h3 className="text-sm">Order Details</h3>
-                  <h3 className="text-sm">{formatTimestamp(timestamp)}</h3>
+                    <h3 className="text-sm">Order Details</h3>
+                    <h3 className="text-sm">{formatTimestamp(timestamp)}</h3>
                   </div>
-                  
                 </div>
                 <div className=" w-full p-6">
                   <div>
@@ -178,7 +213,7 @@ const TableContents = ({
                   <hr className=" bg-white w-full h-px my-3"></hr>
                   <div>
                     <h1 className="font-bold text-md my-2">Timeline</h1>
-                    <Timeline data={timeline}/>
+                    <Timeline data={timeline} />
                   </div>
                   {/* <div className="mb-4 ">
               <h4 className="text-md font-semibold">Products</h4>
@@ -201,24 +236,65 @@ const TableContents = ({
                       Tracking Information
                     </h4>
                     <div className="">
-                    <p className="text-sm">Courier: {courierName}</p>
-                    <p className="text-sm">Tracking Number: {trackingNumber}</p>
+                      <p className="text-sm">Courier: {courierName}</p>
+                      <p className="text-sm">
+                        Tracking Number: {trackingNumber}
+                      </p>
                     </div>
                   </div>
                   <div className="mb-4">
                     <h4 className="text-md font-semibold">Selling Platform</h4>
                     <p className="text-sm">{sellingPlatform}</p>
                   </div>
-                  <div>
-                  <hr className=" bg-white w-full h-px my-3"></hr>
-                  <div >
-                  <h1 className="text-md font-semibold mb-2">Notes</h1>
-                  <textarea className=" h-40 rounded-lg bg-primary bg-opacity-50 w-full p-2 resize-none "/>
-                  
+                  <div className="mb-4">
+                    <h4 className="text-md font-semibold">
+                      Total Paid: ₱{totalPaid}
+                    </h4>
+
+                    <h3 className="text-xs font-semibold">
+                      Fees: ₱{otherFees}
+                    </h3>
                   </div>
+                  <div>
+                    <hr className=" bg-white w-full h-px my-3"></hr>
+                    <div>
+                      <h1 className="text-md font-semibold mb-2">Notes</h1>
+                      <div className="relative">
+                        <textarea
+                        value={noteText}
+                        onChange={(e) => setNoteText(e.target.value)}
+                        disabled={!editNotes}
+                        className="h-15 rounded-lg bg-primary bg-opacity-50 w-full p-2 resize-none"
+                      />
+                        <div className="absolute z-20 right-1 top-1 cursor-pointer"  >
+                          {!editNotes && (
+                          <div onClick={() => setEditNotes((prev) => !prev)}>
+                          <PencilIcon
+                          
+                          size={15}
+                          
+                          />
+                          </div>)
+                          }
+                          {editNotes && (
+                            <>
+                          <div className={`${editNotes ? "opacity-100": "opacity-0"}`} onClick={cancelnotes}>
+                          <XCircleFillIcon
+                          
+                          size={15}
+                          
+                        /></div>
+                          <div className={`${editNotes ? "opacity-100": "opacity-0"}`} onClick={savenotes}>
+                          <ArchiveIcon size={15}></ArchiveIcon>
+                          </div> </>) }
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-4 tooltip tooltip-right" data-tip="Delete Order Record">
+                      <button className="p-1" onClick={deleterecord} ><TrashIcon className=" text-error"/></button>
+                    </div>
                   </div>
                 </div>
-                
               </div>
             </div>
           ) : (
@@ -228,7 +304,7 @@ const TableContents = ({
       </tr>
       {showProducts && (
         <tr className="border-none text-white bg-secondary">
-          <td colSpan="7">
+          <td colSpan="8">
             <table className="table w-full">
               <thead className="text-white">
                 <tr className="border-opacity-50">
@@ -290,64 +366,56 @@ const Alerts = (orderid) => {
   );
 };
 
-const Timeline = ({data}) => {
-
+const Timeline = ({ data }) => {
   //const empty = data.length === 0
-  const next_data = data.slice(1)
-  console.log(next_data)
+  const next_data = data.slice(1);
 
   return (
     <ol className="relative mb-3">
       <li className="ms-4 flex items-center">
         <div className="flex items-center absolute w-4 h-4 rounded-full -start-[0.425rem]">
-          <CheckCircleFillIcon size={16} className="text-success"/>
+          <CheckCircleFillIcon size={16} className="text-success" />
         </div>
         <div className="flex flex-row justify-between w-full">
           <div className="flex flex-col">
-          <div className="font-bold">{data[0].status}</div>
-          <div className="text-xs">
-            {data[0].details}
-          </div>
+            <div className="font-bold">{data[0].status}</div>
+            <div className="text-xs">{data[0].details}</div>
           </div>
           <div>
-            <div className=" font-medium text-md">{formatTimestamp(data[0].timestamp)}</div>
+            <div className=" font-medium text-md">
+              {formatTimestamp(data[0].timestamp)}
+            </div>
           </div>
         </div>
       </li>
-      {next_data.map((item) => (
-        <div>
-      <li className="border-s h-8 -mt-1.5" />
+      {next_data.map((item,index) => (
+        <div key={index}>
+          <li className="border-s h-8 -mt-1.5" />
 
-<li className="-mt-1.5 ms-4 flex items-center">
-  <div className="flex items-center absolute w-4 h-4 rounded-full -start-[0.425rem]">
-    <CheckCircleFillIcon size={16} className="text-success"/>
-  </div>
-  <div className="flex flex-row justify-between w-full">
-    <div className="flex flex-col">
-    <div className="font-bold">{item.status}</div>
-    <div className="text-xs">
-      {item.details}
-    </div>
-    </div>
-    <div>
-      <date className=" font-medium text-md">{formatTimestamp(item.timestamp)}</date>
-    </div>
-
-  </div>
-  
-</li>
+          <li className="-mt-1.5 ms-4 flex items-center">
+            <div className="flex items-center absolute w-4 h-4 rounded-full -start-[0.425rem]">
+              <CheckCircleFillIcon size={16} className="text-success" />
+            </div>
+            <div className="flex flex-row justify-between w-full">
+              <div className="flex flex-col">
+                <div className="font-bold">{item.status}</div>
+                <div className="text-xs">{item.details}</div>
+              </div>
+              <div>
+                <div className=" font-medium text-md">
+                  {formatTimestamp(item.timestamp)}
+                </div>
+              </div>
+            </div>
+          </li>
         </div>
-
-
-
       ))}
-
     </ol>
   );
 };
 
-
-{/* <ol class="relative border-s border-gray-200 dark:border-gray-700">                  
+{
+  /* <ol class="relative border-s border-gray-200 dark:border-gray-700">                  
     <li class="mb-10 ms-4">
         <div class="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -start-1.5 border border-white dark:border-gray-900 dark:bg-gray-700"></div>
         <time class="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">February 2022</time>
@@ -369,5 +437,5 @@ const Timeline = ({data}) => {
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">E-Commerce UI code in Tailwind CSS</h3>
         <p class="text-base font-normal text-gray-500 dark:text-gray-400">Get started with dozens of web components and interactive elements built on top of Tailwind CSS.</p>
     </li>
-</ol> */}
-
+</ol> */
+}
