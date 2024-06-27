@@ -6,6 +6,8 @@ import AddProductForm from "../forms/AddProductForm";
 import StockInForm from "../forms/StockInForm";
 import StockOutForm from "../forms/StockOutForm";
 
+const ITEMS_PER_PAGE = 10;
+
 const getCategoryNameById = (id) => {
   const cat = category.find(category => category.id === id);
   return cat ? cat.name : 'Unknown Category';
@@ -23,9 +25,11 @@ const InventoryTable = () => {
   const [stockOut, setStockOut] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
   const [openEditFormId, setOpenEditFormId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
+    setCurrentPage(1); 
   };
 
   const handleCheckboxChange = (sku) => {
@@ -40,6 +44,16 @@ const InventoryTable = () => {
     item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.sku.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const currentItems = filteredProducts.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE
+  )
 
   return (
     <div className="overflow-x-auto overflow-y-hidden">
@@ -108,7 +122,7 @@ const InventoryTable = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredProducts.map((item, index) => (
+          {currentItems.map((item, index) => (
             <TableContents
               key={index}
               {...item}
@@ -122,10 +136,17 @@ const InventoryTable = () => {
       </table>
       <div className="flex justify-center mt-4">
         <div className="join">
-          <button className="join-item btn btn-active">1</button>
-          <button className="join-item btn">2</button>
-          <button className="join-item btn">3</button>
-          <button className="join-item btn">4</button>
+          {
+            [...Array(totalPages)].map((_,i) => (
+              <button
+                key={i}
+                onClick={() => handlePageChange(i+1)}
+                className={`join-item btn ${currentPage === i + 1 ? "btn-active" : ""}`}
+              >
+                {i+1}
+              </button>
+            ))
+          }
         </div>
       </div>
 

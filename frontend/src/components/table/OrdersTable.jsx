@@ -1,32 +1,23 @@
+
 import React, { useState } from "react";
-import {
-  XIcon,
-  PencilIcon,
-  KebabHorizontalIcon,
-  SearchIcon,
-  AlertIcon,
-  BellIcon,
-  StopIcon,
-  CheckCircleIcon,
-  CheckCircleFillIcon,
-  ArchiveIcon,
-  XCircleFillIcon,
-  TrashIcon,
-} from "@primer/octicons-react";
+import { SearchIcon, KebabHorizontalIcon } from "@primer/octicons-react";
 import { orders } from "../../constants";
 import AddOrderForm from "../forms/AddOrderForm";
-import { formatTimestamp } from "../../utils";
-// import OrderDetailsForm from "../forms/OrderDetailsForm";
+import EditOrderForm from "../forms/EditOrderForm";
+
+const ITEMS_PER_PAGE = 10;
 
 const OrdersTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [addOrder, setAddOrder] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [orderDetailsId, setOrderDetailsId] = useState(null);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
+    setCurrentPage(1); // Reset to first page on search
   };
 
-  // Search
   const filteredOrders = orders.filter(
     (order) =>
       order.products.some((product) =>
@@ -36,6 +27,21 @@ const OrdersTable = () => {
       order.trackingNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.sellingPlatform.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const totalPages = Math.ceil(filteredOrders.length / ITEMS_PER_PAGE);
+  const currentItems = filteredOrders.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handleDeleteRecord = (id) => {
+    // Implement delete record logic here
+    console.log(`Delete order with id: ${id}`);
+  };
 
   return (
     <div className="overflow-x-auto overflow-y-hidden">
@@ -68,7 +74,6 @@ const OrdersTable = () => {
       )}
 
       <table className="table w-full">
-        {/* head */}
         <thead>
           <tr className="border-none text-white">
             <th>Order ID</th>
@@ -82,19 +87,35 @@ const OrdersTable = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredOrders.map((order) => (
-            <TableContents key={order.id} {...order} />
+          {currentItems.map((order) => (
+            <TableContents
+              key={order.id}
+              {...order}
+              setOrderDetailsId={setOrderDetailsId}
+            />
           ))}
         </tbody>
       </table>
       <div className="flex justify-center mt-4">
         <div className="join">
-          <button className="join-item btn btn-active">1</button>
-          <button className="join-item btn">2</button>
-          <button className="join-item btn">3</button>
-          <button className="join-item btn">4</button>
+          {[...Array(totalPages)].map((_, i) => (
+            <button
+              key={i}
+              onClick={() => handlePageChange(i + 1)}
+              className={`join-item btn ${currentPage === i + 1 ? "btn-active" : ""}`}
+            >
+              {i + 1}
+            </button>
+          ))}
         </div>
       </div>
+      {orderDetailsId && (
+        <EditOrderForm
+          {...orders.find((order) => order.id === orderDetailsId)}
+          onClose={() => setOrderDetailsId(null)}
+          onDelete={() => handleDeleteRecord(orderDetailsId)}
+        />
+      )}
     </div>
   );
 };
@@ -107,36 +128,11 @@ const TableContents = ({
   courierName,
   trackingNumber,
   sellingPlatform,
-  buyerName,
-  buyerEmail,
-  buyerPhone,
   status,
   totalPaid,
-  otherFees,
-  timestamp,
-  timeline,
-  notes,
+  setOrderDetailsId,
 }) => {
   const [showProducts, setShowProducts] = useState(false);
-  const [orderDetails, setOrderDetails] = useState(false);
-  const [editNotes, setEditNotes] = useState(false);
-  const [noteText, setNoteText] = useState(notes);
-  const [isDropdownOpen, setDropdownOpen] = useState(false);
-  
-  const savenotes = () => {
-    setEditNotes(false)
-  }
-
-  const cancelnotes = () => {
-    setEditNotes(false)
-    setNoteText(notes)
-  }
-
-  const deleterecord = () => {
-    // insert delete record 
-  }
-
-  // for transfering order to order details
 
   return (
     <>
@@ -156,150 +152,14 @@ const TableContents = ({
         <td>{status}</td>
         <td>{totalPaid}</td>
         <td>
-        <div className="relative inline-block text-left">
-      <button
-        onClick={() => setOrderDetails((prev) => !prev)}
-        className="flex items-center justify-center p-2"
-      >
-        <KebabHorizontalIcon className="rotate-90" />
-      </button>
-      
-    </div>
-          {/* // order details form */}
-          {orderDetails ? (
-            <div className={`fixed inset-4 flex items-center justify-end z-50`}>
-              <div
-                className="fixed inset-0 bg-black opacity-50 z-0"
-                onClick={() => setOrderDetails(false)}
-              ></div>
-              <div className="flex flex-col relative bg-base-100 bg-opacity-80 text-white rounded-l-lg shadow-lg z-10 w-full max-w-md h-full overflow-y-auto">
-                <div className="bg-primary w-full p-6">
-                  <button
-                    onClick={() => setOrderDetails((prev) => !prev)}
-                    className="absolute top-6 right-6 font-bold text-white"
-                  >
-                    <XIcon size={20} />
-                  </button>
-                  <h2 className="text-xl font-bold mb-2"># {id} </h2>
-                  <div className=" flex justify-between flex-row">
-                    <h3 className="text-sm">Order Details</h3>
-                    <h3 className="text-sm">{formatTimestamp(timestamp)}</h3>
-                  </div>
-                </div>
-                <div className=" w-full p-6">
-                  <div>
-                    <h4 className="text-md font-semibold">Buyer</h4>
-                    <div className="flex items-center justify-between mb-2">
-                      <div>
-                        <p className="text-sm">{buyerName}</p>
-                        <p className="text-sm text-accent">{buyerEmail}</p>
-                        <p className="text-sm">{buyerPhone}</p>
-                      </div>
-                      <button className="text-white">
-                        <PencilIcon size={16} />
-                      </button>
-                    </div>
-                  </div>
-                  <hr className=" bg-white w-full h-px my-3"></hr>
-                  <div className="mb-4 ">
-                    <h1 className="font-bold text-md my-2">Alerts</h1>
-                    <div className="flex flex-col">
-                      <div>
-                        <Alerts orderid={id}></Alerts>
-                      </div>
-                    </div>
-                  </div>
-
-                  <hr className=" bg-white w-full h-px my-3"></hr>
-                  <div>
-                    <h1 className="font-bold text-md my-2">Timeline</h1>
-                    <Timeline data={timeline} />
-                  </div>
-                  {/* <div className="mb-4 ">
-              <h4 className="text-md font-semibold">Products</h4>
-              <div className="space-y-2">
-                {products.map((product, index) => (
-                  <div key={index} className="bg-base-100 rounded flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-semibold">{product.name}</p>
-                      <p className="text-xs">SKU: {product.sku}</p>
-                      <p className="text-xs">Quantity: {product.quantity}</p>
-                      <p className="text-xs">Price: ₱{product.price}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div> */}
-                  <hr className=" bg-white w-full h-px my-3"></hr>
-                  <div className="mb-4">
-                    <h4 className="text-md font-semibold">
-                      Tracking Information
-                    </h4>
-                    <div className="">
-                      <p className="text-sm">Courier: {courierName}</p>
-                      <p className="text-sm">
-                        Tracking Number: {trackingNumber}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="mb-4">
-                    <h4 className="text-md font-semibold">Selling Platform</h4>
-                    <p className="text-sm">{sellingPlatform}</p>
-                  </div>
-                  <div className="mb-4">
-                    <h4 className="text-md font-semibold">
-                      Total Paid: ₱{totalPaid}
-                    </h4>
-
-                    <h3 className="text-xs font-semibold">
-                      Fees: ₱{otherFees}
-                    </h3>
-                  </div>
-                  <div>
-                    <hr className=" bg-white w-full h-px my-3"></hr>
-                    <div>
-                      <h1 className="text-md font-semibold mb-2">Notes</h1>
-                      <div className="relative">
-                        <textarea
-                        value={noteText}
-                        onChange={(e) => setNoteText(e.target.value)}
-                        disabled={!editNotes}
-                        className="h-15 rounded-lg bg-primary bg-opacity-50 w-full p-2 resize-none"
-                      />
-                        <div className="absolute z-20 right-1 top-1 cursor-pointer"  >
-                          {!editNotes && (
-                          <div onClick={() => setEditNotes((prev) => !prev)}>
-                          <PencilIcon
-                          
-                          size={15}
-                          
-                          />
-                          </div>)
-                          }
-                          {editNotes && (
-                            <>
-                          <div className={`${editNotes ? "opacity-100": "opacity-0"}`} onClick={cancelnotes}>
-                          <XCircleFillIcon
-                          
-                          size={15}
-                          
-                        /></div>
-                          <div className={`${editNotes ? "opacity-100": "opacity-0"}`} onClick={savenotes}>
-                          <ArchiveIcon size={15}></ArchiveIcon>
-                          </div> </>) }
-                        </div>
-                      </div>
-                    </div>
-                    <div className="mt-4 tooltip tooltip-right" data-tip="Delete Order Record">
-                      <button className="p-1" onClick={deleterecord} ><TrashIcon className=" text-error"/></button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            ""
-          )}
+          <div className="relative inline-block text-left">
+            <button
+              onClick={() => setOrderDetailsId(id)}
+              className="flex items-center justify-center p-2"
+            >
+              <KebabHorizontalIcon className="rotate-90" />
+            </button>
+          </div>
         </td>
       </tr>
       {showProducts && (
@@ -331,111 +191,3 @@ const TableContents = ({
     </>
   );
 };
-
-const Alerts = (orderid) => {
-  return (
-    <div className="space-y-2">
-      <div className="flex flex-row w-full bg-secondary rounded-lg h-11 items-center">
-        <div className="flex items-center justify-center rounded-full ml-3 w-9 h-9 bg-base-100">
-          <StopIcon size={16} className=" text-warning" />
-        </div>
-        <div className="ml-3 flex flex-col text-xs">
-          <div className=" font-bold">Warning</div>
-          <div>Message</div>
-        </div>
-      </div>
-      <div className="flex flex-row w-full bg-secondary rounded-lg h-11 items-center">
-        <div className="flex items-center justify-center rounded-full ml-3 w-9 h-9 bg-base-100">
-          <BellIcon size={16} className=" text-success" />
-        </div>
-        <div className="ml-3 flex flex-col text-xs">
-          <div className=" font-bold">Notification</div>
-          <div>Warning Message</div>
-        </div>
-      </div>
-      <div className="flex flex-row w-full bg-secondary rounded-lg h-11 items-center">
-        <div className="flex items-center justify-center rounded-full ml-3 w-9 h-9 bg-base-100">
-          <AlertIcon size={16} className=" text-error" />
-        </div>
-        <div className="ml-3 flex flex-col text-xs">
-          <div className=" font-bold">Alert</div>
-          <div>Message</div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const Timeline = ({ data }) => {
-  //const empty = data.length === 0
-  const next_data = data.slice(1);
-
-  return (
-    <ol className="relative mb-3">
-      <li className="ms-4 flex items-center">
-        <div className="flex items-center absolute w-4 h-4 rounded-full -start-[0.425rem]">
-          <CheckCircleFillIcon size={16} className="text-success" />
-        </div>
-        <div className="flex flex-row justify-between w-full">
-          <div className="flex flex-col">
-            <div className="font-bold">{data[0].status}</div>
-            <div className="text-xs">{data[0].details}</div>
-          </div>
-          <div>
-            <div className=" font-medium text-md">
-              {formatTimestamp(data[0].timestamp)}
-            </div>
-          </div>
-        </div>
-      </li>
-      {next_data.map((item,index) => (
-        <div key={index}>
-          <li className="border-s h-8 -mt-1.5" />
-
-          <li className="-mt-1.5 ms-4 flex items-center">
-            <div className="flex items-center absolute w-4 h-4 rounded-full -start-[0.425rem]">
-              <CheckCircleFillIcon size={16} className="text-success" />
-            </div>
-            <div className="flex flex-row justify-between w-full">
-              <div className="flex flex-col">
-                <div className="font-bold">{item.status}</div>
-                <div className="text-xs">{item.details}</div>
-              </div>
-              <div>
-                <div className=" font-medium text-md">
-                  {formatTimestamp(item.timestamp)}
-                </div>
-              </div>
-            </div>
-          </li>
-        </div>
-      ))}
-    </ol>
-  );
-};
-
-{
-  /* <ol class="relative border-s border-gray-200 dark:border-gray-700">                  
-    <li class="mb-10 ms-4">
-        <div class="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -start-1.5 border border-white dark:border-gray-900 dark:bg-gray-700"></div>
-        <time class="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">February 2022</time>
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Application UI code in Tailwind CSS</h3>
-        <p class="mb-4 text-base font-normal text-gray-500 dark:text-gray-400">Get access to over 20+ pages including a dashboard layout, charts, kanban board, calendar, and pre-order E-commerce & Marketing pages.</p>
-        <a href="#" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:outline-none focus:ring-gray-100 focus:text-blue-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700">Learn more <svg class="w-3 h-3 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
-    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
-  </svg></a>
-    </li>
-    <li class="mb-10 ms-4">
-        <div class="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -start-1.5 border border-white dark:border-gray-900 dark:bg-gray-700"></div>
-        <time class="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">March 2022</time>
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Marketing UI design in Figma</h3>
-        <p class="text-base font-normal text-gray-500 dark:text-gray-400">All of the pages and components are first designed in Figma and we keep a parity between the two versions even as we update the project.</p>
-    </li>
-    <li class="ms-4">
-        <div class="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -start-1.5 border border-white dark:border-gray-900 dark:bg-gray-700"></div>
-        <time class="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">April 2022</time>
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">E-Commerce UI code in Tailwind CSS</h3>
-        <p class="text-base font-normal text-gray-500 dark:text-gray-400">Get started with dozens of web components and interactive elements built on top of Tailwind CSS.</p>
-    </li>
-</ol> */
-}

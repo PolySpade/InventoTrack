@@ -4,14 +4,19 @@ import { KebabHorizontalIcon, SearchIcon } from "@primer/octicons-react";
 import EditExpenseForm from "../forms/EditExpenseForm";
 import AddExpenseForm from "../forms/AddExpenseForm";
 
+const ITEMS_PER_PAGE = 10;
+
 const ExpensesTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [addProduct, setAddProduct] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
   const [openEditFormId, setOpenEditFormId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
+    setCurrentPage(1); 
   };
 
   const handleCheckboxChange = (id) => {
@@ -27,8 +32,18 @@ const ExpensesTable = () => {
       item.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  const totalPages = Math.ceil(filteredExpenses.length / ITEMS_PER_PAGE);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
   const expenseToEdit = expenses.find((expense) => expense.id === openEditFormId);
+
+  const currentItems = filteredExpenses.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   return (
     <div className="overflow-x-auto">
@@ -77,7 +92,7 @@ const ExpensesTable = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredExpenses.map((item, index) => (
+          {currentItems.map((item, index) => (
             <TableContents
               key={index}
               {...item}
@@ -91,10 +106,15 @@ const ExpensesTable = () => {
       </table>
       <div className="flex justify-center mt-4">
         <div className="join">
-          <button className="join-item btn btn-active">1</button>
-          <button className="join-item btn">2</button>
-          <button className="join-item btn">3</button>
-          <button className="join-item btn">4</button>
+          {[...Array(totalPages)].map((_, i) => (
+            <button
+              key={i}
+              onClick={() => handlePageChange(i + 1)}
+              className={`join-item btn ${currentPage === i + 1 ? "btn-active" : ""}`}
+            >
+              {i + 1}
+            </button>
+          ))}
         </div>
       </div>
       {openEditFormId && expenseToEdit && (
