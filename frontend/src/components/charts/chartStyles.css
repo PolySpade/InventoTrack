@@ -1,0 +1,26 @@
+/* chartStyles.css */
+
+/* Style the toolbar background and button color */
+.apexcharts-toolbar {
+    @apply p-3;
+}
+
+
+.apexcharts-toolbar svg {
+    @apply text-gray-300;
+}
+
+/* Style the dropdown menu */
+.apexcharts-menu {
+    @apply bg-base-content rounded-md shadow-lg;
+}
+
+/* Style the menu items */
+.apexcharts-menu-item {
+    @apply text-gray-300 p-2 cursor-pointer;
+}
+
+/* Hover effect for menu items */
+.apexcharts-menu-item:hover {
+    @apply bg-teal-500 text-gray-800;
+}

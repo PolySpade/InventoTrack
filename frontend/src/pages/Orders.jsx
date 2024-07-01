@@ -7,7 +7,6 @@ const Orders = () => {
       <div className='m-10 w-full'>
         <OrdersTable />
       </div>
-
     </div>
   )
 }
