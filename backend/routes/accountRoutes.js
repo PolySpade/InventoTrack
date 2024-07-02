@@ -1,7 +1,9 @@
 import mongoose from 'mongoose';
-import express from 'express';
+import express, { request, response } from 'express';
 const router = express.Router();
 import { accountModel } from '../models/accountModel.js';
+import "../strategies/local-strategy.js"; //might just be needed in account routes 
+import passport from 'passport';
 
 // create
 router.post('/CreateAccount', async (req, res) => {
@@ -29,6 +31,26 @@ router.post('/CreateAccount', async (req, res) => {
     }
 });
 
+router.post('/login', passport.authenticate("local"), (req, res) => {
+        res.sendStatus(200);
+    }
+)
+
+router.get('/status',(req, res) =>{ //not sure lang if this should be /status or /login/status -> maybe consider renaming login -> /auth then this to /auth/status
+    console.log('Inside /status');
+    console.log(req.user);
+    console.log(req.session);
+    return req.user ? res.send(req.user) : res.sendStatus(401);
+})
+
+router.post('/logout', (req, res) => {
+    if(!req.user) return res.sendStatus(401);
+    req.logout((err) => {
+        if(err) return res.sendStatus(400);
+        res.send(200);
+    });
+});
+
 // get all accounts
 router.get('/', async (req, res) => {
     try {
@@ -39,6 +61,9 @@ router.get('/', async (req, res) => {
         res.status(500).send({ message: err.message });
     }
 });
+
+
+
 
 // get specific account
 router.get('/:id', async (req, res) => {
@@ -92,17 +117,5 @@ router.delete('/DeleteAccount/:id', async (req, res) => {
 });
 
 
-/*router.post('/login', passport.authenticate('local'), (req, res) => {
-    res.status(200).send({ message: 'Login successful!' });
-});
-
-router.get('/logout', (req, res) => {
-    req.logout();
-    res.status(200).send({ message: 'Logout successful!' });
-});
-
-router.get('/current_user', (req, res) => {
-    res.send(req.user);
-});*/
 
 export default router;

@@ -1,8 +1,13 @@
 import express from 'express';
 import {PORT, mongodbURL} from "./config.js";
 import mongoose from "mongoose";
-//import session from 'express-session';
-//import passport from './config/passport.js';
+
+import cookieParser from 'cookie-parser';
+import session from 'express-session';
+import passport from 'passport';
+import "./strategies/local-strategy.js"; //might just be needed in account routes 
+
+
 
 import warehouseRoutes from './routes/warehouseRoutes.js';
 import productRoutes from './routes/productRoutes.js';
@@ -20,6 +25,23 @@ import expenseRoutes from './routes/expenseRoutes.js';
 import alertRoutes from './routes/alertRoutes.js';
 
 const app = express();
+
+app.use(cookieParser());
+app.use(
+    session({
+        secret: "inventotrack secret",
+        saveUninitialized: false,
+        resave: false,
+        cookie: {
+            maxAge: 60000 * 60 * 24 // cookies lasts for 1 day -> feel free to edit 
+        }
+    })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+
 app.use(express.json());
 
 app.use('/warehouses', warehouseRoutes);
@@ -36,14 +58,6 @@ app.use('/couriers', courierRoutes);
 app.use('/expensesTypes', expensesTypeRoutes);
 app.use('/expenses', expenseRoutes);
 app.use('/alerts', alertRoutes);
-
-/*app.use(session({
-    secret: 'yourSecretKey',
-    resave: false,
-    saveUninitialized: false
-}));
-app.use(passport.initialize());
-app.use(passport.session());*/
 
 
 
