@@ -6,23 +6,24 @@ import axios from "axios"
 
 const Expenses = () => {
   const API_URL = import.meta.env.VITE_API_URL;
-
-  // await axios.post(`${API_URL}/`, {
-    
-
-
-  // })
-
+  const [data, setData] = useState([]);
 
   function getExpenses() {
-    return axios.get(`${API_URL}/expenses/`);
+    axios.get(`${API_URL}/expenses/`).then((response) => {
+      setData(response.data)
+    }).catch((err) => {
+      console.log(err)
+    })
   }
-  console.log(getExpenses())
+  useEffect(() => {
+    getExpenses();
+  }, [])
+
   return (
     <div className='flex flex-row justify-center items-center'>
       <div className='m-10 w-full'>
       
-        <ExpensesTable />
+        <ExpensesTable data={data} />
       </div>
 
     </div>

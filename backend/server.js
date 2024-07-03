@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import passport from 'passport';
+import cors from 'cors';
 import "./strategies/local-strategy.js"; // might just be needed in account routes 
 
 import warehouseRoutes from './routes/warehouseRoutes.js';
@@ -43,6 +44,15 @@ app.use(passport.session());
 
 app.use(express.json());
 
+const corsOptions = {
+    origin: process.env.ORIGIN, 
+    credentials: true, 
+    optionSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
+
+
 app.use('/warehouses', warehouseRoutes);
 app.use('/products', productRoutes);
 app.use('/suppliers', supplierRoutes);
@@ -59,7 +69,11 @@ app.use('/expenses', expenseRoutes);
 app.use('/alerts', alertRoutes);
 
 app.get('/', (req, res) => {
-    res.send('Welcome to the Inventotrack API');
+    try {
+        res.status(200).send('Welcome to the Inventotrack API');
+    } catch (error) {
+        res.status(500).send('An error occurred: ' + error.message);
+    }
 });
 
 mongoose.connect(process.env.DB_URL)

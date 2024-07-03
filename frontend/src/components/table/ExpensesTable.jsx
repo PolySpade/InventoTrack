@@ -1,22 +1,24 @@
 import React, { useState } from "react";
-import { expenses } from "../../constants";
 import { KebabHorizontalIcon, SearchIcon } from "@primer/octicons-react";
 import EditExpenseForm from "../forms/EditExpenseForm";
 import AddExpenseForm from "../forms/AddExpenseForm";
+import { formatTimestamp, formatTimestampDay } from "../../utils";
 
 const ITEMS_PER_PAGE = 10;
 
-const ExpensesTable = () => {
+const ExpensesTable = ({ data }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [addProduct, setAddProduct] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
   const [openEditFormId, setOpenEditFormId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
 
+  const expenses = data;
+  console.log(expenses);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
-    setCurrentPage(1); 
+    setCurrentPage(1);
   };
 
   const handleCheckboxChange = (id) => {
@@ -29,16 +31,17 @@ const ExpensesTable = () => {
 
   const filteredExpenses = expenses.filter(
     (item) =>
-      item.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.expensestype.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
   const totalPages = Math.ceil(filteredExpenses.length / ITEMS_PER_PAGE);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
-  const expenseToEdit = expenses.find((expense) => expense.id === openEditFormId);
+  const expenseToEdit = expenses.find((expense) => expense._id === openEditFormId);
 
   const currentItems = filteredExpenses.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
@@ -48,7 +51,7 @@ const ExpensesTable = () => {
   return (
     <div className="overflow-x-auto">
       <div className="flex items-center justify-center">
-        <SearchIcon size={20} className="text-white mr-3"></SearchIcon>
+        <SearchIcon size={20} className="text-white mr-3" />
         <input
           type="text"
           placeholder="Search..."
@@ -77,10 +80,7 @@ const ExpensesTable = () => {
           <tr className="border-none text-white">
             <th>
               <label>
-                <input
-                  type="checkbox"
-                  className="checkbox checkbox-secondary"
-                />
+                <input type="checkbox" className="checkbox checkbox-secondary" />
               </label>
             </th>
             <th>Date</th>
@@ -92,11 +92,11 @@ const ExpensesTable = () => {
           </tr>
         </thead>
         <tbody>
-          {currentItems.map((item, index) => (
+          {currentItems.map((item) => (
             <TableContents
-              key={index}
+              key={item._id}
               {...item}
-              isChecked={isChecked(item.id)}
+              isChecked={isChecked(item._id)}
               onCheckboxChange={handleCheckboxChange}
               openEditFormId={openEditFormId}
               setOpenEditFormId={setOpenEditFormId}
@@ -118,10 +118,7 @@ const ExpensesTable = () => {
         </div>
       </div>
       {openEditFormId && expenseToEdit && (
-        <EditExpenseForm
-          onClose={() => setOpenEditFormId(null)}
-          {...expenseToEdit}
-        />
+        <EditExpenseForm onClose={() => setOpenEditFormId(null)} {...expenseToEdit} />
       )}
     </div>
   );
@@ -130,19 +127,21 @@ const ExpensesTable = () => {
 export default ExpensesTable;
 
 const TableContents = ({
-  id,
-  date,
+  _id,
+  timestamp,
   amount,
   currency,
-  type,
+  expensestype,
   description,
   isChecked,
   onCheckboxChange,
   openEditFormId,
   setOpenEditFormId,
 }) => {
+
+  timestamp = formatTimestampDay(timestamp);
   const handleEditClick = () => {
-    setOpenEditFormId(openEditFormId === id ? null : id);
+    setOpenEditFormId(openEditFormId === _id ? null : _id);
   };
 
   return (
@@ -153,14 +152,14 @@ const TableContents = ({
             type="checkbox"
             className="checkbox checkbox-secondary"
             checked={isChecked}
-            onChange={() => onCheckboxChange(id)}
+            onChange={() => onCheckboxChange(_id)}
           />
         </label>
       </th>
-      <td>{date}</td>
+      <td>{timestamp}</td>
       <td>{amount}</td>
-      <td>{currency}</td>
-      <td>{type}</td>
+      <td>{currency.name}</td>
+      <td>{expensestype.name}</td>
       <td>{description}</td>
       <td className="relative">
         <button onClick={handleEditClick}>

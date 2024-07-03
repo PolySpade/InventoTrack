@@ -32,7 +32,7 @@ router.post('/CreateExpense', async (req, res) => {
 // read all expenses
 router.get('/', async (req, res) => {
     try {
-        const expenses = await expenseModel.find({})
+        const expenses = await expenseModel.find({}).populate('currency').populate('expensestype');
         return res.status(200).json(expenses);
     } catch (err) {
         console.log(err.message);

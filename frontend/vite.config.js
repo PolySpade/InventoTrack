@@ -12,5 +12,8 @@ export default defineConfig(({ command, mode }) => {
     define: {
       APP_VERSION: JSON.stringify("1.0.0")
     },
+    server: {
+      port: 3000
+    }
   }
 })
