@@ -13,7 +13,7 @@ export default defineConfig(({ command, mode }) => {
       APP_VERSION: JSON.stringify("1.0.0")
     },
     server: {
-      port: 3000
+      port: env.VITE_PORT
     }
   }
 })

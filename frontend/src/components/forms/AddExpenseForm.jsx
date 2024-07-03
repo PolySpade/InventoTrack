@@ -1,12 +1,32 @@
-import { expense_types, currency_types } from '../../constants';
 import { getCurrentDate } from '../../utils';
+import axios from 'axios';
+import { ExpenseContext } from "../../pages/Expenses";
+import { useContext } from 'react';
 
 const AddExpenseForm = ({ onClose }) => {
+  const API_URL = import.meta.env.VITE_API_URL;
+  const { currencies: currency_types, expenseTypes: expense_types } = useContext(ExpenseContext);
 
-  const handleSubmit = (event) => {
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // Add your form submission logic here
-    onClose();
+    const formData = new FormData(event.target);
+    const data = {
+      timestamp: formData.get('date'),
+      amount: formData.get('amount'),
+      currency: formData.get('currency'),
+      expensestype: formData.get('expense_types'),
+      description: formData.get('description')
+    };
+    console.log(data)
+    try {
+      await axios.post(`${API_URL}/CreateExpense`, data);
+
+      onClose();
+    } catch (error) {
+      console.error('Error submitting the form:', error);
+      // Optionally handle the error here, e.g., show an error message to the user
+    }
   };
 
   const handleCancel = () => {
@@ -20,29 +40,29 @@ const AddExpenseForm = ({ onClose }) => {
         <div className='p-1 flex flex-col'>
           <div className='my-2 flex flex-col'>
             <label className='text-xs' htmlFor='date'>Date</label>
-            <input id="date" type="text" placeholder={`MM/DD/YYYY`} defaultValue={`${getCurrentDate()}`} className="input input-bordered w-full max-w-xs" />
+            <input id="date" name="date" type="text" placeholder={`MM/DD/YYYY`} defaultValue={`${getCurrentDate()}`} className="input input-bordered w-full max-w-xs" />
           </div>
           <div className='my-2 flex flex-col'>
             <label className='text-xs' htmlFor='expense_types'>Type</label>
-            <select id="expense_types" className="input input-bordered w-full max-w-xs">
-              <option disabled selected value="">Select a Type</option>
-              {expense_types.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+            <select id="expense_types" name="expense_types" className="input input-bordered w-full max-w-xs" defaultValue="">
+              <option disabled value="">Select a Type</option>
+              {expense_types.map((item) => <option key={item._id} value={item._id}>{item.name}</option>)}
             </select>
           </div>
           <div className='my-2 flex flex-col'>
             <label className='text-xs' htmlFor='currency'>Currency</label>
-            <select id="currency" className="input input-bordered w-full max-w-xs">
-              <option disabled selected value="">Select a Currency</option>
-              {currency_types.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+            <select id="currency" name="currency" className="input input-bordered w-full max-w-xs" defaultValue="">
+              <option disabled value="">Select a Currency</option>
+              {currency_types.map((item) => <option key={item._id} value={item._id}>{item.name}</option>)}
             </select>
           </div>
           <div className='my-2 flex flex-col'>
             <label className='text-xs' htmlFor='amount'>Amount</label>
-            <input id="amount" type="text" placeholder="Type here" className="input input-bordered w-full max-w-xs" />
+            <input id="amount" name="amount" type="text" placeholder="Type here" className="input input-bordered w-full max-w-xs" />
           </div>
           <div className='my-2 flex flex-col'>
             <label className='text-xs' htmlFor='description'>Short Description</label>
-            <input id="description" type="text" placeholder="Type here" className="input input-bordered w-full max-w-xs" />
+            <input id="description" name="description" type="text" placeholder="Type here" className="input input-bordered w-full max-w-xs" />
           </div>
         </div>
 

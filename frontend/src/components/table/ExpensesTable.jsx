@@ -1,20 +1,21 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { KebabHorizontalIcon, SearchIcon } from "@primer/octicons-react";
 import EditExpenseForm from "../forms/EditExpenseForm";
 import AddExpenseForm from "../forms/AddExpenseForm";
-import { formatTimestamp, formatTimestampDay } from "../../utils";
+import { formatTimestampDay } from "../../utils";
+
+import { ExpenseContext } from "../../pages/Expenses";
 
 const ITEMS_PER_PAGE = 10;
 
-const ExpensesTable = ({ data }) => {
+const ExpensesTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [addProduct, setAddProduct] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
   const [openEditFormId, setOpenEditFormId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const expenses = data;
-  console.log(expenses);
+  const { data: expenses } = useContext(ExpenseContext);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -25,6 +26,14 @@ const ExpensesTable = ({ data }) => {
     setCheckedItems((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
+  };
+
+  const handleSelectAll = (event) => {
+    if (event.target.checked) {
+      setCheckedItems(filteredExpenses.map((item) => item._id));
+    } else {
+      setCheckedItems([]);
+    }
   };
 
   const isChecked = (id) => checkedItems.includes(id);
@@ -80,7 +89,12 @@ const ExpensesTable = ({ data }) => {
           <tr className="border-none text-white">
             <th>
               <label>
-                <input type="checkbox" className="checkbox checkbox-secondary" />
+                <input
+                  type="checkbox"
+                  className="checkbox checkbox-secondary"
+                  onChange={handleSelectAll}
+                  checked={checkedItems.length === filteredExpenses.length}
+                />
               </label>
             </th>
             <th>Date</th>
@@ -95,7 +109,7 @@ const ExpensesTable = ({ data }) => {
           {currentItems.map((item) => (
             <TableContents
               key={item._id}
-              {...item}
+              item={item}
               isChecked={isChecked(item._id)}
               onCheckboxChange={handleCheckboxChange}
               openEditFormId={openEditFormId}
@@ -127,19 +141,22 @@ const ExpensesTable = ({ data }) => {
 export default ExpensesTable;
 
 const TableContents = ({
-  _id,
-  timestamp,
-  amount,
-  currency,
-  expensestype,
-  description,
+  item,
   isChecked,
   onCheckboxChange,
   openEditFormId,
   setOpenEditFormId,
 }) => {
+  const {
+    _id,
+    timestamp,
+    amount,
+    currency,
+    expensestype,
+    description,
+  } = item;
 
-  timestamp = formatTimestampDay(timestamp);
+  const formattedTimestamp = formatTimestampDay(timestamp);
   const handleEditClick = () => {
     setOpenEditFormId(openEditFormId === _id ? null : _id);
   };
@@ -156,7 +173,7 @@ const TableContents = ({
           />
         </label>
       </th>
-      <td>{timestamp}</td>
+      <td>{formattedTimestamp}</td>
       <td>{amount}</td>
       <td>{currency.name}</td>
       <td>{expensestype.name}</td>

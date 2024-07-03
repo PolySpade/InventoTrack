@@ -7,15 +7,13 @@ import { expenseModel } from '../models/expenseModel.js';
 router.post('/CreateExpense', async (req, res) => {
     try {
         const { timestamp, amount, currency, expensestype, description } = req.body;
-
         if (!timestamp || !amount || !currency || !expensestype || !description ) {
             return res.status(400).send({ message: "Send all fields!" });
         }
-
         const newExpense = {
             timestamp,
             amount,
-            currency,
+            currency: new mongoose.Types.ObjectId(expensestype),
             expensestype: new mongoose.Types.ObjectId(expensestype),
             description
         };
