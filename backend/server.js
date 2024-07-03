@@ -1,13 +1,10 @@
 import express from 'express';
-import {PORT, mongodbURL} from "./config.js";
+import { config } from 'dotenv';
 import mongoose from "mongoose";
-
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import passport from 'passport';
-import "./strategies/local-strategy.js"; //might just be needed in account routes 
-
-
+import "./strategies/local-strategy.js"; // might just be needed in account routes 
 
 import warehouseRoutes from './routes/warehouseRoutes.js';
 import productRoutes from './routes/productRoutes.js';
@@ -24,23 +21,25 @@ import expensesTypeRoutes from './routes/expensesTypeRoutes.js';
 import expenseRoutes from './routes/expenseRoutes.js';
 import alertRoutes from './routes/alertRoutes.js';
 
+// Load environment variables
+config();
+
 const app = express();
 
 app.use(cookieParser());
 app.use(
     session({
-        secret: "inventotrack secret",
+        secret: process.env.SECRET,
         saveUninitialized: false,
         resave: false,
         cookie: {
-            maxAge: 60000 * 60 * 24 // cookies lasts for 1 day -> feel free to edit 
+            maxAge: 60000 * 60 * 24 // cookies last for 1 day -> feel free to edit 
         }
     })
 );
 
 app.use(passport.initialize());
 app.use(passport.session());
-
 
 app.use(express.json());
 
@@ -59,18 +58,17 @@ app.use('/expensesTypes', expensesTypeRoutes);
 app.use('/expenses', expenseRoutes);
 app.use('/alerts', alertRoutes);
 
-
-
-mongoose.connect(mongodbURL)
-.then(() => {
-    console.log("Connected to InventotrackDB Database");
-    app.listen(PORT, () => {
-        console.log(`PORT ${PORT} is active`);
-    });
-})
-.catch((err) => {
-    console.log(err);
+app.get('/', (req, res) => {
+    res.send('Welcome to the Inventotrack API');
 });
 
-
-
+mongoose.connect(process.env.DB_URL)
+    .then(() => {
+        console.log("Connected to InventotrackDB Database");
+        app.listen(process.env.PORT, () => {
+            console.log(`PORT ${process.env.PORT} is active`);
+        });
+    })
+    .catch((err) => {
+        console.log(err);
+    });

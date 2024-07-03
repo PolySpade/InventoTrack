@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { category, warehouse } from '../../constants';
 
 const AddProductForm = ({ onClose }) => {

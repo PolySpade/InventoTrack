@@ -1,4 +1,4 @@
-import React from 'react'
+
 import OrdersTable from '../components/table/OrdersTable'
 
 const Orders = () => {

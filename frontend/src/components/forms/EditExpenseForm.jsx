@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { expense_types, currency_types } from '../../constants';
 
 const EditExpenseForm = ({ onClose, id, date, amount, currency, type, description }) => {

@@ -1,4 +1,3 @@
-import React from 'react';
 import { expense_types, currency_types } from '../../constants';
 import { getCurrentDate } from '../../utils';
 

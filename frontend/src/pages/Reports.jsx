@@ -1,4 +1,4 @@
-import React from 'react'
+
 import LineChart from '../components/charts/LineChart'
 import SalesChart from '../components/charts/SalesChart'
 
