@@ -13,7 +13,7 @@ router.post('/CreateExpense', async (req, res) => {
         const newExpense = {
             timestamp,
             amount,
-            currency: new mongoose.Types.ObjectId(expensestype),
+            currency: new mongoose.Types.ObjectId(currency),
             expensestype: new mongoose.Types.ObjectId(expensestype),
             description
         };

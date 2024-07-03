@@ -20,9 +20,9 @@ const AddExpenseForm = ({ onClose }) => {
     };
     console.log(data)
     try {
-      await axios.post(`${API_URL}/CreateExpense`, data);
+      await axios.post(`${API_URL}/expenses/CreateExpense`, data);
 
-      onClose();
+      window.location.reload();
     } catch (error) {
       console.error('Error submitting the form:', error);
       // Optionally handle the error here, e.g., show an error message to the user
@@ -55,7 +55,7 @@ const AddExpenseForm = ({ onClose }) => {
               <option disabled value="">Select a Currency</option>
               {currency_types.map((item) => <option key={item._id} value={item._id}>{item.name}</option>)}
             </select>
-          </div>
+          </div>  
           <div className='my-2 flex flex-col'>
             <label className='text-xs' htmlFor='amount'>Amount</label>
             <input id="amount" name="amount" type="text" placeholder="Type here" className="input input-bordered w-full max-w-xs" />
