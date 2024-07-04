@@ -1,22 +1,14 @@
-import React, { useState } from "react";
-import { category, products, warehouse } from "../../constants";
+import React, { useState, useContext } from "react";
+//import { category, warehouse } from "../../constants";
 import { KebabHorizontalIcon, SearchIcon } from "@primer/octicons-react";
 import EditInventoryForm from "../forms/EditInventoryForm";
 import AddProductForm from "../forms/AddProductForm";
 import StockInForm from "../forms/StockInForm";
 import StockOutForm from "../forms/StockOutForm";
+import { InventoryContext } from "../../contexts";
+
 
 const ITEMS_PER_PAGE = 10;
-
-const getCategoryNameById = (id) => {
-  const cat = category.find(category => category.id === id);
-  return cat ? cat.name : 'Unknown Category';
-};
-
-const getWarehouseNameById = (id) => {
-  const ware = warehouse.find(warehouse => warehouse.id === id);
-  return ware ? ware.name : 'Unknown Warehouse';
-};
 
 const InventoryTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -26,6 +18,8 @@ const InventoryTable = () => {
   const [checkedItems, setCheckedItems] = useState([]);
   const [openEditFormId, setOpenEditFormId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+
+  const { inventorydata: products, warehouse, category } = useContext(InventoryContext)
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -174,6 +168,8 @@ const TableContents = ({
   length,
   width,
   height,
+  categoryName,
+  warehouseName,
   quantity,
   isChecked,
   onCheckboxChange,
@@ -183,10 +179,6 @@ const TableContents = ({
   const handleEditClick = () => {
     setOpenEditFormId(openEditFormId === sku ? null : sku);
   };
-
-  const categoryName = getCategoryNameById(category_id);
-  const warehouseName = getWarehouseNameById(warehouse_id);
-
   return (
     <tr className="border-none text-white bg-base-content">
       <th>

@@ -34,8 +34,8 @@ router.post('/AddProduct', async (req, res) => {
 
 // read all products
 router.get('/', async (req, res) => {
-    try {
-        const products = await productModel.find({}).populate('warehouse');
+    try {   
+        const products = await productModel.find({}).populate('warehouse').populate('category');
         return res.status(200).json(products);
     } catch (err) {
         console.log(err.message);
