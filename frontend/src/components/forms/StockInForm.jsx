@@ -1,7 +1,7 @@
 import React, { useState, useContext} from "react";
 import { SearchIcon, XCircleFillIcon } from "@primer/octicons-react";
 import { InventoryContext } from "../../contexts";
-
+//TODO : Finish Stock in Backend
 const StockInForm = ({ onClose }) => {
   const { inventorydata: products, suppliers} = useContext(InventoryContext)
   
