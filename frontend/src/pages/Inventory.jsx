@@ -9,6 +9,7 @@ const Inventory = () => {
   const [inventorydata, setInventorydata] = useState([]);
   const [warehouse, setWarehouse] = useState([]);
   const [category, setCategory] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
 
   const getInventoryData = () => {
     axios.get(`${API_URL}/products/`)
@@ -36,13 +37,23 @@ const Inventory = () => {
       })
   }
 
+  const getSuppliers = () => {
+    axios.get(`${API_URL}/suppliers/`)
+      .then( (response) => {
+        setSuppliers(response.data);
+      }).catch( (err) => {
+        console.log(err);
+      })
+  }
+
   useEffect(() => {
     getCategory();
     getInventoryData();
     getWarehouse();
+    getSuppliers();
   }, []);
   return (
-    <InventoryContext.Provider value={{category,warehouse,inventorydata}}>
+    <InventoryContext.Provider value={{category,warehouse,inventorydata,suppliers}}>
     <div className='flex flex-row justify-center items-center'>
       <div className='m-10 w-full'>
         <InventoryTable />

@@ -8,19 +8,29 @@ router.post('/AddProduct', async (req, res) => {
     try {
         const { name, category, unitCost, weightKG, warehouse, dimensions, stockLeft, sku } = req.body;
 
+        // Validate the presence of all required fields
         if (!name || !category || !unitCost || !weightKG || !warehouse || !dimensions || !dimensions.lengthCM || !dimensions.widthCM || !dimensions.heightCM || !stockLeft || !sku) {
-            return res.status(400).send({ message: "Send all fields!" });
+            return res.status(400).send({ message: "Please provide all required fields!" });
+        }
+
+        // Validate numeric fields
+        if (isNaN(unitCost) || isNaN(weightKG) || isNaN(stockLeft) || isNaN(dimensions.lengthCM) || isNaN(dimensions.widthCM) || isNaN(dimensions.heightCM)) {
+            return res.status(400).send({ message: "Numeric fields must be numbers!" });
         }
 
         const newProduct = {
             sku,
             name,
             category: new mongoose.Types.ObjectId(category),
-            unitCost,
-            weightKG,
+            unitCost: parseFloat(unitCost),
+            weightKG: parseFloat(weightKG),
             warehouse: new mongoose.Types.ObjectId(warehouse),
-            dimensions,
-            stockLeft
+            dimensions: {
+                lengthCM: parseFloat(dimensions.lengthCM),
+                widthCM: parseFloat(dimensions.widthCM),
+                heightCM: parseFloat(dimensions.heightCM)
+            },
+            stockLeft: parseInt(stockLeft, 10)
         };
 
         const product = await productModel.create(newProduct);
@@ -30,7 +40,6 @@ router.post('/AddProduct', async (req, res) => {
         res.status(500).send({ message: err.message });
     }
 });
-
 
 // read all products
 router.get('/', async (req, res) => {
@@ -65,6 +74,7 @@ router.get('/:id', async (req, res) => {
 router.put('/EditProduct/:id', async (req, res) => {
     try {
         const { id } = req.params;
+        console.log(req.body);
         const productToEdit = await productModel.findByIdAndUpdate(id, req.body, {new: true});
 
         if (!productToEdit) {
