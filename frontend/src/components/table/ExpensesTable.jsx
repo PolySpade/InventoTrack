@@ -4,7 +4,7 @@ import EditExpenseForm from "../forms/EditExpenseForm";
 import AddExpenseForm from "../forms/AddExpenseForm";
 import { formatTimestampDay } from "../../utils";
 
-import { ExpenseContext } from "../../pages/Expenses";
+import { ExpenseContext } from "../../contexts";
 
 const ITEMS_PER_PAGE = 10;
 

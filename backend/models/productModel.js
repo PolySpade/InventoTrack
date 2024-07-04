@@ -29,7 +29,7 @@ const productSchema = new mongoose.Schema({
     },
     warehouse: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'warehouse',
+        ref: 'warehouses',
         required: true
     },
     dimensions: {

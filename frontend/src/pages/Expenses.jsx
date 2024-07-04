@@ -1,8 +1,7 @@
-import React, { createContext, useEffect, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import ExpensesTable from '../components/table/ExpensesTable';
 import axios from "axios";
-
-export const ExpenseContext = createContext();
+import { ExpenseContext } from '../contexts';
 
 const Expenses = () => {
   const API_URL = import.meta.env.VITE_API_URL;

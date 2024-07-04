@@ -1,6 +1,6 @@
 import { getCurrentDate } from '../../utils';
 import axios from 'axios';
-import { ExpenseContext } from "../../pages/Expenses";
+import { ExpenseContext } from '../../contexts';
 import { useContext } from 'react';
 
 const AddExpenseForm = ({ onClose }) => {

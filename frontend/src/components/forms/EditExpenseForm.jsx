@@ -1,5 +1,5 @@
 import { formatTimestampDay } from '../../utils';
-import { ExpenseContext } from "../../pages/Expenses";
+import { ExpenseContext } from '../../contexts';
 import { useContext, useState } from 'react';
 import axios from 'axios';
 
