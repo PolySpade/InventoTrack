@@ -5,12 +5,11 @@ import { warehouseModel } from '../models/warehouseModel.js';
 // create
 router.post('/CreateWarehouse', async (req, res) => {
     try {
-        if (!req.body.id || !req.body.name) {
+        if (!req.body.name) {
             return res.status(400).send({message: "Send all fields!",});
         }
 
         const newWarehouse = {
-            id: req.body.id,
             name: req.body.name
         }
 
