@@ -6,19 +6,20 @@ import { orderModel } from '../models/orderModel.js';
 // create
 router.post('/CreateOrder', async (req, res) => {
     try {
-        const {id, timestamp, products, courier, trackingNumber, sellingPlatform, buyer, totalPaid, otherFees, status, timeline, notes} = req.body;
+        const { id, timestamp, products, courierName, trackingNumber, sellingPlatform, buyerName, buyerEmail, buyerPhone, totalPaid, otherFees, status, timeline, notes } = req.body;
 
-        if (!id || !timestamp || products === 0 || !courier || !trackingNumber || !sellingPlatform || !buyer || !totalPaid || !otherFees || !status || !timeline || !notes){
+        if (!id || !timestamp || !products || products.length === 0 || !courierName || !trackingNumber || !sellingPlatform || !buyerName || !buyerEmail || !buyerPhone || !totalPaid || !otherFees || !status || !timeline || !notes){
             return res.status(400).send({ message: "Send all fields!" });
         }
 
         const productObjects = products.map(product => {
-            const { productId, quantity, price } = product;
-            if (!productId || quantity === undefined || !price) {
-                throw new Error('Each product must have productId, quantity, and price');
+            const { productId, name, quantity, price } = product;
+            if (!productId || !name || quantity === undefined || !price) {
+                throw new Error('Each product must have sku, quantity, and price');
             }
             return {
-                productId: new mongoose.Types.ObjectId(productId),
+                productId: new mongoose.Types.ObjectId(productId), 
+                name,
                 quantity,
                 price
             };
@@ -28,16 +29,24 @@ router.post('/CreateOrder', async (req, res) => {
             id,
             timestamp,
             products: productObjects,
-            courier: new mongoose.Types.ObjectId(courier),
+            courier: new mongoose.Types.ObjectId(courier), 
             trackingNumber,
-            sellingPlatform: new mongoose.Types.ObjectId(sellingPlatform),
-            buyer,
+            sellingPlatform: new mongoose.Types.ObjectId(sellingPlatform), 
+            buyer: {
+                buyerName,
+                buyerEmail,
+                buyerPhone
+            },
             totalPaid,
             otherFees,
             status,
-            timeline,
+            timeline: timeline.map(t => ({
+                status: t.status,
+                timestamp: t.timestamp,
+                details: t.details || 'no other details provided'
+            })),
             notes
-        }
+        };
 
         const order = await orderModel.create(newOrder);
         return res.status(201).send(order);
@@ -46,6 +55,7 @@ router.post('/CreateOrder', async (req, res) => {
         res.status(500).send({ message: err.message });
     }
 });
+
 
 // get all orders
 router.get('/', async (req, res) => {

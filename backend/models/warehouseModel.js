@@ -1,14 +1,14 @@
 import mongoose from 'mongoose';
 
 const warehouseSchema = new mongoose.Schema({
-    name: {
-        type: String,
+    id: {
+        type: Number,
         required: true
-    }, 
-    address: {
+    },
+    name: {
         type: String,
         required: true
     }
 });
 
-export const warehouseModel = mongoose.model("warehouse", warehouseSchema);
+export const warehouseModel = mongoose.model("warehouses", warehouseSchema);
