@@ -1,10 +1,10 @@
 import express from 'express';
 import { productModel as Product } from '../models/productModel.js';
-import { supplierModel as Supplier } from '../models/supplierModel.js'; // Ensure you have this model
+import { supplierModel as Supplier } from '../models/supplierModel.js';
 
 const router = express.Router();
 
-router.post('/stockIn', async (req, res) => {
+router.put('/stockIn', async (req, res) => {
     try {
         const { supplierName, products } = req.body;
         
@@ -24,11 +24,7 @@ router.post('/stockIn', async (req, res) => {
                 return res.status(400).json({ message: "SKU and a valid quantity are required for each product" });
             }
 
-            const updateResult = await Product.updateOne({ SKU }, { $inc: { quantity } });
-
-            if (updateResult.nModified === 0) {
-                return res.status(404).json({ message: `Product with SKU ${SKU} not found` });
-            }
+            await Product.updateOne({ SKU }, { $inc: { quantity } });
         }
 
         res.status(200).json({ message: "Stock in successful" });
