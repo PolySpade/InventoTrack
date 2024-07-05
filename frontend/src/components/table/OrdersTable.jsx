@@ -55,12 +55,22 @@ const OrdersTable = () => {
           className="input input-bordered text-white bg-neutral w-full max-w-lg"
         />
       </div>
+      <div className="flex justify-start flex-row">
       <button
         onClick={() => setAddOrder((prev) => !prev)}
-        className="btn text-white bg-secondary border-none mb-4"
+        className="btn text-white bg-secondary border-none"
       >
         Create Order
       </button>
+      <div className="dropdown dropdown-bottom ml-3">
+        <label tabIndex={0} className="btn text-white">Filter Orders</label>
+        <ul tabIndex={0} className="dropdown-content text-white z-[1] menu p-2 shadow bg-neutral rounded-box w-52">
+          <li><a>Item 1</a></li>
+          <li><a>Item 2</a></li>
+        </ul>
+      </div>
+
+      </div>
       {addOrder && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
           <div

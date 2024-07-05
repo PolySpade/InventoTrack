@@ -40,7 +40,8 @@ const orderSchema = new mongoose.Schema({
     },
     trackingNumber: { 
       type: String, 
-      required: true 
+      required: true,
+      unique: true
     },
     sellingPlatform: {
       type: mongoose.Schema.Types.ObjectId, 
