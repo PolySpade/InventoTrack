@@ -21,6 +21,9 @@ import courierRoutes from './routes/courierRoutes.js';
 import expensesTypeRoutes from './routes/expensesTypeRoutes.js';
 import expenseRoutes from './routes/expenseRoutes.js';
 import alertRoutes from './routes/alertRoutes.js';
+// stock in & stock out
+import stockIn from './buttonFunc/stockIn.js';
+import stockOut from './buttonFunc/stockOut.js';
 
 // Load environment variables
 config();
@@ -67,6 +70,9 @@ app.use('/couriers', courierRoutes);
 app.use('/expensesTypes', expensesTypeRoutes);
 app.use('/expenses', expenseRoutes);
 app.use('/alerts', alertRoutes);
+// stock in & stock out
+app.use('/stockIn', stockIn);
+app.use('/stockOut', stockOut);
 
 app.get('/', (req, res) => {
     try {
