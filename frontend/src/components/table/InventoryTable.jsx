@@ -1,22 +1,14 @@
-import React, { useState } from "react";
-import { category, products, warehouse } from "../../constants";
+import React, { useState, useContext } from "react";
+//import { category, warehouse } from "../../constants";
 import { KebabHorizontalIcon, SearchIcon } from "@primer/octicons-react";
-import EditInventoryForm from "../forms/EditInventoryForm";
+import EditProductForm from "../forms/EditProductForm";
 import AddProductForm from "../forms/AddProductForm";
 import StockInForm from "../forms/StockInForm";
 import StockOutForm from "../forms/StockOutForm";
+import { InventoryContext } from "../../contexts";
+
 
 const ITEMS_PER_PAGE = 10;
-
-const getCategoryNameById = (id) => {
-  const cat = category.find(category => category.id === id);
-  return cat ? cat.name : 'Unknown Category';
-};
-
-const getWarehouseNameById = (id) => {
-  const ware = warehouse.find(warehouse => warehouse.id === id);
-  return ware ? ware.name : 'Unknown Warehouse';
-};
 
 const InventoryTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -26,6 +18,8 @@ const InventoryTable = () => {
   const [checkedItems, setCheckedItems] = useState([]);
   const [openEditFormId, setOpenEditFormId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+
+  const { inventorydata: products, warehouse, category } = useContext(InventoryContext)
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -46,6 +40,9 @@ const InventoryTable = () => {
   );
 
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+
+  const productToEdit = products.find((product) => product._id === openEditFormId);
+
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -125,7 +122,7 @@ const InventoryTable = () => {
           {currentItems.map((item, index) => (
             <TableContents
               key={index}
-              {...item}
+              item={item}
               isChecked={isChecked(item.sku)}
               onCheckboxChange={handleCheckboxChange}
               openEditFormId={openEditFormId}
@@ -150,11 +147,11 @@ const InventoryTable = () => {
         </div>
       </div>
 
-      {openEditFormId && (
+      {openEditFormId && productToEdit && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
           <div className="fixed inset-0 bg-black opacity-50" onClick={() => setOpenEditFormId(null)}></div>
           <div className="rounded shadow-lg z-10 bg-neutral">
-            <EditInventoryForm onClose={() => setOpenEditFormId(null)} />
+            <EditProductForm onClose={() => setOpenEditFormId(null)} item={productToEdit}  />
           </div>
         </div>
       )}
@@ -165,28 +162,28 @@ const InventoryTable = () => {
 export default InventoryTable;
 
 const TableContents = ({
-  sku,
-  name,
-  category_id,
-  cost,
-  weight,
-  warehouse_id,
-  length,
-  width,
-  height,
-  quantity,
+  item,
   isChecked,
   onCheckboxChange,
   openEditFormId,
   setOpenEditFormId,
 }) => {
+  
+  const {
+    _id,
+    sku,
+    name,
+    category,
+    unitCost: cost,
+    weightKG: weight,
+    warehouse,
+    dimensions,
+    stockLeft: quantity
+  } = item;
+
   const handleEditClick = () => {
-    setOpenEditFormId(openEditFormId === sku ? null : sku);
+    setOpenEditFormId(openEditFormId === _id ? null : _id);
   };
-
-  const categoryName = getCategoryNameById(category_id);
-  const warehouseName = getWarehouseNameById(warehouse_id);
-
   return (
     <tr className="border-none text-white bg-base-content">
       <th>
@@ -195,22 +192,22 @@ const TableContents = ({
             type="checkbox"
             className="checkbox checkbox-secondary"
             checked={isChecked}
-            onChange={() => onCheckboxChange(sku)}
+            onChange={() => onCheckboxChange(_id)}
           />
         </label>
       </th>
       <td>{sku}</td>
       <td>{name}</td>
-      <td>{categoryName}</td>
+      <td>{category.name}</td>
       <td>₱{cost}</td>
       <td>{weight} kg</td>
-      <td>{warehouseName}</td>
+      <td>{warehouse.name}</td>
       <td>
-        <span>{length}</span>
+        <span>{dimensions.lengthCM}</span>
         <span> x </span>
-        <span>{width}</span>
+        <span>{dimensions.widthCM}</span>
         <span> x </span>
-        <span>{height}</span>
+        <span>{dimensions.heightCM}</span>
         <span> cm</span>
       </td>
       <td>{quantity}</td>

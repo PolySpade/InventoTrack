@@ -6,9 +6,9 @@ import { orderModel } from '../models/orderModel.js';
 // create
 router.post('/CreateOrder', async (req, res) => {
     try {
-        const { id, timestamp, products, courierName, trackingNumber, sellingPlatform, buyerName, buyerEmail, buyerPhone, totalPaid, otherFees, status, timeline, notes } = req.body;
+        const { id, timestamp, products, courier, trackingNumber, sellingPlatform, buyerName, buyerEmail, buyerPhone, totalPaid, otherFees, status, timeline, notes } = req.body;
 
-        if (!id || !timestamp || !products || products.length === 0 || !courierName || !trackingNumber || !sellingPlatform || !buyerName || !buyerEmail || !buyerPhone || !totalPaid || !otherFees || !status || !timeline || !notes){
+        if (!id || !timestamp || !products || products.length === 0 || !courier || !trackingNumber || !sellingPlatform || !buyerName || !buyerEmail || !totalPaid || !otherFees || !status || !timeline || !notes) {
             return res.status(400).send({ message: "Send all fields!" });
         }
 
@@ -56,11 +56,10 @@ router.post('/CreateOrder', async (req, res) => {
     }
 });
 
-
 // get all orders
 router.get('/', async (req, res) => {
     try {
-        const orders = await orderModel.find({});
+        const orders = await orderModel.find({}).populate('courier').populate('sellingPlatform');
         return res.status(200).json(orders);
     } catch (err) {
         console.log(err.message);
@@ -71,10 +70,10 @@ router.get('/', async (req, res) => {
 // get a specific order
 router.get('/:id', async (req, res) => {
     try {
-        const {id} = req.params;
+        const { id } = req.params;
         const order = await orderModel.findById(id);
 
-        if (!order){
+        if (!order) {
             return res.status(404).send({ message: "Order not found" });
         }
 
@@ -88,14 +87,47 @@ router.get('/:id', async (req, res) => {
 // edit
 router.put('/EditOrder/:id', async (req, res) => {
     try {
-        const {id} = req.params;
-        const orderToEdit = await orderModel.findByIdAndUpdate(id, req.body);
+        const { id } = req.params;
+        const { products, courier, sellingPlatform, timeline } = req.body;
 
-        if (!orderToEdit){
+        if (products) {
+            req.body.products = products.map(product => {
+                const { productId, name, quantity, price } = product;
+                if (!productId || !name || quantity === undefined || !price) {
+                    throw new Error('Each product must have productId, name, quantity, and price');
+                }
+                return {
+                    productId: new mongoose.Types.ObjectId(productId), 
+                    name,
+                    quantity,
+                    price
+                };
+            });
+        }
+
+        if (courier) {
+            req.body.courier = new mongoose.Types.ObjectId(courier);
+        }
+
+        if (sellingPlatform) {
+            req.body.sellingPlatform = new mongoose.Types.ObjectId(sellingPlatform);
+        }
+
+        if (timeline) {
+            req.body.timeline = timeline.map(t => ({
+                status: t.status,
+                timestamp: t.timestamp,
+                details: t.details || 'no other details provided'
+            }));
+        }
+
+        const orderToEdit = await orderModel.findByIdAndUpdate(id, req.body, { new: true });
+
+        if (!orderToEdit) {
             return res.status(404).send({ message: "Order not found" });
         }
 
-        return res.status(200).send({message: "Update Successful!"});
+        return res.status(200).send({ message: "Update Successful!", order: orderToEdit });
     } catch (err) {
         console.log(err.message);
         res.status(500).send({ message: err.message });
@@ -105,10 +137,10 @@ router.put('/EditOrder/:id', async (req, res) => {
 // delete
 router.delete('/DeleteOrder/:id', async (req, res) => {
     try {
-        const {id} = req.params;
+        const { id } = req.params;
         const orderToDelete = await orderModel.findByIdAndDelete(id);
 
-        if (!orderToDelete){
+        if (!orderToDelete) {
             return res.status(404).json({ message: "Order not found!" });
         }
 

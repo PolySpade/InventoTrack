@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-import { products,supplier } from "../../constants";
+import React, { useState, useContext} from "react";
 import { SearchIcon, XCircleFillIcon } from "@primer/octicons-react";
-
+import { InventoryContext } from "../../contexts";
+//TODO : Finish Stock in Backend
 const StockInForm = ({ onClose }) => {
+  const { inventorydata: products, suppliers} = useContext(InventoryContext)
   
   const [searchTerm, setSearchTerm] = useState("");
   const [additembox, setAdditembox] = useState(false);
@@ -64,8 +65,8 @@ const StockInForm = ({ onClose }) => {
                 <option disabled selected value="">
                   Select a supplier
                 </option>
-                {supplier.map((item) => (
-                  <option key={item.id} value={item.id}>
+                {suppliers.map((item) => (
+                  <option key={item._id} value={item._id}>
                     {item.supplierName}
                   </option>
                 ))}
@@ -209,12 +210,12 @@ const SearchContents = ({ sku, name, isChecked, onCheckboxChange }) => {
     );
   };
 
-  const TableContents = ({ sku, name, quantity, isChecked, onCheckboxChange }) => {
+  const TableContents = ({ sku, name, stockLeft, isChecked, onCheckboxChange }) => {
     return (
       <tr>
         <td>{sku}</td>
         <td>{name}</td>
-        <td>{quantity}</td>
+        <td>{stockLeft}</td>
         <td>
           <input
             type="number"

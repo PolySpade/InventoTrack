@@ -1,8 +1,10 @@
-import React, { useState } from "react";
-import { products } from "../../constants";
+import React, { useState, useContext } from "react";
+//import { products } from "../../constants";
 import { SearchIcon, XCircleFillIcon } from "@primer/octicons-react";
+import { InventoryContext } from "../../contexts";
 
 const StockOutForm = ({ onClose }) => {
+  const { inventorydata: products} = useContext(InventoryContext)
   
   const [searchTerm, setSearchTerm] = useState("");
   const [additembox, setAdditembox] = useState(false);
@@ -174,9 +176,7 @@ const SearchContents = ({ sku, name, isChecked, onCheckboxChange }) => {
     return (
       <tr>
         <td>{sku}</td>
-        <td>{name}</td>
-
-  
+        <td>{name}</td>  
         <th>
           <label>
             <input
@@ -191,12 +191,12 @@ const SearchContents = ({ sku, name, isChecked, onCheckboxChange }) => {
     );
   };
 
-  const TableContents = ({ sku, name, quantity, isChecked, onCheckboxChange }) => {
+  const TableContents = ({ sku, name, stockLeft, isChecked, onCheckboxChange }) => {
     return (
       <tr>
         <td>{sku}</td>
         <td>{name}</td>
-        <td>{quantity}</td>
+        <td>{stockLeft}</td>
         <td>
           <input
             type="number"
