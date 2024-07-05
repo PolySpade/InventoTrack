@@ -7,21 +7,17 @@ router.post('/stockOut', async (req, res) => {
     try {
         const { reason, products } = req.body;
 
-        // Validate input
         if (!reason || !products || !Array.isArray(products)) {
             return res.status(400).json({ message: "All fields are required" });
         }
 
-        // Iterate over the products
         for (let product of products) {
             const { SKU, quantity } = product;
 
-            // Validate SKU and quantity
             if (!SKU || typeof quantity !== 'number' || quantity <= 0) {
                 return res.status(400).json({ message: "SKU and a valid quantity are required for each product" });
             }
 
-            // Check if product exists and has sufficient stock
             const productDoc = await Product.findOne({ SKU });
             if (!productDoc) {
                 return res.status(404).json({ message: `Product with SKU ${SKU} not found` });
@@ -31,7 +27,6 @@ router.post('/stockOut', async (req, res) => {
                 return res.status(400).json({ message: `Insufficient stock for SKU ${SKU}` });
             }
 
-            // Update product quantity
             await Product.updateOne({ SKU }, { $inc: { quantity: -quantity } });
         }
 
