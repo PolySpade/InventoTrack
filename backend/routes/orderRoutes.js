@@ -59,7 +59,11 @@ router.post('/CreateOrder', async (req, res) => {
 // get all orders
 router.get('/', async (req, res) => {
     try {
-        const orders = await orderModel.find({}).populate('courier').populate('sellingPlatform');
+        const orders = await orderModel.find({}).populate('courier').populate('sellingPlatform').populate({
+            path: 'products.productId',
+            model: 'products',
+            select: 'sku'
+        });
         return res.status(200).json(orders);
     } catch (err) {
         console.log(err.message);

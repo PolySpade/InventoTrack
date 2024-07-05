@@ -1,5 +1,3 @@
-// src/components/EditOrderForm.js
-
 import React, { useState } from "react";
 import {
   XIcon,
@@ -10,18 +8,15 @@ import {
   AlertIcon,
   BellIcon,
   StopIcon,
-  CheckCircleFillIcon
+  CheckCircleFillIcon,
 } from "@primer/octicons-react";
 import { formatTimestamp } from "../../utils";
 
-
-
 const EditOrderForm = ({
+  _id,
   id,
-  buyerName,
-  buyerEmail,
-  buyerPhone,
-  courierName,
+  buyer,
+  courier,
   trackingNumber,
   sellingPlatform,
   status,
@@ -38,6 +33,7 @@ const EditOrderForm = ({
 
   const saveNotes = () => {
     setEditNotes(false);
+    // Add logic to save the updated notes
   };
 
   const cancelNotes = () => {
@@ -46,7 +42,7 @@ const EditOrderForm = ({
   };
 
   return (
-    <div className={`fixed inset-4 flex items-center justify-end z-50`}>
+    <div className="fixed inset-4 flex items-center justify-end z-50">
       <div
         className="fixed inset-0 bg-black opacity-50 z-0"
         onClick={onClose}
@@ -70,9 +66,9 @@ const EditOrderForm = ({
             <h4 className="text-md font-semibold">Buyer</h4>
             <div className="flex items-center justify-between mb-2">
               <div>
-                <p className="text-sm">{buyerName}</p>
-                <p className="text-sm text-accent">{buyerEmail}</p>
-                <p className="text-sm">{buyerPhone}</p>
+                <p className="text-sm">{buyer.buyerName}</p>
+                <p className="text-sm text-accent">{buyer.buyerEmail}</p>
+                <p className="text-sm">{buyer.buyerPhone}</p>
               </div>
               <button className="text-white">
                 <PencilIcon size={16} />
@@ -93,13 +89,13 @@ const EditOrderForm = ({
           <div className="mb-4">
             <h4 className="text-md font-semibold">Tracking Information</h4>
             <div>
-              <p className="text-sm">Courier: {courierName}</p>
+              <p className="text-sm">Courier: {courier.name}</p>
               <p className="text-sm">Tracking Number: {trackingNumber}</p>
             </div>
           </div>
           <div className="mb-4">
             <h4 className="text-md font-semibold">Selling Platform</h4>
-            <p className="text-sm">{sellingPlatform}</p>
+            <p className="text-sm">{sellingPlatform.name}</p>
           </div>
           <div className="mb-4">
             <h4 className="text-md font-semibold">
@@ -158,81 +154,63 @@ const EditOrderForm = ({
 export default EditOrderForm;
 
 const Alerts = ({ orderid }) => {
-    return (
-      <div className="space-y-2">
-        <div className="flex flex-row w-full bg-secondary rounded-lg h-11 items-center">
-          <div className="flex items-center justify-center rounded-full ml-3 w-9 h-9 bg-base-100">
-            <StopIcon size={16} className="text-warning" />
-          </div>
-          <div className="ml-3 flex flex-col text-xs">
-            <div className="font-bold">Warning</div>
-            <div>Message</div>
-          </div>
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-row w-full bg-secondary rounded-lg h-11 items-center">
+        <div className="flex items-center justify-center rounded-full ml-3 w-9 h-9 bg-base-100">
+          <StopIcon size={16} className="text-warning" />
         </div>
-        <div className="flex flex-row w-full bg-secondary rounded-lg h-11 items-center">
-          <div className="flex items-center justify-center rounded-full ml-3 w-9 h-9 bg-base-100">
-            <BellIcon size={16} className="text-success" />
-          </div>
-          <div className="ml-3 flex flex-col text-xs">
-            <div className="font-bold">Notification</div>
-            <div>Warning Message</div>
-          </div>
-        </div>
-        <div className="flex flex-row w-full bg-secondary rounded-lg h-11 items-center">
-          <div className="flex items-center justify-center rounded-full ml-3 w-9 h-9 bg-base-100">
-            <AlertIcon size={16} className="text-error" />
-          </div>
-          <div className="ml-3 flex flex-col text-xs">
-            <div className="font-bold">Alert</div>
-            <div>Message</div>
-          </div>
+        <div className="ml-3 flex flex-col text-xs">
+          <div className="font-bold">Warning</div>
+          <div>Message</div>
         </div>
       </div>
-    );
-  };
+      <div className="flex flex-row w-full bg-secondary rounded-lg h-11 items-center">
+        <div className="flex items-center justify-center rounded-full ml-3 w-9 h-9 bg-base-100">
+          <BellIcon size={16} className="text-success" />
+        </div>
+        <div className="ml-3 flex flex-col text-xs">
+          <div className="font-bold">Notification</div>
+          <div>Warning Message</div>
+        </div>
+      </div>
+      <div className="flex flex-row w-full bg-secondary rounded-lg h-11 items-center">
+        <div className="flex items-center justify-center rounded-full ml-3 w-9 h-9 bg-base-100">
+          <AlertIcon size={16} className="text-error" />
+        </div>
+        <div className="ml-3 flex flex-col text-xs">
+          <div className="font-bold">Alert</div>
+          <div>Message</div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
-  const Timeline = ({ data }) => {
-    const nextData = data.slice(1);
-  
-    return (
-      <ol className="relative mb-3">
-        <li className="ms-4 flex items-center">
-          <div className="flex items-center absolute w-4 h-4 rounded-full -start-[0.425rem]">
-            <CheckCircleFillIcon size={16} className="text-success" />
-          </div>
-          <div className="flex flex-row justify-between w-full">
-            <div className="flex flex-col">
-              <div className="font-bold">{data[0].status}</div>
-              <div className="text-xs">{data[0].details}</div>
+const Timeline = ({ data }) => {
+  return (
+    <ol className="relative mb-3">
+      {data.map((item, index) => (
+        <div key={index}>
+          <li className="ms-4 flex items-center">
+            <div className="flex items-center absolute w-4 h-4 rounded-full -start-[0.425rem]">
+              <CheckCircleFillIcon size={16} className="text-success" />
             </div>
-            <div>
-              <div className="font-medium text-md">
-                {formatTimestamp(data[0].timestamp)}
+            <div className="flex flex-row justify-between w-full">
+              <div className="flex flex-col">
+                <div className="font-bold">{item.status}</div>
+                <div className=" text-xs">{item.details}</div>
               </div>
-            </div>
-          </div>
-        </li>
-        {nextData.map((item, index) => (
-          <div key={index}>
-            <li className="border-s h-8 -mt-1.5" />
-            <li className="-mt-1.5 ms-4 flex items-center">
-              <div className="flex items-center absolute w-4 h-4 rounded-full -start-[0.425rem]">
-                <CheckCircleFillIcon size={16} className="text-success" />
-              </div>
-              <div className="flex flex-row justify-between w-full">
-                <div className="flex flex-col">
-                  <div className="font-bold">{item.status}</div>
-                  <div className="text-xs">{item.details}</div>
-                </div>
-                <div>
-                  <div className="font-medium text-md">
-                    {formatTimestamp(item.timestamp)}
-                  </div>
+              <div>
+                <div className="font-medium text-sm">
+                  {formatTimestamp(item.timestamp)}
                 </div>
               </div>
-            </li>
-          </div>
-        ))}
-      </ol>
-    );
-  };
+            </div>
+          </li>
+          {index < data.length - 1 && <li className="border-s h-8 -mt-1.5" />}
+        </div>
+      ))}
+    </ol>
+  );
+};

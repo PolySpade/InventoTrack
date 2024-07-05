@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { courier, salesplatform } from "../../constants";
-import { products } from "../../constants";
+//import { products } from "../../constants";
 import { SearchIcon, XCircleFillIcon } from "@primer/octicons-react";
+import { OrdersContext } from "../../contexts";
 
 const AddOrderForm =  ({onClose}) => {
+  const {couriers, salesplatforms, products} = useContext(OrdersContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [additembox, setAdditembox] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
@@ -57,9 +58,6 @@ const AddOrderForm =  ({onClose}) => {
     setTotalPrice(total - fees);
   };
 
-  //console.log(checkedProducts.map((item) => `${document.getElementById(`${item.sku}-price`).value}`));
-
-  //TODO add total price , add confirm
   return (
     <div className="flex flex-row overflow-y-auto min-w-full bg-neutral rounded shadow-lg text-white">
       <form
@@ -82,24 +80,16 @@ const AddOrderForm =  ({onClose}) => {
                   className="input input-bordered w-full"
                 />
               </div>
-
-              {/* <div className='my-2 flex flex-col'>
-                  <label className='text-xs' htmlFor='category'>Category</label>
-                  <select id="category" className="input input-bordered  w-full max-w-xs">
-                    <option value="">Select a warehouse</option>
-                    <option value="warehouse-a">Warehouse A</option>
-                  </select>
-            </div> */}
             </div>
             <div className="flex flex-row justify-start">
               <div className="my-2 mr-2 flex flex-col">
-                <label className="text-xs" htmlFor="courier">
+                <label className="text-xs" htmlFor="couriers">
                   Courier
                 </label>
-                <select id="courier" className="input input-bordered">
+                <select id="couriers" className="input input-bordered">
                   <option value="">Select a Courier</option>
-                  {courier.map((item) => (
-                    <option key={item.id} value={item.id}>
+                  {couriers.map((item) => (
+                    <option key={item._id} value={item._id}>
                       {item.name}
                     </option>
                   ))}
@@ -118,16 +108,16 @@ const AddOrderForm =  ({onClose}) => {
               </div>
             </div>
             <div className="my-2 flex flex-col">
-              <label className="text-xs" htmlFor="salesplatform">
+              <label className="text-xs" htmlFor="salesplatforms">
                 Sales Platform
               </label>
               <select
-                id="salesplatform"
+                id="salesplatforms"
                 className="input input-bordered w-full"
               >
                 <option value="">Select a Platform</option>
-                {salesplatform.map((item) => (
-                  <option id={item.id}>{item.name}</option>
+                {salesplatforms.map((item) => (
+                  <option key={item._id} value={item._id}>{item.name}</option>
                 ))}
               </select>
             </div>
@@ -224,25 +214,14 @@ const AddOrderForm =  ({onClose}) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredProducts.map((item, index) => (
+                    {filteredProducts.map((item) => (
                       <SearchContents
-                        key={index}
+                        key={item.sku}
                         {...item}
                         isChecked={isChecked(item.sku)}
                         onCheckboxChange={handleCheckboxChange}
                       />
                     ))}
-                    {/* row 1 */}
-                    {/* <tr>
-                    <th>GB</th>
-                    <td>Gameboy</td>
-                    <td>
-                      <input
-                        type="checkbox"
-                        className="checkbox checkbox-secondary"
-                      />
-                    </td>
-                  </tr> */}
                   </tbody>
                 </table>
               </div>
@@ -276,9 +255,9 @@ const AddOrderForm =  ({onClose}) => {
                   </thead>
                   <tbody className=" max-h-96 overflow-x-hidden overflow-y-auto">
                     {/* row 1 */}
-                    {checkedProducts.map((item, index) => (
+                    {checkedProducts.map((item) => (
                       <TableContents
-                        key={index}
+                        key={item.sku}
                         {...item}
                         isChecked={isChecked(item.sku)}
                         onCheckboxChange={handleCheckboxChange}
@@ -318,7 +297,6 @@ const SearchContents = ({ sku, name, isChecked, onCheckboxChange }) => {
     <tr>
       <td>{sku}</td>
       <td>{name}</td>
-
       <th>
         <label>
           <input

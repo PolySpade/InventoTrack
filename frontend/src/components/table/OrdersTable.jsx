@@ -1,31 +1,45 @@
-
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { SearchIcon, KebabHorizontalIcon } from "@primer/octicons-react";
-import { orders } from "../../constants";
 import AddOrderForm from "../forms/AddOrderForm";
 import EditOrderForm from "../forms/EditOrderForm";
+import { OrdersContext } from "../../contexts";
 
 const ITEMS_PER_PAGE = 10;
 
 const OrdersTable = () => {
+  const { ordersData: orders } = useContext(OrdersContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [addOrder, setAddOrder] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [orderDetailsId, setOrderDetailsId] = useState(null);
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filterDate, setFilterDate] = useState("");
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
     setCurrentPage(1); // Reset to first page on search
   };
 
+  const handleStatusFilterChange = (status) => {
+    setFilterStatus(status);
+    setCurrentPage(1); // Reset to first page on filter change
+  };
+
+  const handleDateFilterChange = (event) => {
+    setFilterDate(event.target.value);
+    setCurrentPage(1); // Reset to first page on filter change
+  };
+
   const filteredOrders = orders.filter(
     (order) =>
-      order.products.some((product) =>
+      (filterStatus ? order.status === filterStatus : true) &&
+      (filterDate ? new Date(order.timestamp).toISOString().split('T')[0] === filterDate : true) &&
+      (order.products.some((product) =>
         product.name.toLowerCase().includes(searchTerm.toLowerCase())
       ) ||
-      order.courierName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.courier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.trackingNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.sellingPlatform.toLowerCase().includes(searchTerm.toLowerCase())
+      order.sellingPlatform.name.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const totalPages = Math.ceil(filteredOrders.length / ITEMS_PER_PAGE);
@@ -44,7 +58,7 @@ const OrdersTable = () => {
   };
 
   return (
-    <div className="overflow-x-auto overflow-y-hidden">
+    <div className="overflow-x-auto overflow-y-hidden min-h-96">
       <div className="flex items-center justify-center mb-4">
         <SearchIcon size={20} className="text-white mr-3" />
         <input
@@ -56,20 +70,30 @@ const OrdersTable = () => {
         />
       </div>
       <div className="flex justify-start flex-row">
-      <button
-        onClick={() => setAddOrder((prev) => !prev)}
-        className="btn text-white bg-secondary border-none"
-      >
-        Create Order
-      </button>
-      <div className="dropdown dropdown-bottom ml-3">
-        <label tabIndex={0} className="btn text-white">Filter Orders</label>
-        <ul tabIndex={0} className="dropdown-content text-white z-[1] menu p-2 shadow bg-neutral rounded-box w-52">
-          <li><a>Item 1</a></li>
-          <li><a>Item 2</a></li>
-        </ul>
-      </div>
-
+        <button
+          onClick={() => setAddOrder((prev) => !prev)}
+          className="btn text-white bg-secondary border-none"
+        >
+          Create Order
+        </button>
+        <div className="dropdown dropdown-bottom ml-3">
+          <label tabIndex={0} className="btn text-white">Filter Status</label>
+          <ul tabIndex={0} className="dropdown-content text-white z-10 menu p-2 shadow bg-neutral rounded-box w-52">
+            <li><a onClick={() => handleStatusFilterChange("")}>All</a></li>
+            <li><a onClick={() => handleStatusFilterChange("Processing")}>Processing</a></li>
+            <li><a onClick={() => handleStatusFilterChange("Shipped")}>Shipped</a></li>
+            <li><a onClick={() => handleStatusFilterChange("Completed")}>Completed</a></li>
+            <li><a onClick={() => handleStatusFilterChange("Returned")}>Returned</a></li>
+          </ul>
+        </div>
+        <div className="ml-3">
+          <input
+            type="date"
+            value={filterDate}
+            onChange={handleDateFilterChange}
+            className="input input-bordered text-white bg-neutral"
+          />
+        </div>
       </div>
       {addOrder && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
@@ -99,7 +123,7 @@ const OrdersTable = () => {
         <tbody>
           {currentItems.map((order) => (
             <TableContents
-              key={order.id}
+              key={order._id}
               {...order}
               setOrderDetailsId={setOrderDetailsId}
             />
@@ -121,7 +145,7 @@ const OrdersTable = () => {
       </div>
       {orderDetailsId && (
         <EditOrderForm
-          {...orders.find((order) => order.id === orderDetailsId)}
+          {...orders.find((order) => order._id === orderDetailsId)}
           onClose={() => setOrderDetailsId(null)}
           onDelete={() => handleDeleteRecord(orderDetailsId)}
         />
@@ -133,9 +157,10 @@ const OrdersTable = () => {
 export default OrdersTable;
 
 const TableContents = ({
+  _id,
   id,
   products,
-  courierName,
+  courier,
   trackingNumber,
   sellingPlatform,
   status,
@@ -156,15 +181,15 @@ const TableContents = ({
             {showProducts ? "Hide List" : "View List"}
           </button>
         </td>
-        <td>{courierName}</td>
+        <td>{courier.name}</td>
         <td>{trackingNumber}</td>
-        <td>{sellingPlatform}</td>
+        <td>{sellingPlatform.name}</td>
         <td>{status}</td>
         <td>{totalPaid}</td>
         <td>
           <div className="relative inline-block text-left">
             <button
-              onClick={() => setOrderDetailsId(id)}
+              onClick={() => setOrderDetailsId(_id)}
               className="flex items-center justify-center p-2"
             >
               <KebabHorizontalIcon className="rotate-90" />
@@ -178,7 +203,7 @@ const TableContents = ({
             <table className="table w-full">
               <thead className="text-white">
                 <tr className="border-opacity-50">
-                  <th>SKU</th>
+                  <th>Product ID</th>
                   <th>Product Name</th>
                   <th>Price</th>
                   <th>Quantity</th>
@@ -187,7 +212,7 @@ const TableContents = ({
               <tbody>
                 {products.map((product, index) => (
                   <tr key={index} className="border-none">
-                    <td>{product.sku}</td>
+                    <td>{product.productId.sku}</td>
                     <td>{product.name}</td>
                     <td className="font-semibold">₱{product.price}</td>
                     <td>{product.quantity}</td>
