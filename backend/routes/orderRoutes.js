@@ -13,12 +13,12 @@ router.post('/CreateOrder', async (req, res) => {
         }
 
         const productObjects = products.map(product => {
-            const { productId, name, quantity, price } = product;
-            if (!productId || !name || quantity === undefined || !price) {
-                throw new Error('Each product must have sku, quantity, and price');
+            const { sku, name, quantity, price } = product;
+            if (!sku || !name || quantity === undefined || !price) {
+                throw new Error('Each product must have sku, name, quantity, and price');
             }
             return {
-                productId: new mongoose.Types.ObjectId(productId), 
+                sku: new mongoose.Types.ObjectId(sku), 
                 name,
                 quantity,
                 price
