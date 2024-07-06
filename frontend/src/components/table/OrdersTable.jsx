@@ -82,7 +82,7 @@ const OrdersTable = () => {
             <li><a onClick={() => handleStatusFilterChange("")}>All</a></li>
             <li><a onClick={() => handleStatusFilterChange("Processing")}>Processing</a></li>
             <li><a onClick={() => handleStatusFilterChange("Shipped")}>Shipped</a></li>
-            <li><a onClick={() => handleStatusFilterChange("Completed")}>Completed</a></li>
+            <li><a onClick={() => handleStatusFilterChange("Delivered")}>Delivered</a></li>
             <li><a onClick={() => handleStatusFilterChange("Returned")}>Returned</a></li>
           </ul>
         </div>

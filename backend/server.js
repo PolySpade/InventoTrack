@@ -30,20 +30,18 @@ config();
 
 const app = express();
 
-app.use(cookieParser());
-app.use(
-    session({
-        secret: process.env.SECRET,
-        saveUninitialized: false,
-        resave: false,
-        cookie: {
-            maxAge: 60000 * 60 * 24 // cookies last for 1 day -> feel free to edit 
-        }
-    })
-);
+// app.use(cookieParser());
+// app.use(
+//     session({
+//         secret: process.env.SECRET,
+//         saveUninitialized: false,
+//         resave: false,
+//         cookie: {
+//             maxAge: 60000 * 60 * 24 // cookies last for 1 day -> feel free to edit 
+//         }
+//     })
+// );
 
-app.use(passport.initialize());
-app.use(passport.session());
 
 app.use(express.json());
 
@@ -55,6 +53,9 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+// Initialize Passport
+app.use(passport.initialize());
+// app.use(passport.session());
 
 app.use('/warehouses', warehouseRoutes);
 app.use('/products', productRoutes);

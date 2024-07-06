@@ -4,21 +4,35 @@ const router = express.Router();
 import { accountModel } from '../models/accountModel.js';
 import "../strategies/local-strategy.js"; //might just be needed in account routes 
 import passport from 'passport';
+import bcrypt from 'bcrypt';
+import { config } from 'dotenv';
+import jwt from 'jsonwebtoken';
+config();
+
+const JWT_SECRET = process.env.SECRET;
+
+const authMiddleware = (req, res, next) => {
+    const token = req.headers['authorization'];
+    if (!token) return res.sendStatus(403);
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+        if (err) return res.sendStatus(403);
+        req.user = user;
+        next();
+    });
+};
+
 
 // create
 router.post('/CreateAccount', async (req, res) => {
     try {
         const {email, name, password, role} = req.body;
-
         if (!email || !name || !password || !role){
             return res.status(400).send({ message: "Send all fields!" });
-        }
-
-        //const hashedPasword = await bcrypt.hash(password,10)
-
+        }        
+        const hashedPasword = await bcrypt.hash(password,10)
         const newAccount = {
             email,
-            username,
+            name,   
             password: hashedPasword,
             role: new mongoose.Types.ObjectId(role)
         }
@@ -31,25 +45,33 @@ router.post('/CreateAccount', async (req, res) => {
     }
 });
 
-router.post('/login', passport.authenticate("local"), (req, res) => {
-        res.sendStatus(200);
-    }
-)
-
-router.get('/status',(req, res) =>{ //not sure lang if this should be /status or /login/status -> maybe consider renaming login -> /auth then this to /auth/status
-    console.log('Inside /status');
-    console.log(req.user);
-    console.log(req.session);
-    return req.user ? res.send(req.user) : res.sendStatus(401);
-})
-
-router.post('/logout', (req, res) => {
-    if(!req.user) return res.sendStatus(401);
-    req.logout((err) => {
-        if(err) return res.sendStatus(400);
-        res.send(200);
-    });
+router.post('/login', async (req, res, next) => {
+    passport.authenticate('local', (err, user, info) => {
+        if (err || !user) {
+            console.log(err);
+            return res.status(400).json({ message: 'Invalid credentials' });
+        }
+        req.login(user, { session: false }, (err) => {
+            if (err) {
+                res.send(err);
+            }
+            const token = jwt.sign(user.toJSON(), JWT_SECRET, { expiresIn: '1h' });
+            console.log("Success")
+            return res.json({ user, token });
+        });
+    })(req, res, next);
 });
+
+router.get('/status', authMiddleware, (req, res) => {
+    return req.user ? res.send(req.user) : res.sendStatus(401);
+});
+
+// router.post('/logout', (req, res) => {
+//     req.logout((err) => {
+//         if (err) return res.status(400).send({ message: 'Error logging out' });
+//         res.sendStatus(200);
+//     });
+// });
 
 // get all accounts
 router.get('/', async (req, res) => {

@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { SearchIcon, XCircleFillIcon } from "@primer/octicons-react";
 import { OrdersContext } from "../../contexts";
 
+// TODO: Add Status of Order Default is Processing
+
 const AddOrderForm =  ({onClose}) => {
   const {couriers, salesplatforms, products} = useContext(OrdersContext);
   const [searchTerm, setSearchTerm] = useState("");
