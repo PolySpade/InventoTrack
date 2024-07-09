@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { logo_default_text } from "../assets/logo";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   MailIcon,
   KeyIcon,
@@ -17,6 +17,7 @@ const CreateAccount = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -73,17 +74,19 @@ const CreateAccount = () => {
         password: formData.get('password'),
         role: formData.get('role')
       }
-      console.log(data)
-      // try{
-      //   const response = await axios.post(`${API_URL}/accounts/CreateAccount`,data);
-      //   if(response.status === 201){
-      //     console.log("Successful");
-      //   }
-      // }catch(err){
-      //   console.log(err);
-      // }
-
-
+      try{
+        const response = await axios.post(`${API_URL}/accounts/CreateAccount`,data);
+        if(response.status === 201){
+          navigate('/login');
+        }
+      }catch(err){
+        console.log(err);
+        if (err.response && err.response.data && err.response.data.message) {
+          setError(err.response.data.message);
+        } else {
+          setError("An unexpected error occurred. Please try again.");
+        }
+      }
     }
   };
 

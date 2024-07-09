@@ -20,6 +20,8 @@ const Layout = () => {
     );
 };
 
+// TODO: add specific routes after login
+
 const AppRoutes = () => {
     return (
         <Router>

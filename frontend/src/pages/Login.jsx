@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { logo_default_text } from "../assets/logo";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   MailIcon,
   KeyIcon,
@@ -13,7 +13,9 @@ import axios from "axios";
 const Login = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const [hidePass, setHidePass] = useState(true);
+  const [error, setError] = useState("");
   const signIn = useSignIn();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Change base to white
@@ -54,10 +56,15 @@ const Login = () => {
             role_id: response.data.user.role
           }
         });
-        // Redirect or perform any action upon successful login
+        navigate("/dashboard");
       }
     } catch (error) {
       console.log(error);
+      if (error.response && error.response.data && error.response.data.message) {
+        setError(error.response.data.message);
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
     }
   };
 
@@ -69,8 +76,7 @@ const Login = () => {
         </Link>
         <hr className="h-px border-0 bg-black" />
       </div>
-      <form onSubmit={handleSubmit}
-        method="post" className="my-auto flex justify-center">
+      <form onSubmit={handleSubmit} method="post" className="my-auto flex justify-center">
         <div className="flex flex-col text-primary justify-center items-center w-full">
           <img src={logo_default_text} width={345} alt="Logo" />
           <div>
@@ -95,6 +101,9 @@ const Login = () => {
                   )}
                 </button>
               </label>
+
+              {error && <div className="text-red-500 text-sm">{error}</div>}
+
               <div className="flex justify-center">
                 <button type="submit"
                   className="btn btn-secondary px-10 text-white transition ease-in-out delay-150 hover:bg-base-200 hover:-translate-y-1 hover:scale-105"
@@ -104,10 +113,7 @@ const Login = () => {
               </div>
 
               <div className="flex justify-center">
-                <Link
-                  to="/"
-                  className=" font-medium underline underline-offset-1"
-                >
+                <Link to="/" className=" font-medium underline underline-offset-1">
                   Can't login?
                 </Link>
               </div>
