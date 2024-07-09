@@ -38,7 +38,7 @@ const Login = () => {
       email: formData.get("email"),
       password: formData.get("password")
     };
-    console.log(data.email);
+    //console.log(data.email);
     try {
       const response = await axios.post(`${API_URL}/accounts/login/`, data);
       if (response.status === 200) {
