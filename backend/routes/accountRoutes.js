@@ -28,7 +28,13 @@ router.post('/CreateAccount', async (req, res) => {
         const {email, name, password, role} = req.body;
         if (!email || !name || !password || !role){
             return res.status(400).send({ message: "Send all fields!" });
-        }        
+        }
+        
+        const existingAccount = await accountModel.findOne({email});
+        if(existingAccount) {
+            return res.status(400).send({message: "Email is already in use!"});
+        }
+
         const hashedPasword = await bcrypt.hash(password,10)
         const newAccount = {
             email,
