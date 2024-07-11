@@ -1,21 +1,35 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import Chart from "react-apexcharts";
 import './chartStyles.css';
 import { formatTimestampDay, formatTimestampMonth, formatTimestampWeek } from '../../utils';
+import { ReportsContext } from '../../contexts';
 
-const SalesChart = ({ orders }) => {
-    const [timeFrame, setTimeFrame] = useState('daily');
+const SalesChart = () => {
+    const { ordersData: orders, timeFrame } = useContext(ReportsContext);
 
-    const groupByDateAndSum = (orders, timeFrame) => {
+    const filterOrders = (orders, timeFrame) => {
+        const now = new Date();
+        let filteredOrders = orders;
+
+        if (timeFrame === 'last7days') {
+            const startOfPeriod = new Date(now.setDate(now.getDate() - 7));
+            filteredOrders = orders.filter(order => new Date(order.timestamp) >= startOfPeriod);
+        } else if (timeFrame === 'last15days') {
+            const startOfPeriod = new Date(now.setDate(now.getDate() - 15));
+            filteredOrders = orders.filter(order => new Date(order.timestamp) >= startOfPeriod);
+        } else if (timeFrame === 'last30days') {
+            const startOfPeriod = new Date(now.setDate(now.getDate() - 30));
+            filteredOrders = orders.filter(order => new Date(order.timestamp) >= startOfPeriod);
+        } else if (timeFrame === 'overall') {
+            filteredOrders = orders;
+        }
+
+        return filteredOrders;
+    }
+
+    const groupByDateAndCount = (orders) => {
         return orders.reduce((acc, order) => {
-            let date;
-            if (timeFrame === 'monthly') {
-                date = formatTimestampMonth(order.timestamp);
-            } else if (timeFrame === 'weekly') {
-                date = formatTimestampWeek(order.timestamp);
-            } else {
-                date = formatTimestampDay(order.timestamp);
-            }
+            let date = formatTimestampDay(order.timestamp);
 
             if (!acc[date]) {
                 acc[date] = 0;
@@ -26,7 +40,8 @@ const SalesChart = ({ orders }) => {
         }, {});
     }
 
-    const groupedData = groupByDateAndSum(orders, timeFrame);
+    const filteredOrders = filterOrders(orders, timeFrame);
+    const groupedData = groupByDateAndCount(filteredOrders);
 
     const chartData = Object.keys(groupedData).map(date => ({
         date: date,
@@ -150,16 +165,6 @@ const SalesChart = ({ orders }) => {
 
     return (
         <div className='chart flex flex-col relative px-5 pt-3 pb-0'>
-            <div className='flex justify-center z-10 w-full absolute'>
-                <div className="dropdown -mt-1 p-0">
-                <label tabIndex={0} className="btn p-2 text-white">{timeFrame.toUpperCase()}</label>
-                <ul tabIndex={0} className="dropdown-content menu shadow bg-base-100 rounded-box p-1">
-                    <li><button onClick={() => setTimeFrame('daily')}>Daily</button></li>
-                    <li><button onClick={() => setTimeFrame('weekly')}>Weekly</button></li>
-                    <li><button onClick={() => setTimeFrame('monthly')}>Monthly</button></li>
-                </ul>
-                </div>
-            </div>
             <Chart options={options} series={series} type="line" />
         </div>
     );

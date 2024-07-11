@@ -8,30 +8,25 @@ const SmallChart = ({ datas, name, timeFrame }) => {
         const now = new Date();
         let filteredData = datas;
 
-        if (timeFrame === 'today') {
-            const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            filteredData = datas.filter(data => new Date(data.timestamp) >= startOfDay);
-        } else if (timeFrame === 'week') {
-            const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
-            filteredData = datas.filter(data => new Date(data.timestamp) >= startOfWeek);
-        } else if (timeFrame === 'month') {
-            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-            filteredData = datas.filter(data => new Date(data.timestamp) >= startOfMonth);
+        if (timeFrame === 'last7days') {
+            const startOfPeriod = new Date(now.setDate(now.getDate() - 7));
+            filteredData = datas.filter(data => new Date(data.timestamp) >= startOfPeriod);
+        } else if (timeFrame === 'last15days') {
+            const startOfPeriod = new Date(now.setDate(now.getDate() - 15));
+            filteredData = datas.filter(data => new Date(data.timestamp) >= startOfPeriod);
+        } else if (timeFrame === 'last30days') {
+            const startOfPeriod = new Date(now.setDate(now.getDate() - 30));
+            filteredData = datas.filter(data => new Date(data.timestamp) >= startOfPeriod);
+        } else if (timeFrame === 'overall') {
+            filteredData = datas;
         }
 
         return filteredData;
     }
 
-    const groupByDateAndSum = (datas, timeFrame) => {
+    const groupByDateAndSum = (datas) => {
         return datas.reduce((acc, data) => {
-            let date;
-            if (timeFrame === 'monthly') {
-                date = formatTimestampMonth(data.timestamp);
-            } else if (timeFrame === 'weekly') {
-                date = formatTimestampWeek(data.timestamp);
-            } else {
-                date = formatTimestampDay(data.timestamp);
-            }
+            let date = formatTimestampDay(data.timestamp);
 
             if (!acc[date]) {
                 acc[date] = 0;
@@ -43,7 +38,7 @@ const SmallChart = ({ datas, name, timeFrame }) => {
     }
 
     const filteredData = filterData(datas, timeFrame);
-    const groupedData = groupByDateAndSum(filteredData, timeFrame);
+    const groupedData = groupByDateAndSum(filteredData);
 
     let chartData = Object.keys(groupedData).map(date => ({
         date: date,

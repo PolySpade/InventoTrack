@@ -7,11 +7,15 @@ import OrdersChart from '../components/charts/OrdersChart';
 import SmallChart from '../components/charts/SmallChart';
 import ExpensesChart from '../components/charts/ExpensesChart';
 import COGChart from '../components/charts/COGChart';
+import GrossProfitChart from '../components/charts/GrossProfitChart';
 
 const Reports = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const [ordersData, setOrdersData] = useState([]);
   const [expensesData, setExpensesData] = useState([]);
+  const [timeFrame, setTimeFrame] = useState('last7days');
+  const [timeFrameText, setTimeFrameText] = useState('Last 7 Days');
+
   const getOrdersData = () => {
     axios
       .get(`${API_URL}/orders/`)
@@ -28,28 +32,46 @@ const Reports = () => {
     getOrdersData();
     getExpensesData();
   }, [])
-  
-  const [timeFrame,setTimeFrame] =useState('month');
 
   return (
-    <ReportsContext.Provider value = {{ordersData,expensesData}}>
-      <div className=' overflow-y-hidden flex flex-col justify-center items-center p-10'>
-        <div className='w-full text-white flex flex-row justify-between space-x-10'>
+    <ReportsContext.Provider value = {{ordersData,expensesData, timeFrame}}>
+      <div className='max-w-full soverflow-x-hidden flex flex-col px-10 pt-3'>
+      <div className='flex justify-start z-10 w-full mb-2'>
+                <div className="dropdown">
+                <label tabIndex={0} className="btn p-2 text-white">{timeFrameText.toUpperCase()}</label>
+                    <ul tabIndex={0} className="dropdown-content menu shadow bg-base-100 rounded-box p-1 text-white">
+                        <li><button onClick={() => {setTimeFrame('last7days');setTimeFrameText("Last 7 Days");}}>Last 7 Days</button></li>
+                        <li><button onClick={() => {setTimeFrame('last15days');setTimeFrameText("Last 15 Days");}}>Last 15 Days</button></li>
+                        <li><button onClick={() => {setTimeFrame('last30days');setTimeFrameText("Last 30 Days");}}>Last 30 Days</button></li>
+                        <li><button onClick={() => {setTimeFrame('overall');setTimeFrameText("Overall");}}>Overall</button></li>
+                    </ul>
+                </div>
+            </div>
+        <div className=' max-w-full text-white flex flex-row justify-between space-x-10'>
               {/* <LineChart/> */}
-              <div className='max-w-4xl bg-base-content rounded-3xl flex-1'>
-                <SalesChart orders={ordersData}/>
+              <div className='max-w-2xl bg-base-content rounded-3xl flex-1'>
+                <SalesChart />
               </div>
-              <div className='bg-base-content max-w-4xl flex-1 rounded-3xl'>
-                <OrdersChart orders={ordersData}/> 
+              <div className='bg-base-content max-w-2xl flex-1 rounded-3xl'>
+                <OrdersChart/> 
               </div>
         </div>
-        <div className='mt-5 w-full text-white flex flex-row justify-start space-x-10'>
+        <div className='mt-5 max-w-[83.5rem] text-white flex flex-row justify-start space-x-10 overflow-x-scroll overflow-y-hidden'>
               {/* <LineChart/> */}
-              <div className='max-w-96 bg-base-content rounded-3xl flex-1'>
-                <ExpensesChart timeFrame={timeFrame}/>
+              <div className='min-w-96 bg-base-content rounded-3xl flex-1'>
+                <ExpensesChart/>
               </div>
-              <div className='bg-base-content max-w-96 flex-1 rounded-3xl'>
+              <div className='bg-base-content min-w-96 flex-1 rounded-3xl'>
                 <COGChart/>
+              </div>
+              <div className='bg-base-content min-w-96 flex-1 rounded-3xl'>
+                <GrossProfitChart/>
+              </div>
+              <div className='bg-base-content min-w-96 flex-1 rounded-3xl'>
+                <GrossProfitChart/>
+              </div>
+              <div className='bg-base-content min-w-96 flex-1 rounded-3xl'>
+                <GrossProfitChart/>
               </div>
         </div>
       </div>
