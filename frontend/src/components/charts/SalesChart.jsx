@@ -91,6 +91,9 @@ const SalesChart = ({ orders }) => {
                 }
             }
         },
+        grid: {
+            show: false // Hide grid lines
+        },
         stroke: {
             width: 5,
             colors: ['#E323FF']

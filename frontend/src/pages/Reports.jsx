@@ -5,6 +5,7 @@ import { createContext, useEffect, useState } from 'react';
 import { ReportsContext } from '../contexts';
 import OrdersChart from '../components/charts/OrdersChart';
 import SmallChart from '../components/charts/SmallChart';
+import ExpensesChart from '../components/charts/ExpensesChart';
 
 const Reports = () => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -27,8 +28,10 @@ const Reports = () => {
     getExpensesData();
   }, [])
   
+  const [timeFrame,setTimeFrame] =useState('month');
+
   return (
-    <ReportsContext.Provider value = {{ordersData}}>
+    <ReportsContext.Provider value = {{ordersData,expensesData}}>
       <div className=' overflow-y-hidden flex flex-col justify-center items-center p-10'>
         <div className='w-full text-white flex flex-row justify-between space-x-10'>
               {/* <LineChart/> */}
@@ -42,7 +45,7 @@ const Reports = () => {
         <div className='mt-5 w-full text-white flex flex-row justify-start space-x-10'>
               {/* <LineChart/> */}
               <div className='max-w-96 bg-base-content rounded-3xl flex-1'>
-                <SmallChart datas={expensesData}/>
+                <ExpensesChart timeFrame={timeFrame}/>
               </div>
               <div className='bg-white max-w-96 flex-1 rounded-3xl'>
                 <SalesChart orders={ordersData}/> 

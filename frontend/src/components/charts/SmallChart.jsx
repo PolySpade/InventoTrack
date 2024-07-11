@@ -4,7 +4,23 @@ import './chartStyles.css';
 import { formatTimestampDay, formatTimestampMonth, formatTimestampWeek } from '../../utils';
 
 const SmallChart = ({ datas, name, timeFrame }) => {
-    timeFrame = 'daily';
+    const filterData = (datas, timeFrame) => {
+        const now = new Date();
+        let filteredData = datas;
+
+        if (timeFrame === 'today') {
+            const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            filteredData = datas.filter(data => new Date(data.timestamp) >= startOfDay);
+        } else if (timeFrame === 'week') {
+            const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+            filteredData = datas.filter(data => new Date(data.timestamp) >= startOfWeek);
+        } else if (timeFrame === 'month') {
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            filteredData = datas.filter(data => new Date(data.timestamp) >= startOfMonth);
+        }
+
+        return filteredData;
+    }
 
     const groupByDateAndSum = (datas, timeFrame) => {
         return datas.reduce((acc, data) => {
@@ -26,7 +42,8 @@ const SmallChart = ({ datas, name, timeFrame }) => {
         }, {});
     }
 
-    const groupedData = groupByDateAndSum(datas, timeFrame);
+    const filteredData = filterData(datas, timeFrame);
+    const groupedData = groupByDateAndSum(filteredData, timeFrame);
 
     let chartData = Object.keys(groupedData).map(date => ({
         date: date,
@@ -95,12 +112,15 @@ const SmallChart = ({ datas, name, timeFrame }) => {
                 }
             }
         },
+        grid: {
+            show: false 
+        },
         stroke: {
             width: 2,
             colors: ['#E323FF']
         },
         title: {
-            text: `Expenses: ${totalAmount}`,
+            text: `${name}: ${totalAmount}`,
             align: 'left',
             style: {
                 fontSize: "12px",
@@ -145,7 +165,7 @@ const SmallChart = ({ datas, name, timeFrame }) => {
     };
 
     const series = [{
-        name: 'Expenses',
+        name: name,
         data: total
     }];
 
