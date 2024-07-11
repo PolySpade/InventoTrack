@@ -72,7 +72,7 @@ app.use('/expensesTypes', expensesTypeRoutes);
 app.use('/expenses', expenseRoutes);
 app.use('/alerts', alertRoutes);
 // stock in & stock out
-app.use('/stockIn', stockIn);
+app.use('/inventory/stockIn', stockIn);
 app.use('/stockOut', stockOut);
 
 app.get('/', (req, res) => {

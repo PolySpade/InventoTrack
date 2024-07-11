@@ -1,15 +1,17 @@
+// stockIn.js
+
 import express from 'express';
 import { productModel as Product } from '../models/productModel.js';
 import { supplierModel as Supplier } from '../models/supplierModel.js';
 
 const router = express.Router();
 
-router.put('/stockIn', async (req, res) => {
+router.put('/', async (req, res) => {
     try {
         const { supplierName, products } = req.body;
         
-        if (!supplierName || !products || !Array.isArray(products)) {
-            return res.status(400).json({ message: "All fields are required" });
+        if (!supplierName || !products || !Array.isArray(products) || products.length === 0) {
+            return res.status(400).json({ message: "Supplier name and a non-empty array of products are required" });
         }
 
         const supplier = await Supplier.findOne({ name: supplierName });
