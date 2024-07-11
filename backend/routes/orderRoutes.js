@@ -62,7 +62,7 @@ router.get('/', async (req, res) => {
         const orders = await orderModel.find({}).populate('courier').populate('sellingPlatform').populate({
             path: 'products.productId',
             model: 'products',
-            select: 'sku'
+            select: ['sku','unitCost']
         });
         return res.status(200).json(orders);
     } catch (err) {
