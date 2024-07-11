@@ -9,7 +9,8 @@ const GrossProfitChart = () => {
     const parsedData = orders.map((data) => {
         const totalUnitCost = data.products.reduce((sum, product) => sum + (product.productId.unitCost * product.quantity) , 0);
         const totalPaid = data.totalPaid;
-        const amount = totalPaid - totalUnitCost;
+        const otherFees = data.otherFees || 0;
+        const amount = totalPaid - totalUnitCost - otherFees;
         return { timestamp: data.timestamp, amount };
     });
 
