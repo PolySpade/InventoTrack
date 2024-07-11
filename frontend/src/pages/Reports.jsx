@@ -6,6 +6,7 @@ import { ReportsContext } from '../contexts';
 import OrdersChart from '../components/charts/OrdersChart';
 import SmallChart from '../components/charts/SmallChart';
 import ExpensesChart from '../components/charts/ExpensesChart';
+import COGChart from '../components/charts/COGChart';
 
 const Reports = () => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -47,8 +48,8 @@ const Reports = () => {
               <div className='max-w-96 bg-base-content rounded-3xl flex-1'>
                 <ExpensesChart timeFrame={timeFrame}/>
               </div>
-              <div className='bg-white max-w-96 flex-1 rounded-3xl'>
-                <SalesChart orders={ordersData}/> 
+              <div className='bg-base-content max-w-96 flex-1 rounded-3xl'>
+                <COGChart/>
               </div>
         </div>
       </div>
