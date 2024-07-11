@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
-import { orders } from '../../constants';
-import { formatTimestampDay, formatTimestampMonth, formatTimestampWeek } from '../../utils';
 import Chart from "react-apexcharts";
 import './chartStyles.css';
+import { formatTimestampDay, formatTimestampMonth, formatTimestampWeek } from '../../utils';
 
-const ExpensesChart = () => {
+const OrdersChart = ({ orders }) => {
     const [timeFrame, setTimeFrame] = useState('daily');
 
-    const groupByDateAndSum = (orders, timeFrame) => {
+    const groupByDateAndCount = (orders, timeFrame) => {
         return orders.reduce((acc, order) => {
             let date;
             if (timeFrame === 'monthly') {
@@ -21,28 +20,26 @@ const ExpensesChart = () => {
             if (!acc[date]) {
                 acc[date] = 0;
             }
-            acc[date] += order.totalPaid;
+            acc[date] += 1;
 
             return acc;
         }, {});
     }
 
-    const groupedData = groupByDateAndSum(orders, timeFrame);
+    const groupedData = groupByDateAndCount(orders, timeFrame);
 
     const chartData = Object.keys(groupedData).map(date => ({
         date: date,
-        totalPaid: groupedData[date],
+        orderCount: groupedData[date],
     }));
 
     const dates = chartData.map(data => data.date);
-    const totalPaid = chartData.map(data => data.totalPaid);
-
-    const overallTotalPaid = chartData.reduce((acc, data) => acc + data.totalPaid, 0);
+    const orderCounts = chartData.map(data => data.orderCount);
 
     const options = {
         chart: {
             type: 'line',
-            height: 350,
+            height: 300,
             fontFamily: 'Poppins, sans-serif',
             toolbar: {
                 theme: 'dark',
@@ -99,7 +96,7 @@ const ExpensesChart = () => {
             colors: ['#E323FF']
         },
         title: {
-            text: `Sales Data`,
+            text: `Orders Data`,
             align: 'left',
             style: {
                 fontSize: "20px",
@@ -144,16 +141,16 @@ const ExpensesChart = () => {
     };
 
     const series = [{
-        name: 'Sales',
-        data: totalPaid
+        name: 'Orders',
+        data: orderCounts
     }];
 
     return (
-        <div className='chart flex flex-col relative p-4'>
+        <div className='chart flex flex-col relative px-5 pt-3 pb-0'>
             <div className='flex justify-center z-10 w-full absolute'>
                 <div className="dropdown -mt-1 p-0">
-                <label tabIndex={0} className="btn p-2 text-white  ">{timeFrame.toUpperCase()}</label>
-                <ul tabIndex={0} className="dropdown-content menu shadow bg-base-100 rounded-box p-1    ">
+                <label tabIndex={0} className="btn p-2 text-white">{timeFrame.toUpperCase()}</label>
+                <ul tabIndex={0} className="dropdown-content menu shadow bg-base-100 rounded-box p-1">
                     <li><button onClick={() => setTimeFrame('daily')}>Daily</button></li>
                     <li><button onClick={() => setTimeFrame('weekly')}>Weekly</button></li>
                     <li><button onClick={() => setTimeFrame('monthly')}>Monthly</button></li>
@@ -165,4 +162,4 @@ const ExpensesChart = () => {
     );
 }
 
-export default ExpensesChart;
+export default OrdersChart;

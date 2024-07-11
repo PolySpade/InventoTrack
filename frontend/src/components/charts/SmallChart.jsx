@@ -3,47 +3,51 @@ import Chart from "react-apexcharts";
 import './chartStyles.css';
 import { formatTimestampDay, formatTimestampMonth, formatTimestampWeek } from '../../utils';
 
-const SalesChart = ({ orders }) => {
-    const [timeFrame, setTimeFrame] = useState('daily');
+const SmallChart = ({ datas, name, timeFrame }) => {
+    timeFrame = 'daily';
 
-    const groupByDateAndSum = (orders, timeFrame) => {
-        return orders.reduce((acc, order) => {
+    const groupByDateAndSum = (datas, timeFrame) => {
+        return datas.reduce((acc, data) => {
             let date;
             if (timeFrame === 'monthly') {
-                date = formatTimestampMonth(order.timestamp);
+                date = formatTimestampMonth(data.timestamp);
             } else if (timeFrame === 'weekly') {
-                date = formatTimestampWeek(order.timestamp);
+                date = formatTimestampWeek(data.timestamp);
             } else {
-                date = formatTimestampDay(order.timestamp);
+                date = formatTimestampDay(data.timestamp);
             }
 
             if (!acc[date]) {
                 acc[date] = 0;
             }
-            acc[date] += order.totalPaid;
+            acc[date] += data['amount'];
 
             return acc;
         }, {});
     }
 
-    const groupedData = groupByDateAndSum(orders, timeFrame);
+    const groupedData = groupByDateAndSum(datas, timeFrame);
 
-    const chartData = Object.keys(groupedData).map(date => ({
+    let chartData = Object.keys(groupedData).map(date => ({
         date: date,
-        totalPaid: groupedData[date],
+        total: groupedData[date],
     }));
 
-    const dates = chartData.map(data => data.date);
-    const totalPaid = chartData.map(data => data.totalPaid);
+    // Sort the data by date in ascending order
+    chartData = chartData.sort((a, b) => new Date(a.date) - new Date(b.date));
 
+    const dates = chartData.map(data => data.date);
+    const total = chartData.map(data => data.total);
+
+    const totalAmount = total.reduce((acc, amount) => acc + amount, 0);
     const options = {
         chart: {
-            type: 'line',
+            type: 'area',
             height: 300,
             fontFamily: 'Poppins, sans-serif',
             toolbar: {
                 theme: 'dark',
-                show: true,
+                show: false,
                 tools: {
                     download: true,
                     selection: false,
@@ -77,7 +81,7 @@ const SalesChart = ({ orders }) => {
             labels: {
                 style: {
                     colors: '#868B93',
-                    fontSize: '12px',
+                    fontSize: '5px',
                     fontFamily: 'Poppins, sans-serif'
                 }
             }
@@ -86,20 +90,20 @@ const SalesChart = ({ orders }) => {
             labels: {
                 style: {
                     colors: '#868B93',
-                    fontSize: '12px',
+                    fontSize: '8px',
                     fontFamily: 'Poppins, sans-serif'
                 }
             }
         },
         stroke: {
-            width: 5,
+            width: 2,
             colors: ['#E323FF']
         },
         title: {
-            text: `Sales Data`,
+            text: `Expenses: ${totalAmount}`,
             align: 'left',
             style: {
-                fontSize: "20px",
+                fontSize: "12px",
                 color: "white",
                 fontWeight: 'bold',
                 padding: '10px'
@@ -112,8 +116,8 @@ const SalesChart = ({ orders }) => {
                 gradientToColors: ['#7517F8'],
                 shadeIntensity: 1,
                 type: 'horizontal',
-                opacityFrom: 1,
-                opacityTo: 1,
+                opacityFrom: 0.7,
+                opacityTo: 0.9,
                 stops: [0, 100]
             }
         },
@@ -141,13 +145,13 @@ const SalesChart = ({ orders }) => {
     };
 
     const series = [{
-        name: 'Sales',
-        data: totalPaid
+        name: 'Expenses',
+        data: total
     }];
 
     return (
         <div className='chart flex flex-col relative px-5 pt-3 pb-0'>
-            <div className='flex justify-center z-10 w-full absolute'>
+            {/* <div className='flex justify-center z-10 w-full absolute'>
                 <div className="dropdown -mt-1 p-0">
                 <label tabIndex={0} className="btn p-2 text-white">{timeFrame.toUpperCase()}</label>
                 <ul tabIndex={0} className="dropdown-content menu shadow bg-base-100 rounded-box p-1">
@@ -156,10 +160,10 @@ const SalesChart = ({ orders }) => {
                     <li><button onClick={() => setTimeFrame('monthly')}>Monthly</button></li>
                 </ul>
                 </div>
-            </div>
-            <Chart options={options} series={series} type="line" />
+            </div> */}
+            <Chart options={options} series={series} type="area" />
         </div>
     );
 }
 
-export default SalesChart;
+export default SmallChart;
