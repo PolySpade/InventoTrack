@@ -13,12 +13,12 @@ router.post('/CreateOrder', async (req, res) => {
         }
 
         const productObjects = products.map(product => {
-            const { sku, name, quantity, price } = product;
-            if (!sku || !name || quantity === undefined || !price) {
+            const { productId, name, quantity, price } = product;
+            if (!productId || !name || quantity === undefined || !price) {
                 throw new Error('Each product must have sku, name, quantity, and price');
             }
             return {
-                sku,
+                productId: new mongoose.Types.ObjectId(productId) ,
                 name,
                 quantity,
                 price
@@ -60,7 +60,7 @@ router.post('/CreateOrder', async (req, res) => {
 router.get('/', async (req, res) => {
     try {
         const orders = await orderModel.find({}).populate('courier').populate('sellingPlatform').populate({
-            path: 'products.sku',
+            path: 'products.productId',
             model: 'products',
             select: ['sku','unitCost']
         });
@@ -76,7 +76,7 @@ router.get('/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const order = await orderModel.findById(id).populate('courier').populate('sellingPlatform').populate({
-            path: 'products.sku',
+            path: 'products.productId',
             model: 'products',
             select: ['sku','unitCost']
         });
@@ -100,12 +100,12 @@ router.put('/EditOrder/:id', async (req, res) => {
 
         if (products) {
             req.body.products = products.map(product => {
-                const { sku, name, quantity, price } = product;
-                if (!sku || !name || quantity === undefined || !price) {
+                const { productId, name, quantity, price } = product;
+                if (!productId || !name || quantity === undefined || !price) {
                     throw new Error('Each product must have sku, name, quantity, and price');
                 }
                 return {
-                    sku, 
+                    productId, 
                     name,
                     quantity,
                     price
