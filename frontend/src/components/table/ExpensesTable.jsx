@@ -38,11 +38,13 @@ const ExpensesTable = () => {
 
   const isChecked = (id) => checkedItems.includes(id);
 
-  const filteredExpenses = expenses.filter(
+  const filteredExpenses = expenses
+  .filter(
     (item) =>
       item.expensestype.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  )
+  .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
   const totalPages = Math.ceil(filteredExpenses.length / ITEMS_PER_PAGE);
 
@@ -99,7 +101,6 @@ const ExpensesTable = () => {
             </th>
             <th>Date</th>
             <th>Amount</th>
-            <th>Currency</th>
             <th>Type</th>
             <th>Description</th>
             <th>Actions</th>
@@ -151,7 +152,6 @@ const TableContents = ({
     _id,
     timestamp,
     amount,
-    currency,
     expensestype,
     description,
   } = item;
@@ -175,7 +175,6 @@ const TableContents = ({
       </th>
       <td>{formattedTimestamp}</td>
       <td>{amount}</td>
-      <td>{currency.name}</td>
       <td>{expensestype.name}</td>
       <td>{description}</td>
       <td className="relative">
