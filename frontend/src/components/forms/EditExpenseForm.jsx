@@ -3,13 +3,12 @@ import { ExpenseContext } from '../../contexts';
 import { useContext, useState } from 'react';
 import axios from 'axios';
 
-const EditExpenseForm = ({ onClose, _id, timestamp, amount, currency, expensestype, description }) => {
+const EditExpenseForm = ({ onClose, _id, timestamp, amount, expensestype, description }) => {
   const API_URL = import.meta.env.VITE_API_URL;
-  const { currencies: currency_types, expenseTypes: expense_types } = useContext(ExpenseContext);
+  const { expenseTypes: expense_types } = useContext(ExpenseContext);
 
   const [formValues, setFormValues] = useState({
     amount,
-    currency,
     expensestype,
     description
   });
@@ -24,7 +23,6 @@ const EditExpenseForm = ({ onClose, _id, timestamp, amount, currency, expensesty
     const updatedExpense = {
       timestamp,
       amount: formValues.amount,
-      currency: formValues.currency,
       expensestype: formValues.expensestype,
       description: formValues.description
     };
@@ -80,13 +78,6 @@ const EditExpenseForm = ({ onClose, _id, timestamp, amount, currency, expensesty
             <select id="expense_types" name="expensestype" value={formValues.expensestype._id} onChange={handleChange} className="input input-bordered w-full max-w-xs">
               <option disabled value="">Select a Type</option>
               {expense_types.map((item) => <option key={item._id} value={item._id}>{item.name}</option>)}
-            </select>
-          </div>
-          <div className='my-2 flex flex-col'>
-            <label className='text-xs' htmlFor='currency'>Currency</label>
-            <select id="currency" name="currency" value={formValues.currency._id} onChange={handleChange} className="input input-bordered w-full max-w-xs">
-              <option disabled value="">Select a Currency</option>
-              {currency_types.map((item) => <option key={item._id} value={item._id}>{item.name}</option>)}
             </select>
           </div>
           <div className='my-2 flex flex-col'>
