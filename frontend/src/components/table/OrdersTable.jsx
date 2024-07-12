@@ -39,7 +39,9 @@ const OrdersTable = () => {
       ) ||
       order.courier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.trackingNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.sellingPlatform.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      order.sellingPlatform.name.toLowerCase().includes(searchTerm.toLowerCase())
+      || order.id.toLowerCase().includes(searchTerm.toLowerCase())
+    )
   );
 
   const totalPages = Math.ceil(filteredOrders.length / ITEMS_PER_PAGE);
