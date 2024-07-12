@@ -1,9 +1,8 @@
 import mongoose from 'mongoose';
 
 const orderedProductSchema = new mongoose.Schema({
-    productId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'products',
+    sku: {
+        type: String,
         required: true
     },
     name: {

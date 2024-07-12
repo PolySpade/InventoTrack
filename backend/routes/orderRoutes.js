@@ -8,8 +8,8 @@ router.post('/CreateOrder', async (req, res) => {
     try {
         const { id, timestamp, products, courier, trackingNumber, sellingPlatform, buyerName, buyerEmail, buyerPhone, totalPaid, otherFees, status, timeline, notes } = req.body;
 
-        if (!id || !timestamp || !products || products.length === 0 || !courier || !trackingNumber || !sellingPlatform || !buyerName || !buyerEmail || !totalPaid || !otherFees || !status || !timeline || !notes) {
-            return res.status(400).send({ message: "Send all fields!" });
+        if (!id || !timestamp || !products || products.length === 0 || !courier || !trackingNumber || !sellingPlatform || !buyerName || !buyerEmail || !totalPaid || !status || !timeline) {
+            return res.status(400).send({ message: "Send all required fields!" });
         }
 
         const productObjects = products.map(product => {
@@ -18,7 +18,7 @@ router.post('/CreateOrder', async (req, res) => {
                 throw new Error('Each product must have sku, name, quantity, and price');
             }
             return {
-                sku: new mongoose.Types.ObjectId(sku), 
+                sku,
                 name,
                 quantity,
                 price
@@ -35,17 +35,17 @@ router.post('/CreateOrder', async (req, res) => {
             buyer: {
                 buyerName,
                 buyerEmail,
-                buyerPhone
+                buyerPhone: buyerPhone || 'No Phone'
             },
             totalPaid,
-            otherFees,
+            otherFees: otherFees || 0,
             status,
             timeline: timeline.map(t => ({
                 status: t.status,
                 timestamp: t.timestamp,
                 details: t.details || 'no other details provided'
             })),
-            notes
+            notes: notes || 'no notes'
         };
 
         const order = await orderModel.create(newOrder);
@@ -60,7 +60,7 @@ router.post('/CreateOrder', async (req, res) => {
 router.get('/', async (req, res) => {
     try {
         const orders = await orderModel.find({}).populate('courier').populate('sellingPlatform').populate({
-            path: 'products.productId',
+            path: 'products.sku',
             model: 'products',
             select: ['sku','unitCost']
         });
@@ -75,7 +75,11 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const order = await orderModel.findById(id);
+        const order = await orderModel.findById(id).populate('courier').populate('sellingPlatform').populate({
+            path: 'products.sku',
+            model: 'products',
+            select: ['sku','unitCost']
+        });
 
         if (!order) {
             return res.status(404).send({ message: "Order not found" });
@@ -96,12 +100,12 @@ router.put('/EditOrder/:id', async (req, res) => {
 
         if (products) {
             req.body.products = products.map(product => {
-                const { productId, name, quantity, price } = product;
-                if (!productId || !name || quantity === undefined || !price) {
-                    throw new Error('Each product must have productId, name, quantity, and price');
+                const { sku, name, quantity, price } = product;
+                if (!sku || !name || quantity === undefined || !price) {
+                    throw new Error('Each product must have sku, name, quantity, and price');
                 }
                 return {
-                    productId: new mongoose.Types.ObjectId(productId), 
+                    sku, 
                     name,
                     quantity,
                     price
