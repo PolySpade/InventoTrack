@@ -9,11 +9,6 @@ const expenseSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    currency: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'currencies',
-        required: true
-    },
     expensestype: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'expensestypes',

@@ -6,14 +6,13 @@ import { expenseModel } from '../models/expenseModel.js';
 // Create 
 router.post('/CreateExpense', async (req, res) => {
     try {
-        const { timestamp, amount, currency, expensestype, description } = req.body;
-        if (!timestamp || !amount || !currency || !expensestype || !description ) {
+        const { timestamp, amount, expensestype, description } = req.body;
+        if (!timestamp || !amount || !expensestype || !description ) {
             return res.status(400).send({ message: "Send all fields!" });
         }
         const newExpense = {
             timestamp,
             amount,
-            currency: new mongoose.Types.ObjectId(currency),
             expensestype: new mongoose.Types.ObjectId(expensestype),
             description
         };
@@ -30,7 +29,7 @@ router.post('/CreateExpense', async (req, res) => {
 // read all expenses
 router.get('/', async (req, res) => {
     try {
-        const expenses = await expenseModel.find({}).populate('currency').populate('expensestype');
+        const expenses = await expenseModel.find({}).populate('expensestype');
         return res.status(200).json(expenses);
     } catch (err) {
         console.log(err.message);
