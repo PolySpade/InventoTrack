@@ -20,9 +20,16 @@ const OrdersChart = () => {
         } else if (timeFrame === 'last30days') {
             const startOfPeriod = new Date(now.setDate(now.getDate() - 30));
             filteredOrders = orders.filter(order => new Date(order.timestamp) >= startOfPeriod);
-        } else if (timeFrame === 'overall') {
+        }  else if (timeFrame === 'today') {
+            const startOfToday = new Date(now.setHours(0, 0, 0, 0));
+            const endOfToday = new Date(now.setHours(23, 59, 59, 999));
+            filteredOrders = orders.filter((order) => {
+              const orderDate = new Date(order.timestamp);
+              return orderDate >= startOfToday && orderDate <= endOfToday;
+            });
+        }  else {
             filteredOrders = orders;
-        }
+        } 
 
         return filteredOrders;
     }

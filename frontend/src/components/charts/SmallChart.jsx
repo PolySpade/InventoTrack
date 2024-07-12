@@ -17,9 +17,17 @@ const SmallChart = ({ datas, name, timeFrame }) => {
         } else if (timeFrame === 'last30days') {
             const startOfPeriod = new Date(now.setDate(now.getDate() - 30));
             filteredData = datas.filter(data => new Date(data.timestamp) >= startOfPeriod);
+        } else if (timeFrame === 'today') {
+            const startOfToday = new Date(now.setHours(0, 0, 0, 0));
+            const endOfToday = new Date(now.setHours(23, 59, 59, 999));
+            filteredData = datas.filter(data => {
+                const dataDate = new Date(data.timestamp);
+                return dataDate >= startOfToday && dataDate <= endOfToday;
+            });
         } else if (timeFrame === 'overall') {
             filteredData = datas;
         }
+        
 
         return filteredData;
     }
