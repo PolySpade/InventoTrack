@@ -42,7 +42,7 @@ const OrdersTable = () => {
       order.sellingPlatform.name.toLowerCase().includes(searchTerm.toLowerCase())
       || order.id.toLowerCase().includes(searchTerm.toLowerCase())
     )
-  );
+  ).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));;
 
   const totalPages = Math.ceil(filteredOrders.length / ITEMS_PER_PAGE);
   const currentItems = filteredOrders.slice(
