@@ -300,11 +300,11 @@ const ProductSection = ({
     <div className="absolute bottom-0 z-10 w-full flex flex-col items-end">
       <div className="mt-3">
         Total Paid:
-        <input type="number" id="totalpaid" className="input w-16 px-2" />
+        <input type="number" id="totalpaid" className="input w-16 px-2" step="0.01" />
       </div>
       <div className="mt-3">
         Other Fees:
-        <input type="number" id="fees" className="input w-16 px-2" />
+        <input type="number" id="fees" className="input w-16 px-2" step="0.01" />
       </div>
     </div>
   </div>
@@ -330,7 +330,7 @@ const TableContents = ({ sku, name, isChecked, onCheckboxChange }) => (
       <input type="number" className="input input-xs w-12" id={`${sku}-quantity`} />
     </td>
     <td>
-      <input type="number" className="input input-xs w-14" id={`${sku}-price`} />
+      <input type="number" className="input input-xs w-14" id={`${sku}-price`} step="0.01" />
     </td>
     <th>
       <label>
