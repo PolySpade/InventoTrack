@@ -123,7 +123,7 @@ const SmallChartv2 = ({ datas, name, timeFrame }) => {
             colors: ['#E323FF']
         },
         title: {
-            text: `${name}: ${totalAmount}`,
+            text: `${name}: ₱${totalAmount}`,
             align: 'left',
             style: {
                 fontSize: "12px",

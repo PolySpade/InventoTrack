@@ -1,12 +1,10 @@
 import React, { useState, useContext } from "react";
-//import { category, warehouse } from "../../constants";
 import { KebabHorizontalIcon, SearchIcon } from "@primer/octicons-react";
 import EditProductForm from "../forms/EditProductForm";
 import AddProductForm from "../forms/AddProductForm";
 import StockInForm from "../forms/StockInForm";
 import StockOutForm from "../forms/StockOutForm";
 import { InventoryContext } from "../../contexts";
-
 
 const ITEMS_PER_PAGE = 10;
 
@@ -19,7 +17,7 @@ const InventoryTable = () => {
   const [openEditFormId, setOpenEditFormId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { inventorydata: products, warehouse, category } = useContext(InventoryContext)
+  const { inventorydata: products, warehouse, category } = useContext(InventoryContext);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -43,14 +41,13 @@ const InventoryTable = () => {
 
   const productToEdit = products.find((product) => product._id === openEditFormId);
 
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
   const currentItems = filteredProducts.slice(
     (currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE
-  )
+  );
 
   return (
     <div className="overflow-x-auto overflow-y-hidden">
@@ -65,21 +62,20 @@ const InventoryTable = () => {
         />
       </div>
       <div className="flex justify-between">
-      <button
-        onClick={() => setAddProduct((prev) => !prev)}
-        className="btn text-white bg-secondary border-none"
-      >
-        Add Product
-      </button>
-      <div className="flex flex-row">
-        <button onClick={() => setStockIn((prev) => !prev)} className="btn text-white bg-secondary border-none mr-4">
-          Stock-In
+        <button
+          onClick={() => setAddProduct((prev) => !prev)}
+          className="btn text-white bg-secondary border-none"
+        >
+          Add Product
         </button>
-        <button onClick={() => setStockOut((prev) => !prev)} className="btn text-white bg-secondary border-none">
-          Stock-Out
-        </button>
-      </div>
-      
+        <div className="flex flex-row">
+          <button onClick={() => setStockIn((prev) => !prev)} className="btn text-white bg-secondary border-none mr-4">
+            Stock-In
+          </button>
+          <button onClick={() => setStockOut((prev) => !prev)} className="btn text-white bg-secondary border-none">
+            Stock-Out
+          </button>
+        </div>
       </div>
       {addProduct && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
@@ -104,6 +100,14 @@ const InventoryTable = () => {
                 <input
                   type="checkbox"
                   className="checkbox checkbox-secondary"
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setCheckedItems(currentItems.map(item => item.sku));
+                    } else {
+                      setCheckedItems([]);
+                    }
+                  }}
+                  checked={currentItems.length > 0 && currentItems.every(item => checkedItems.includes(item.sku))}
                 />
               </label>
             </th>
@@ -134,13 +138,13 @@ const InventoryTable = () => {
       <div className="flex justify-center mt-4">
         <div className="join">
           {
-            [...Array(totalPages)].map((_,i) => (
+            [...Array(totalPages)].map((_, i) => (
               <button
                 key={i}
-                onClick={() => handlePageChange(i+1)}
+                onClick={() => handlePageChange(i + 1)}
                 className={`join-item btn ${currentPage === i + 1 ? "btn-active" : ""}`}
               >
-                {i+1}
+                {i + 1}
               </button>
             ))
           }
@@ -151,7 +155,7 @@ const InventoryTable = () => {
         <div className="fixed inset-0 flex items-center justify-center z-50">
           <div className="fixed inset-0 bg-black opacity-50" onClick={() => setOpenEditFormId(null)}></div>
           <div className="rounded shadow-lg z-10 bg-neutral">
-            <EditProductForm onClose={() => setOpenEditFormId(null)} item={productToEdit}  />
+            <EditProductForm onClose={() => setOpenEditFormId(null)} item={productToEdit} />
           </div>
         </div>
       )}
@@ -168,7 +172,7 @@ const TableContents = ({
   openEditFormId,
   setOpenEditFormId,
 }) => {
-  
+
   const {
     _id,
     sku,
@@ -192,7 +196,7 @@ const TableContents = ({
             type="checkbox"
             className="checkbox checkbox-secondary"
             checked={isChecked}
-            onChange={() => onCheckboxChange(_id)}
+            onChange={() => onCheckboxChange(sku)}
           />
         </label>
       </th>

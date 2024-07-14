@@ -13,6 +13,7 @@ const AddOrderForm = ({ onClose }) => {
   const [fees, setFees] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
   const [error, setError] = useState("");
+  const { refreshData} = useContext(OrdersContext)
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -30,7 +31,7 @@ const AddOrderForm = ({ onClose }) => {
 
 
   const generateOrderId = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let orderId = '';
     for (let i = 0; i < 6; i++) {
       orderId += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -94,7 +95,7 @@ const AddOrderForm = ({ onClose }) => {
       buyerPhone: customerPhone,
       totalPaid: totalPaid,
       otherFees: otherFees,
-      status: 'Processing',
+      status: 'To Process',
       timeline: [
         {
           status: 'Order Placed',
@@ -108,6 +109,7 @@ const AddOrderForm = ({ onClose }) => {
     try {
       const response = await axios.post(`${API_URL}/orders/CreateOrder`, orderData);
       console.log('Order created:', response);
+      refreshData();
       onClose();
     } catch (error) {
       console.error(error);

@@ -52,7 +52,7 @@ const SalesChart = () => {
 
     const chartData = Object.keys(groupedData).map(date => ({
         date: date,
-        totalPaid: groupedData[date],
+        totalPaid: parseFloat(groupedData[date]).toFixed(2),
     }));
 
     const dates = chartData.map(data => data.date);

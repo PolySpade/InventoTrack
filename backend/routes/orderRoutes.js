@@ -101,6 +101,189 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+//edit notes only
+router.put('/EditNotes/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { notes } = req.body;
+
+        const orderToEdit = await orderModel.findByIdAndUpdate(
+            id,
+            { $set: { notes } },
+            { new: true }
+        );
+
+        if (!orderToEdit) {
+            return res.status(404).send({ message: "Order not found" });
+        }
+
+        return res.status(200).send({ message: "Update Successful!", order: orderToEdit });
+    } catch (err) {
+        console.log(err.message);
+        res.status(500).send({ message: err.message });
+    }
+});
+
+//edit status and timeline only
+router.put('/EditStatus/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status,timeline } = req.body;
+
+        // Validate the timeline data
+        if (!timeline || !Array.isArray(timeline) || timeline.length === 0) {
+            return res.status(400).send({ message: "Invalid timeline data" });
+        }
+
+        // for (let t of timeline) {
+        //     if (!t.status || !t.timestamp) {
+        //         return res.status(400).send({ message: "Each timeline entry must have status and timestamp" });
+        //     }
+        //     if (!t.details) {
+        //         t.details = 'no other details provided';
+        //     }
+        // }
+
+        const updatedOrder = await orderModel.findByIdAndUpdate(
+            id,
+            {
+                $push: { timeline: { $each: timeline } },
+                $set: { status: status }
+            },
+            { new: true }
+        );
+
+        if (!updatedOrder) {
+            return res.status(404).send({ message: "Order not found" });
+        }
+
+        return res.status(200).send({ message: "Status updated successfully!", order: updatedOrder });
+    } catch (err) {
+        console.log(err.message);
+        res.status(500).send({ message: err.message });
+    }
+});
+
+router.put('/EditBuyer/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { buyer } = req.body;
+
+        const updatedOrder = await orderModel.findByIdAndUpdate(
+            id,
+            {
+                $set: { buyer }
+            },
+            { new: true }
+        );
+
+        if (!updatedOrder) {
+            return res.status(404).send({ message: "Order not found" });
+        }
+
+        return res.status(200).send({ message: "Buyer updated successfully!", order: updatedOrder });
+    } catch (err) {
+        console.log(err.message);
+        res.status(500).send({ message: err.message });
+    }
+});
+
+router.put('/EditTotal/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { totalPaid } = req.body;
+
+        const updatedOrder = await orderModel.findByIdAndUpdate(
+            id,
+            {
+                $set: { totalPaid }
+            },
+            { new: true }
+        );
+
+        if (!updatedOrder) {
+            return res.status(404).send({ message: "Order not found" });
+        }
+
+        return res.status(200).send({ message: "Total Paid updated successfully!", order: updatedOrder });
+    } catch (err) {
+        console.log(err.message);
+        res.status(500).send({ message: err.message });
+    }
+});
+
+router.put('/EditFees/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { otherFees } = req.body;
+
+        const updatedOrder = await orderModel.findByIdAndUpdate(
+            id,
+            {
+                $set: { otherFees }
+            },
+            { new: true }
+        );
+
+        if (!updatedOrder) {
+            return res.status(404).send({ message: "Order not found" });
+        }
+
+        return res.status(200).send({ message: "Fees updated successfully!", order: updatedOrder });
+    } catch (err) {
+        console.log(err.message);
+        res.status(500).send({ message: err.message });
+    }
+});
+
+router.put('/EditTracking/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { courier, trackingNumber } = req.body;
+
+        const updatedOrder = await orderModel.findByIdAndUpdate(
+            id,
+            {
+                $set: { courier, trackingNumber }
+            },
+            { new: true }
+        );
+
+        if (!updatedOrder) {
+            return res.status(404).send({ message: "Order not found" });
+        }
+
+        return res.status(200).send({ message: "Tracking updated successfully!", order: updatedOrder });
+    } catch (err) {
+        console.log(err.message);
+        res.status(500).send({ message: err.message });
+    }
+});
+
+router.put('/EditPlatform/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { sellingPlatform } = req.body;
+
+        const updatedOrder = await orderModel.findByIdAndUpdate(
+            id,
+            {
+                $set: { sellingPlatform }
+            },
+            { new: true }
+        );
+
+        if (!updatedOrder) {
+            return res.status(404).send({ message: "Order not found" });
+        }
+
+        return res.status(200).send({ message: "Platform updated successfully!", order: updatedOrder });
+    } catch (err) {
+        console.log(err.message);
+        res.status(500).send({ message: err.message });
+    }
+});
+
 // edit
 router.put('/EditOrder/:id', async (req, res) => {
     try {
