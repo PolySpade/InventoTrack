@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   XIcon,
   PencilIcon,
@@ -11,6 +11,8 @@ import {
   CheckCircleFillIcon,
 } from "@primer/octicons-react";
 import { formatTimestamp } from "../../utils";
+import axios from "axios";
+import { OrdersContext } from "../../contexts";
 
 const EditOrderForm = ({
   _id,
@@ -25,34 +27,155 @@ const EditOrderForm = ({
   timestamp,
   timeline,
   notes,
-  onClose,
-  onDelete,
-}) => {
+  onClose}) => {
+  const { refreshData, couriers, salesplatforms, statustypes } = useContext(OrdersContext);
+  const API_URL = import.meta.env.VITE_API_URL;
   const [editNotes, setEditNotes] = useState(false);
   const [noteText, setNoteText] = useState(notes);
+  const [editStatus, setEditStatus] = useState(false);
+  const [statusname, setStatusName] = useState(status);
+  const [editBuyer, setEditBuyer] = useState(false);
+  const [editTracking, setEditTracking] = useState(false);
+  const [editSellingPlatform, setEditSellingPlatform] = useState(false);
+  const [editTotalPaid, setEditTotalPaid] = useState(false);
+  const [editFees, setEditFees] = useState(false);
 
-  const saveNotes = () => {
+  const [buyerName, setBuyerName] = useState(buyer.buyerName);
+  const [buyerPhone, setBuyerPhone] = useState(buyer.buyerPhone);
+  const [buyerEmail, setBuyerEmail] = useState(buyer.buyerEmail);
+  const [courierName, setCourierName] = useState(courier.name);
+  const [trackingNum, setTrackingNum] = useState(trackingNumber);
+  const [sellingPlatformId, setSellingPlatformId] = useState(sellingPlatform._id);
+  const [totalPaidValue, setTotalPaidValue] = useState(totalPaid);
+  const [feesValue, setFeesValue] = useState(otherFees);
+
+
+
+  const saveNotes = async () => {
     setEditNotes(false);
-    // Add logic to save the updated notes
+    const data = {
+      notes: noteText,
+    };
+    try {
+      const response = await axios.put(`${API_URL}/orders/EditNotes/${_id}`, data);
+      console.log("Notes Updated:", response);
+      refreshData();
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  const cancelNotes = () => {
-    setEditNotes(false);
-    setNoteText(notes);
+  const saveStatus = async () => {
+    setEditStatus(false);
+    const statusType = statustypes.find((status) => status.name === statusname);
+    const data = {
+      status: statusType.name,
+      timeline: [statusType.timeline],
+    };
+    try {
+      const response = await axios.put(`${API_URL}/orders/EditStatus/${_id}`, data);
+      refreshData();
+    } catch (err) {
+      console.log(err);
+    }
   };
+
+  const saveBuyer = async () => {
+    setEditBuyer(false);
+    const data = {
+      buyer: {
+        buyerName,
+        buyerPhone,
+        buyerEmail,
+      },
+    };
+
+    try {
+      const response = await axios.put(`${API_URL}/orders/EditBuyer/${_id}`, data);
+      refreshData();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const saveTrackingInfo = async () => {
+    setEditTracking(false);
+    const data = {
+      courier: courier._id,
+      trackingNumber: trackingNum,
+    };
+
+    try {
+      const response = await axios.put(`${API_URL}/orders/EditTracking/${_id}`, data);
+      console.log(response);
+      refreshData();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const saveSellingPlatform = async () => {
+    setEditSellingPlatform(false);
+    const data = {
+      sellingPlatform: sellingPlatformId,
+    };
+
+    try {
+      const response = await axios.put(`${API_URL}/orders/EditPlatform/${_id}`, data);
+      console.log(response);
+      refreshData();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const saveTotalPaid = async () => {
+    setEditTotalPaid(false);
+    const data = {
+      totalPaid: Number(totalPaidValue).toFixed(2),
+    };
+
+    try {
+      const response = await axios.put(`${API_URL}/orders/EditTotal/${_id}`, data);
+      console.log(response);
+      refreshData();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const saveFees = async () => {
+    setEditFees(false);
+    const data = {
+      otherFees: Number(feesValue).toFixed(2),
+    };
+
+    try {
+      const response = await axios.put(`${API_URL}/orders/EditFees/${_id}`, data);
+      console.log(response);
+      refreshData();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleDelete = async () => {
+    try{
+      const response = await axios.delete(`${API_URL}/orders/DeleteOrder/${_id}`);
+      console.log(response);
+      onClose();
+      refreshData();
+    }catch(err) {
+      console.log(err)
+    }
+  }
 
   return (
     <div className="fixed inset-4 flex items-center justify-end z-50">
-      <div
-        className="fixed inset-0 bg-black opacity-50 z-0"
-        onClick={onClose}
-      ></div>
+      <div className="fixed inset-0 bg-black opacity-50 z-0" onClick={onClose}></div>
       <div className="flex flex-col relative bg-base-100 bg-opacity-80 text-white rounded-l-lg shadow-lg z-10 w-full max-w-md h-full overflow-y-auto">
         <div className="bg-primary w-full p-6">
-          <button
-            onClick={onClose}
-            className="absolute top-6 right-6 font-bold text-white"
-          >
+          <button onClick={onClose} className="absolute top-6 right-6 font-bold text-white">
             <XIcon size={20} />
           </button>
           <h2 className="text-xl font-bold mb-2"># {id} </h2>
@@ -65,20 +188,104 @@ const EditOrderForm = ({
           <div>
             <h4 className="text-md font-semibold">Buyer</h4>
             <div className="flex items-center justify-between mb-2">
-              <div>
-                <p className="text-sm">{buyer.buyerName}</p>
-                <p className="text-sm text-accent">{buyer.buyerEmail}</p>
-                <p className="text-sm">{buyer.buyerPhone}</p>
-              </div>
-              <button className="text-white">
-                <PencilIcon size={16} />
-              </button>
+              {!editBuyer && (
+                <>
+                  <div>
+                    <p className="text-sm">Name: {buyer.buyerName}</p>
+                    <p className="text-sm">
+                      Email: <span className="text-accent">{buyer.buyerEmail}</span>
+                    </p>
+                    <p className="text-sm">Phone: {buyer.buyerPhone}</p>
+                  </div>
+                  <button className="text-white" onClick={() => setEditBuyer((prev) => !prev)}>
+                    <PencilIcon size={16} />
+                  </button>
+                </>
+              )}
+              {editBuyer && (
+                <>
+                  <div>
+                    <div className="space-y-2">
+                      <div className="flex flex-row">
+                        <p className="text-sm pr-2">Name: </p>
+                        <input
+                          type="text"
+                          onChange={(e) => setBuyerName(e.target.value)}
+                          defaultValue={buyer.buyerName}
+                          className="input w-full pt-0 leading-tight h-6 bg-primary text-xs"
+                        />
+                      </div>
+                      <div className="flex flex-row">
+                        <p className="text-sm pr-2">Email: </p>
+                        <input
+                          type="email"
+                          onChange={(e) => setBuyerEmail(e.target.value)}
+                          defaultValue={buyer.buyerEmail}
+                          className="input w-full pt-0 leading-tight h-6 bg-primary text-xs"
+                        />
+                      </div>
+                      <div className="flex flex-row">
+                        <p className="text-sm pr-2">Phone: </p>
+                        <input
+                          type="number"
+                          onChange={(e) => setBuyerPhone(e.target.value)}
+                          defaultValue={buyer.buyerPhone}
+                          className="input w-full pt-0 leading-tight h-6 bg-primary text-xs"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col">
+                    <button onClick={() => setEditBuyer((prev) => !prev)}>
+                      <XCircleFillIcon size={15} />
+                    </button>
+                    <button className="mt-1" onClick={saveBuyer}>
+                      <ArchiveIcon size={15} />
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
           <hr className="bg-white w-full h-px my-3" />
           <div className="mb-4">
             <h1 className="font-bold text-md my-2">Alerts</h1>
             <Alerts orderid={id} />
+          </div>
+          <div>
+            <h1 className="font-bold text-md my-2">Status</h1>
+            <div className="flex flex-row justify-evenly">
+              {statustypes.map((item) => (
+                <button
+                  type="button"
+                  className={`btn text-white text-xs p-1 border-none ${
+                    item.color
+                  } ${status === item.name ? "opacity-50 cursor-not-allowed" : ""}`}
+                  key={item.name}
+                  onClick={() => {
+                    if (!(item.name === status)) {
+                      setEditStatus((prev) => !prev);
+                      setStatusName(item.name);
+                    }
+                  }}
+                >
+                  {item.name}
+                </button>
+              ))}
+            </div>
+            {editStatus && (
+              <div className="w-full flex justify-center items-center flex-col mt-2">
+                <p className="text-xs">Change Status to {statusname}</p>
+                <div>
+                  <button className="text-xs text-white p-1 mr-3" onClick={() => setEditStatus((prev) => !prev)}>
+                    <XCircleFillIcon />
+                  </button>
+                  <button className="text-xs text-white p-1" onClick={saveStatus}>
+                    <ArchiveIcon />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
           <hr className="bg-white w-full h-px my-3" />
           <div>
@@ -88,20 +295,187 @@ const EditOrderForm = ({
           <hr className="bg-white w-full h-px my-3" />
           <div className="mb-4">
             <h4 className="text-md font-semibold">Tracking Information</h4>
-            <div>
-              <p className="text-sm">Courier: {courier.name}</p>
-              <p className="text-sm">Tracking Number: {trackingNumber}</p>
+            <div className="flex items-center justify-between mb-2">
+              {!editTracking && (
+                <>
+                  <div>
+                    <p className="text-sm">Courier: {courier.name}</p>
+                    <p className="text-sm">Tracking Number: {trackingNumber}</p>
+                  </div>
+                  <button className="text-white" onClick={() => setEditTracking((prev) => !prev)}>
+                    <PencilIcon size={16} />
+                  </button>
+                </>
+              )}
+              {editTracking && (
+                <>
+                  <div className="w-full pr-3">
+                    <div className="space-y-2">
+                      <div className="flex flex-row">
+                        <p className="text-sm pr-2">Courier: </p>
+                        <select
+                          id="couriers"
+                          className="input leading-none h-5 text-xs bg-primary w-full"
+                          defaultValue={courier._id}
+                          onChange={(e) => setCourierName(e.target.value)}
+                        >
+                          <option disabled value="">
+                            Select a Courier
+                          </option>
+                          {couriers.map((item) => (
+                            <option key={item._id} value={item._id}>
+                              {item.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex flex-row">
+                        <p className="text-sm pr-2">Tracking Number: </p>
+                        <input
+                          type="text"
+                          onChange={(e) => setTrackingNum(e.target.value)}
+                          defaultValue={trackingNumber}
+                          className="input pt-0 leading-tight h-6 bg-primary text-xs flex-1"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col">
+                    <button onClick={() => setEditTracking((prev) => !prev)}>
+                      <XCircleFillIcon size={15} />
+                    </button>
+                    <button className="mt-1" onClick={saveTrackingInfo}>
+                      <ArchiveIcon size={15} />
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
           <div className="mb-4">
             <h4 className="text-md font-semibold">Selling Platform</h4>
-            <p className="text-sm">{sellingPlatform.name}</p>
+            <div className="flex items-center justify-between mb-2">
+              {!editSellingPlatform && (
+                <>
+                  <div>
+                    <p className="text-sm">Platform: {sellingPlatform.name}</p>
+                  </div>
+                  <button className="text-white" onClick={() => setEditSellingPlatform((prev) => !prev)}>
+                    <PencilIcon size={16} />
+                  </button>
+                </>
+              )}
+              {editSellingPlatform && (
+                <>
+                  <div className="w-full pr-3">
+                    <div className="space-y-2">
+                      <div className="flex flex-row">
+                        <p className="text-sm pr-2">Platform: </p>
+                        <select
+                          id="salesplatforms"
+                          className="input leading-none h-5 text-xs bg-primary w-full"
+                          defaultValue={sellingPlatform._id}
+                          onChange={(e) => setSellingPlatformId(e.target.value)}
+                        >
+                          <option disabled value="">
+                            Select a Selling Platform
+                          </option>
+                          {salesplatforms.map((item) => (
+                            <option key={item._id} value={item._id}>
+                              {item.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col">
+                    <button onClick={() => setEditSellingPlatform((prev) => !prev)}>
+                      <XCircleFillIcon size={15} />
+                    </button>
+                    <button className="mt-1" onClick={saveSellingPlatform}>
+                      <ArchiveIcon size={15} />
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
           <div className="mb-4">
-            <h4 className="text-md font-semibold">
-              Total Paid: ₱{totalPaid}
-            </h4>
-            <h3 className="text-xs font-semibold">Fees: ₱{otherFees}</h3>
+            <h4 className="text-md font-semibold">Total Paid</h4>
+            <div className="flex items-center justify-between mb-2">
+              {!editTotalPaid && (
+                <>
+                  <p className="text-sm">Amount: ₱{totalPaidValue}</p>
+                  <button className="text-white" onClick={() => setEditTotalPaid((prev) => !prev)}>
+                    <PencilIcon size={16} />
+                  </button>
+                </>
+              )}
+              {editTotalPaid && (
+                <>
+                  <div className="w-full pr-3">
+                    <div className="space-y-2">
+                      <div className="flex flex-row">
+                        <p className="text-sm pr-2">Amount: </p>
+                        <input
+                          type="number"
+                          onChange={(e) => setTotalPaidValue(e.target.value)}
+                          defaultValue={totalPaidValue}
+                          className="input w-full pt-0 leading-tight h-6 bg-primary text-xs"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col">
+                    <button onClick={() => setEditTotalPaid((prev) => !prev)}>
+                      <XCircleFillIcon size={15} />
+                    </button>
+                    <button className="mt-1" onClick={saveTotalPaid}>
+                      <ArchiveIcon size={15} />
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+          <div className="mb-4">
+            <h4 className="text-md font-semibold">Fees</h4>
+            <div className="flex items-center justify-between mb-2">
+              {!editFees && (
+                <>
+                  <p className="text-sm">Fees: ₱{feesValue}</p>
+                  <button className="text-white" onClick={() => setEditFees((prev) => !prev)}>
+                    <PencilIcon size={16} />
+                  </button>
+                </>
+              )}
+              {editFees && (
+                <>
+                  <div className="w-full pr-3">
+                    <div className="space-y-2">
+                      <div className="flex flex-row">
+                        <p className="text-sm pr-2">Fees: </p>
+                        <input
+                          type="number"
+                          onChange={(e) => setFeesValue(e.target.value)}
+                          defaultValue={feesValue}
+                          className="input w-full pt-0 leading-tight h-6 bg-primary text-xs"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col">
+                    <button onClick={() => setEditFees((prev) => !prev)}>
+                      <XCircleFillIcon size={15} />
+                    </button>
+                    <button className="mt-1" onClick={saveFees}>
+                      <ArchiveIcon size={15} />
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
           <div>
             <hr className="bg-white w-full h-px my-3" />
@@ -124,7 +498,7 @@ const EditOrderForm = ({
                     <>
                       <div
                         className={`${editNotes ? "opacity-100" : "opacity-0"}`}
-                        onClick={cancelNotes}
+                        onClick={() => setEditNotes((prev) => !prev)}
                       >
                         <XCircleFillIcon size={15} />
                       </div>
@@ -140,7 +514,7 @@ const EditOrderForm = ({
               </div>
             </div>
             <div className="mt-4 tooltip tooltip-right" data-tip="Delete Order Record">
-              <button className="p-1" onClick={onDelete}>
+              <button className="p-1" onClick={handleDelete}>
                 <TrashIcon className="text-error" />
               </button>
             </div>
@@ -188,6 +562,8 @@ const Alerts = ({ orderid }) => {
 };
 
 const Timeline = ({ data }) => {
+  data = data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
   return (
     <ol className="relative mb-3">
       {data.map((item, index) => (
@@ -199,12 +575,10 @@ const Timeline = ({ data }) => {
             <div className="flex flex-row justify-between w-full">
               <div className="flex flex-col">
                 <div className="font-bold">{item.status}</div>
-                <div className=" text-xs">{item.details}</div>
+                <div className="text-xs">{item.details}</div>
               </div>
               <div>
-                <div className="font-medium text-sm">
-                  {formatTimestamp(item.timestamp)}
-                </div>
+                <div className="font-medium text-sm">{formatTimestamp(item.timestamp)}</div>
               </div>
             </div>
           </li>

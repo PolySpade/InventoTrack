@@ -3,17 +3,22 @@ import { SearchIcon, KebabHorizontalIcon } from "@primer/octicons-react";
 import AddOrderForm from "../forms/AddOrderForm";
 import EditOrderForm from "../forms/EditOrderForm";
 import { OrdersContext } from "../../contexts";
+import BulkEditStatusForm from "../forms/BulkEditStatusForm";
+import BulkEditPlatformForm from "../forms/BulkEditPlatformForm";
 
 const ITEMS_PER_PAGE = 10;
 
 const OrdersTable = () => {
-  const { ordersData: orders } = useContext(OrdersContext);
+  const { ordersData: orders,  refreshData, couriers, salesplatforms } = useContext(OrdersContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [addOrder, setAddOrder] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [orderDetailsId, setOrderDetailsId] = useState(null);
   const [filterStatus, setFilterStatus] = useState("");
   const [filterDate, setFilterDate] = useState("");
+  const [checkedItems, setCheckedItems] = useState([]);
+  const [changeStatus, setChangeStatus] = useState(false);
+  const [changePlatform, setChangePlatform] = useState(false);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -29,6 +34,14 @@ const OrdersTable = () => {
     setFilterDate(event.target.value);
     setCurrentPage(1); // Reset to first page on filter change
   };
+
+  const handleCheckboxChange = (orderId) => {
+    setCheckedItems((prev) =>
+      prev.includes(orderId) ? prev.filter((item) => item !== orderId) : [...prev, orderId]
+    );
+  };
+
+  const isChecked = (orderId) => checkedItems.includes(orderId);
 
   const filteredOrders = orders.filter(
     (order) =>
@@ -54,11 +67,6 @@ const OrdersTable = () => {
     setCurrentPage(page);
   };
 
-  const handleDeleteRecord = (id) => {
-    // Implement delete record logic here
-    console.log(`Delete order with id: ${id}`);
-  };
-
   return (
     <div className="overflow-x-auto overflow-y-hidden min-h-96">
       <div className="flex items-center justify-center mb-4">
@@ -72,6 +80,23 @@ const OrdersTable = () => {
         />
       </div>
       <div className="flex justify-start flex-row">
+        <div className="dropdown dropdown-right mr-3">
+          <label tabIndex={0} className="btn text-white">Bulk Actions</label>
+          <ul tabIndex={0} className="dropdown-content text-white z-10 menu p-2 shadow bg-neutral rounded-box w-52">
+            <li><a onClick={() => setChangeStatus( (prev) => !prev)}>Change Status</a></li>
+            <li><a onClick={() => setChangePlatform( (prev) => !prev)}>Change Selling Platform</a></li>
+          </ul>
+        </div>
+        { changeStatus && (
+          <BulkEditStatusForm onClose={() => setChangeStatus(false)} checkedItems={checkedItems} />
+        )
+        }
+
+        { changePlatform && (
+          <BulkEditPlatformForm onClose={() => setChangePlatform(false)} checkedItems={checkedItems} />
+        )
+        }
+
         <button
           onClick={() => setAddOrder((prev) => !prev)}
           className="btn text-white bg-secondary border-none"
@@ -82,12 +107,14 @@ const OrdersTable = () => {
           <label tabIndex={0} className="btn text-white">Filter Status</label>
           <ul tabIndex={0} className="dropdown-content text-white z-10 menu p-2 shadow bg-neutral rounded-box w-52">
             <li><a onClick={() => handleStatusFilterChange("")}>All</a></li>
+            <li><a onClick={() => handleStatusFilterChange("To Process")}>To Process</a></li>
             <li><a onClick={() => handleStatusFilterChange("Processing")}>Processing</a></li>
             <li><a onClick={() => handleStatusFilterChange("Shipped")}>Shipped</a></li>
             <li><a onClick={() => handleStatusFilterChange("Delivered")}>Delivered</a></li>
             <li><a onClick={() => handleStatusFilterChange("Returned")}>Returned</a></li>
           </ul>
         </div>
+        
         <div className="ml-3">
           <input
             type="date"
@@ -112,6 +139,22 @@ const OrdersTable = () => {
       <table className="table w-full">
         <thead>
           <tr className="border-none text-white">
+            <th>
+              <label>
+                <input
+                  type="checkbox"
+                  className="checkbox checkbox-secondary"
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setCheckedItems(currentItems.map(order => order._id));
+                    } else {
+                      setCheckedItems([]);
+                    }
+                  }}
+                  checked={currentItems.length > 0 && currentItems.every(order => checkedItems.includes(order._id))}
+                />
+              </label>
+            </th>
             <th>Order ID</th>
             <th>Products</th>
             <th>Courier Name</th>
@@ -127,6 +170,8 @@ const OrdersTable = () => {
             <TableContents
               key={order._id}
               {...order}
+              isChecked={isChecked(order._id)}
+              onCheckboxChange={handleCheckboxChange}
               setOrderDetailsId={setOrderDetailsId}
             />
           ))}
@@ -167,6 +212,8 @@ const TableContents = ({
   sellingPlatform,
   status,
   totalPaid,
+  isChecked,
+  onCheckboxChange,
   setOrderDetailsId,
 }) => {
   const [showProducts, setShowProducts] = useState(false);
@@ -174,6 +221,16 @@ const TableContents = ({
   return (
     <>
       <tr className="border-none text-white bg-base-content">
+        <th>
+          <label>
+            <input
+              type="checkbox"
+              className="checkbox checkbox-secondary"
+              checked={isChecked}
+              onChange={() => onCheckboxChange(_id)}
+            />
+          </label>
+        </th>
         <td>{id}</td>
         <td>
           <button
@@ -201,7 +258,7 @@ const TableContents = ({
       </tr>
       {showProducts && (
         <tr className="border-none text-white bg-secondary">
-          <td colSpan="8">
+          <td colSpan="9">
             <table className="table w-full">
               <thead className="text-white">
                 <tr className="border-opacity-50">

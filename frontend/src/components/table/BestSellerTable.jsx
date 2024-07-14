@@ -72,7 +72,7 @@ const BestSellerTable = () => {
                             <td>{product.sku}</td>
                             <td>{product.name}</td>
                             <td>{product.orders}</td>
-                            <td>${product.totalRevenue.toFixed(2)}</td>
+                            <td>₱{product.totalRevenue.toFixed(2)}</td>
                         </tr>
                     ))}
                 </tbody>
