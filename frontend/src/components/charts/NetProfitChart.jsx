@@ -12,7 +12,7 @@ const NetProfitChart = () => {
         const otherFees = data.otherFees || 0; // Assuming otherFees might be undefined
         const amount = parseFloat((totalPaid - totalUnitCost - otherFees - totalexpenses).toFixed(2));
         totalexpenses = parseFloat((totalexpenses - (totalPaid - totalUnitCost - otherFees)).toFixed(2));
-
+        
         return { timestamp: data.timestamp, amount };
     });
 

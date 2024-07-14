@@ -8,7 +8,15 @@ router.post('/CreateOrder', async (req, res) => {
     try {
         const { id, timestamp, products, courier, trackingNumber, sellingPlatform, buyerName, buyerEmail, buyerPhone, totalPaid, otherFees, status, timeline, notes } = req.body;
 
-        if (!id || !timestamp || !products || products.length === 0 || !courier || !trackingNumber || !sellingPlatform || !buyerName || !buyerEmail || !totalPaid || !status || !timeline) {
+        // Check if orderId is provided and if it's already used
+        if (id) {
+            const existingOrder = await orderModel.findOne({ id });
+            if (existingOrder) {
+                return res.status(400).send({ message: "Order ID is already used!" });
+            }
+        }
+
+        if (!timestamp || !products || products.length === 0 || !courier || !sellingPlatform || !totalPaid || !status || !timeline) {
             return res.status(400).send({ message: "Send all required fields!" });
         }
 
@@ -18,7 +26,7 @@ router.post('/CreateOrder', async (req, res) => {
                 throw new Error('Each product must have sku, name, quantity, and price');
             }
             return {
-                productId: new mongoose.Types.ObjectId(productId) ,
+                productId: new mongoose.Types.ObjectId(productId),
                 name,
                 quantity,
                 price
@@ -29,13 +37,13 @@ router.post('/CreateOrder', async (req, res) => {
             id,
             timestamp,
             products: productObjects,
-            courier: new mongoose.Types.ObjectId(courier), 
+            courier: new mongoose.Types.ObjectId(courier),
             trackingNumber,
-            sellingPlatform: new mongoose.Types.ObjectId(sellingPlatform), 
+            sellingPlatform: new mongoose.Types.ObjectId(sellingPlatform),
             buyer: {
-                buyerName,
-                buyerEmail,
-                buyerPhone: buyerPhone || 'No Phone'
+                buyerName: buyerName || '',
+                buyerEmail: buyerEmail || '',
+                buyerPhone: buyerPhone || ''
             },
             totalPaid,
             otherFees: otherFees || 0,
@@ -55,6 +63,7 @@ router.post('/CreateOrder', async (req, res) => {
         res.status(500).send({ message: err.message });
     }
 });
+
 
 // get all orders
 router.get('/', async (req, res) => {

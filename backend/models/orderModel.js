@@ -55,9 +55,7 @@ const orderSchema = new mongoose.Schema({
         required: true 
     },
     trackingNumber: { 
-        type: String, 
-        required: true,
-        unique: true
+        type: String
     },
     sellingPlatform: {
         type: mongoose.Schema.Types.ObjectId, 
@@ -66,16 +64,10 @@ const orderSchema = new mongoose.Schema({
     },
     buyer: {
         buyerName: { 
-            type: String, 
-            required: true 
+            type: String 
         },
         buyerEmail: { 
-            type: String, 
-            validate: { 
-                validator: (v) => /\S+@\S+\.\S+/.test(v), 
-                message: "Invalid email format" 
-            },
-            required: true, 
+            type: String
         },
         buyerPhone: { 
             type: String,

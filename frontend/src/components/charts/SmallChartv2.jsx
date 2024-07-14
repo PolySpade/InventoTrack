@@ -50,7 +50,7 @@ const SmallChartv2 = ({ datas, name, timeFrame }) => {
 
     let chartData = Object.keys(groupedData).map(date => ({
         date: date,
-        total: parseFloat(groupedData[date])
+        total: parseFloat(groupedData[date].toFixed(2))
     }));
 
     // Sort the data by date in ascending order
