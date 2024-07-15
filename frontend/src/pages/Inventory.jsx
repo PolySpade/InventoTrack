@@ -46,14 +46,18 @@ const Inventory = () => {
       })
   }
 
-  useEffect(() => {
+  const refreshData = () => {
     getCategory();
     getInventoryData();
     getWarehouse();
     getSuppliers();
+  }
+
+  useEffect(() => {
+    refreshData();
   }, []);
   return (
-    <InventoryContext.Provider value={{category,warehouse,inventorydata,suppliers}}>
+    <InventoryContext.Provider value={{refreshData,category,warehouse,inventorydata,suppliers}}>
     <div className='flex flex-row justify-center items-center'>
       <div className='m-10 w-full'>
         <InventoryTable />

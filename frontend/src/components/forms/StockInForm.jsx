@@ -5,13 +5,13 @@ import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 
 const StockInForm = ({ onClose }) => {
-  const { inventorydata: products, suppliers } = useContext(InventoryContext);
+  const { inventorydata: products, suppliers, refreshData } = useContext(InventoryContext);
   
   const [searchTerm, setSearchTerm] = useState("");
   const [additembox, setAdditembox] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(""); 
+  const [error, setError] = useState("")
   
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -21,18 +21,35 @@ const StockInForm = ({ onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-      try {
-          const response = await axios.post(`${API_URL}/inventory/stockIn`, {
-              productId,
-              quantity,
-              date
-          });
-
-          console.log(response.data);
-      } catch (error) {
-          console.error(error.response.data);
-      }
+  
+    if (!selectedSupplier) {
+      setError("Please select a supplier.");
+      return;
+    }
+  
+    const productsToSubmit = checkedProducts.map(product => {
+      const quantity = parseInt(document.getElementById(`${product.sku}-quantity`).value);
+      return { SKU: product.sku, quantity };
+    });
+  
+    if (productsToSubmit.some(product => !product.quantity || product.quantity <= 0)) {
+      setError("Please enter a valid quantity for all selected products.");
+      return;
+    }
+    try {
+      const response = await axios.put(`${API_URL}/inventory/stockIn`, {
+        supplierName: selectedSupplier,
+        products: productsToSubmit,
+      });
+      
+      console.log(response.data);
+      setError("");
+      onClose();
+      refreshData();
+    } catch (error) {
+      console.error(error.response.data.message);
+      setError(error.response.data.message);
+    }
   };
 
   const checkedProducts = products.filter((item) =>
@@ -75,7 +92,7 @@ const StockInForm = ({ onClose }) => {
             className="p-6 flex flex-col min-w-full"
           >
             <h1 className="text-xl font-semibold">Stock In</h1>
-            <div className="my-2 flex flex-col">
+            <div className="my-4 flex flex-col">
               <label className="text-xs" htmlFor="warehouse">
                 Supplier
               </label>
@@ -190,6 +207,7 @@ const StockInForm = ({ onClose }) => {
                 Save
               </button>
             </div>
+            <p className="w-full justify-center flex text-error">{error}</p>
           </form>
         </div>
       </div>
