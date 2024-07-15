@@ -20,6 +20,7 @@ import courierRoutes from './routes/courierRoutes.js';
 import expensesTypeRoutes from './routes/expensesTypeRoutes.js';
 import expenseRoutes from './routes/expenseRoutes.js';
 import alertRoutes from './routes/alertRoutes.js';
+import historyRoutes from './routes/historyRoutes.js';
 // stock in & stock out
 import stockIn from './buttonFunc/stockIn.js';
 import stockOut from './buttonFunc/stockOut.js';
@@ -69,6 +70,7 @@ app.use('/couriers', courierRoutes);
 app.use('/expensesTypes', expensesTypeRoutes);
 app.use('/expenses', expenseRoutes);
 app.use('/alerts', alertRoutes);
+app.use('/histories', historyRoutes);
 // stock in & stock out
 app.use('/inventory/stockIn', stockIn);
 app.use('/inventory/stockOut', stockOut);
