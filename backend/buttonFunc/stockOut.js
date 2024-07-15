@@ -3,7 +3,7 @@ import { productModel as Product } from '../models/productModel.js';
 
 const router = express.Router();
 
-router.put('http://localhost:3000/inventory/stockOut', async (req, res) => {
+router.put('/', async (req, res) => {
     try {
         const { reason, products } = req.body;
 

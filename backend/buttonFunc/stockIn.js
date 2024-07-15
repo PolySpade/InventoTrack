@@ -1,5 +1,3 @@
-// stockIn.js
-
 import express from 'express';
 import { productModel as Product } from '../models/productModel.js';
 import { supplierModel as Supplier } from '../models/supplierModel.js';

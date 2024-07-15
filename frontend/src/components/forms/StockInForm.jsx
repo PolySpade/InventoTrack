@@ -13,31 +13,26 @@ const StockInForm = ({ onClose }) => {
   const [loading, setLoading] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(""); 
   
-  const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const handleCancel = () => {
     onClose();
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    const params = {
-      supplier: selectedSupplier,
-      items: checkedItems 
-    };
+      try {
+          const response = await axios.post(`${API_URL}/inventory/stockIn`, {
+              productId,
+              quantity,
+              date
+          });
 
-    setLoading(true);
-    axios
-      .put('http://localhost:3000/inventory/stockIn', params)
-      .then(() => {
-        setLoading(false);
-        onClose(); 
-      })
-      .catch((err) => {
-        console.log(err);
-        setLoading(false);
-      });
+          console.log(response.data);
+      } catch (error) {
+          console.error(error.response.data);
+      }
   };
 
   const checkedProducts = products.filter((item) =>
