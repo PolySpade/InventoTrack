@@ -350,6 +350,69 @@ router.put('/EditOrder/:id', async (req, res) => {
     }
 });
 
+// edit products order
+router.put('/EditProductsOrder/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { products } = req.body;
+
+        const existingOrder = await orderModel.findById(id);
+        if (!existingOrder) {
+            return res.status(404).send({ message: "Order not found" });
+        }
+
+        for (let oldProduct of existingOrder.products) {
+            const { productId, quantity } = oldProduct;
+
+            await Product.updateOne({ _id: productId }, { $inc: { stockLeft: quantity } });
+        }
+
+        await orderModel.findByIdAndUpdate(id, { $set: { products: [] } });
+
+        const productObjects = [];
+
+        for (let product of products) {
+            const { productId, name, quantity, price } = product;
+
+            const productDoc = await Product.findOne({ _id: productId });
+
+            if (!productDoc) {
+                return res.status(404).send({ message: `Product with ID ${productId} not found` });
+            }
+
+            if (productDoc.stockLeft < quantity) {
+                return res.status(400).send({ message: `Insufficient stock for product ID ${productId}` });
+            }
+
+            await Product.updateOne({ _id: productId }, { $inc: { stockLeft: -quantity } });
+
+            productObjects.push({
+                productId: new mongoose.Types.ObjectId(productId),
+                name,
+                quantity,
+                price
+            });
+        }
+
+        const updatedOrder = await orderModel.findByIdAndUpdate(
+            id,
+            {
+                $set: { products: productObjects }
+            },
+            { new: true }
+        );
+
+        if (!updatedOrder) {
+            return res.status(404).send({ message: "Failed to update order" });
+        }
+
+        return res.status(200).send({ message: "Products updated successfully!", order: updatedOrder });
+    } catch (err) {
+        console.log(err.message);
+        res.status(500).send({ message: err.message });
+    }
+});
+
 // delete
 router.delete('/DeleteOrder/:id', async (req, res) => {
     try {
