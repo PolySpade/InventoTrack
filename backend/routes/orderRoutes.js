@@ -20,18 +20,34 @@ router.post('/CreateOrder', async (req, res) => {
             return res.status(400).send({ message: "Send all required fields!" });
         }
 
-        const productObjects = products.map(product => {
+        const productObjects = [];
+
+        for (let product of products) {
             const { productId, name, quantity, price } = product;
+
             if (!productId || !name || quantity === undefined || !price) {
-                throw new Error('Each product must have sku, name, quantity, and price');
+                return res.status(400).send({ message: "Send all required fields!" });
             }
-            return {
+
+            const productDoc = await Product.findOne({ _id: productId });
+
+            if (!productDoc) {
+                return res.status(404).send({ message: `Product with ID ${productId} not found` });
+            }
+
+            if (productDoc.stockLeft < quantity) {
+                return res.status(400).send({ message: `Insufficient stock for product ID ${productId}` });
+            }
+
+            await Product.updateOne({ _id: productId }, { $inc: { stockLeft: -quantity } });
+
+            productObjects.push({
                 productId: new mongoose.Types.ObjectId(productId),
                 name,
                 quantity,
                 price
-            };
-        });
+            });
+        }
 
         const newOrder = {
             id,
