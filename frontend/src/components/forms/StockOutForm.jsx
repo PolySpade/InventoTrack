@@ -1,25 +1,57 @@
 import React, { useState, useContext } from "react";
-//import { products } from "../../constants";
 import { SearchIcon, XCircleFillIcon } from "@primer/octicons-react";
 import { InventoryContext } from "../../contexts";
+import axios from "axios";
+import { useNavigate } from 'react-router-dom';
 
 const StockOutForm = ({ onClose }) => {
-  const { inventorydata: products} = useContext(InventoryContext)
+  const { inventorydata: products, suppliers, refreshData } = useContext(InventoryContext);
   
   const [searchTerm, setSearchTerm] = useState("");
   const [additembox, setAdditembox] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
+  const [error, setError] = useState("");
+  const [reason,setReason] = useState("");
+  
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const handleCancel = () => {
     onClose();
   };
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    onClose();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    const productsToSubmit = checkedProducts.map(product => {
+      const quantity = parseInt(document.getElementById(`${product.sku}-quantity`).value);
+      return { SKU: product.sku, quantity };
+    });
+  
+    if (productsToSubmit.some(product => !product.quantity || product.quantity <= 0)) {
+      setError("Please enter a valid quantity for all selected products.");
+      return;
+    }
+    const data = {
+      reason: reason,
+      products: productsToSubmit
+    }
+    console.log(data)
+    try {
+      const response = await axios.put(`${API_URL}/inventory/stockOut`, data);
+      console.log(response.data);
+      setError("");
+      onClose();
+      refreshData();
+    } catch (error) {
+      console.error(error.response.data);
+      setError(error.response.data.message);
+    }
   };
+
   const checkedProducts = products.filter((item) =>
     checkedItems.includes(item.sku)
   );
+
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
@@ -39,6 +71,7 @@ const StockOutForm = ({ onClose }) => {
   const handleAddItem = () => {
     setAdditembox((prev) => !prev);
   };
+
   const isChecked = (sku) => checkedItems.includes(sku);
 
   return (
@@ -55,7 +88,13 @@ const StockOutForm = ({ onClose }) => {
             className="p-6 flex flex-col min-w-full"
           >
             <h1 className="text-xl font-semibold">Stock Out</h1>
-            
+            <input
+              type="text"
+              placeholder="Input Reason"
+              defaultValue={reason}
+              onChange={(e) => setReason(e.target.value)}
+              className="input w-full my-4 "
+            />
             <div className="relative flex flex-col w-fit">
               <button
                 className="btn text-gray-200"
@@ -64,9 +103,9 @@ const StockOutForm = ({ onClose }) => {
               >
                 Add Item
               </button>
-              <div className="absolute block z-20 w-full ">
+              <div className="absolute block z-20 w-full">
                 <div
-                  className={` bg-base-200 z-20 shadow-lg opacity-95 p-3 rounded-lg overflow-y-auto max-h-96 ${
+                  className={`bg-base-200 z-20 shadow-lg opacity-95 p-3 rounded-lg overflow-y-auto max-h-96 ${
                     additembox ? "" : "hidden"
                   }`}
                   id="additembox"
@@ -86,13 +125,11 @@ const StockOutForm = ({ onClose }) => {
                   </div>
                   <div className="overflow-x-auto">
                     <table className="mt-3 table table-sm">
-                      {/* head */}
                       <thead className="text-white">
                         <tr>
                           <th>Item SKU</th>
                           <th>Item Name</th>
                           <th></th>
-                          
                         </tr>
                       </thead>
                       <tbody>
@@ -109,44 +146,35 @@ const StockOutForm = ({ onClose }) => {
                   </div>
                 </div>
               </div>
-              <div className="">
-                {/* 
-                    item_sku item_name quantity price
-                    total base from item quantity * price
-                    , total can be modified show fees
-                 */}
-
-                <div className="table-wrp block overflow-y-auto min-h-80 max-h-80">
-                  <table className="table max-w-96">
-                    {/* head */}
-                    <thead className=" bg-neutral sticky top-0 text-white">
-                      <tr >
-                        <th className="pr-12">SKU</th>
-                        <th className="pr-12">Product Name</th>
-                        <th className="">Current Stocks</th>
-                        <th className="w-12">Quantity</th>
-                        <th>
-                          <label>
-                            <input
-                              type="checkbox"
-                              className="checkbox checkbox-secondary opacity-0 cursor-default"
-                            />
-                          </label>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className=" max-h-96 overflow-x-hidden overflow-y-auto">
-                      {checkedProducts.map((item, index) => (
-                        <TableContents
-                          key={index}
-                          {...item}
-                          isChecked={isChecked(item.sku)}
-                          onCheckboxChange={handleCheckboxChange}
-                        />
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+              <div className="table-wrp block overflow-y-auto min-h-80 max-h-80">
+                <table className="table max-w-96">
+                  <thead className="bg-neutral sticky top-0 text-white">
+                    <tr>
+                      <th className="pr-12">SKU</th>
+                      <th className="pr-12">Product Name</th>
+                      <th className="">Current Stocks</th>
+                      <th className="w-12">Quantity</th>
+                      <th>
+                        <label>
+                          <input
+                            type="checkbox"
+                            className="checkbox checkbox-secondary opacity-0 cursor-default"
+                          />
+                        </label>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="max-h-96 overflow-x-hidden overflow-y-auto">
+                    {checkedProducts.map((item, index) => (
+                      <TableContents
+                        key={index}
+                        {...item}
+                        isChecked={isChecked(item.sku)}
+                        onCheckboxChange={handleCheckboxChange}
+                      />
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
 
@@ -162,6 +190,7 @@ const StockOutForm = ({ onClose }) => {
                 Save
               </button>
             </div>
+            <p className="w-full justify-center flex text-error">{error}</p>
           </form>
         </div>
       </div>
@@ -171,50 +200,49 @@ const StockOutForm = ({ onClose }) => {
 
 export default StockOutForm;
 
-
 const SearchContents = ({ sku, name, isChecked, onCheckboxChange }) => {
-    return (
-      <tr>
-        <td>{sku}</td>
-        <td>{name}</td>  
-        <th>
-          <label>
-            <input
-              type="checkbox"
-              className="checkbox checkbox-secondary"
-              checked={isChecked}
-              onChange={() => onCheckboxChange(sku)}
-            />
-          </label>
-        </th>
-      </tr>
-    );
-  };
-
-  const TableContents = ({ sku, name, stockLeft, isChecked, onCheckboxChange }) => {
-    return (
-      <tr>
-        <td>{sku}</td>
-        <td>{name}</td>
-        <td>{stockLeft}</td>
-        <td>
+  return (
+    <tr>
+      <td>{sku}</td>
+      <td>{name}</td>
+      <th>
+        <label>
           <input
-            type="number"
-            placeholder=""
-            className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none input input-xs w-12"
-            id={sku + "-quantity"}
+            type="checkbox"
+            className="checkbox checkbox-secondary"
+            checked={isChecked}
+            onChange={() => onCheckboxChange(sku)}
           />
-        </td>
-        <th>
-          <label>
-            <input
-              type="checkbox"
-              className="checkbox checkbox-secondary"
-              checked={isChecked}
-              onChange={() => onCheckboxChange(sku)}
-            />
-          </label>
-        </th>
-      </tr>
-    );
-  };  
+        </label>
+      </th>
+    </tr>
+  );
+};
+
+const TableContents = ({ sku, name, stockLeft, isChecked, onCheckboxChange }) => {
+  return (
+    <tr>
+      <td>{sku}</td>
+      <td>{name}</td>
+      <td>{stockLeft}</td>
+      <td>
+        <input
+          type="number"
+          placeholder=""
+          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none input input-xs w-12"
+          id={sku + "-quantity"}
+        />
+      </td>
+      <th>
+        <label>
+          <input
+            type="checkbox"
+            className="checkbox checkbox-secondary"
+            checked={isChecked}
+            onChange={() => onCheckboxChange(sku)}
+          />
+        </label>
+      </th>
+    </tr>
+  );
+};

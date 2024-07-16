@@ -8,11 +8,14 @@ router.put('/', async (req, res) => {
     try {
         const { supplierName, products } = req.body;
         
-        if (!supplierName || !products || !Array.isArray(products) || products.length === 0) {
-            return res.status(400).json({ message: "Supplier name and a non-empty array of products are required" });
+        if (!supplierName ) {
+            return res.status(400).json({ message: "Supplier name is required" });
+        }
+        if (products.length === 0 || !products || !Array.isArray(products)) {
+            return res.status(400).json({ message: "No Products Selected!"})
         }
 
-        const supplier = await Supplier.findOne({ name: supplierName });
+        const supplier = await Supplier.findById(supplierName);
         if (!supplier) {
             return res.status(404).json({ message: "Supplier not found" });
         }
@@ -24,7 +27,7 @@ router.put('/', async (req, res) => {
                 return res.status(400).json({ message: "SKU and a valid quantity are required for each product" });
             }
 
-            await Product.updateOne({ SKU }, { $inc: { quantity } });
+            await Product.updateOne({ sku: SKU }, { $inc: { stockLeft: quantity } });
         }
 
         res.status(200).json({ message: "Stock in successful" });

@@ -7,8 +7,8 @@ router.put('/', async (req, res) => {
     try {
         const { reason, products } = req.body;
 
-        if (!reason || !products || !Array.isArray(products)) {
-            return res.status(400).json({ message: "All fields are required" });
+        if (products.length === 0 || !products || !Array.isArray(products)) {
+            return res.status(400).json({ message: "No Products Selected!"})
         }
 
         for (let product of products) {
@@ -18,7 +18,7 @@ router.put('/', async (req, res) => {
                 return res.status(400).json({ message: "SKU and a valid quantity are required for each product" });
             }
 
-            const productDoc = await Product.findOne({ SKU });
+            const productDoc = await Product.findOne({ sku: SKU });
             if (!productDoc) {
                 return res.status(404).json({ message: `Product with SKU ${SKU} not found` });
             }
@@ -27,7 +27,7 @@ router.put('/', async (req, res) => {
                 return res.status(400).json({ message: `Insufficient stock for SKU ${SKU}` });
             }
 
-            await Product.updateOne({ SKU }, { $inc: { quantity: -quantity } });
+            await Product.updateOne({ sku: SKU }, { $inc: { stockLeft: -quantity } });
         }
 
         res.status(200).json({ message: "Stock out successful" });
