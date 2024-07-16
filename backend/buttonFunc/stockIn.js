@@ -8,8 +8,11 @@ router.put('/', async (req, res) => {
     try {
         const { supplierName, products } = req.body;
         
-        if (!supplierName || !products || !Array.isArray(products) || products.length === 0) {
-            return res.status(400).json({ message: "Supplier name and a non-empty array of products are required" });
+        if (!supplierName ) {
+            return res.status(400).json({ message: "Supplier name is required" });
+        }
+        if (products.length === 0 || !products || !Array.isArray(products)) {
+            return res.status(400).json({ message: "No Products Selected!"})
         }
 
         const supplier = await Supplier.findById(supplierName);

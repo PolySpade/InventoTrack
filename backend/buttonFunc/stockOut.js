@@ -7,8 +7,8 @@ router.put('/', async (req, res) => {
     try {
         const { reason, products } = req.body;
 
-        if (!reason || !products || !Array.isArray(products)) {
-            return res.status(400).json({ message: "All fields are required" });
+        if (products.length === 0 || !products || !Array.isArray(products)) {
+            return res.status(400).json({ message: "No Products Selected!"})
         }
 
         for (let product of products) {
