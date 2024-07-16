@@ -13,6 +13,7 @@ import {
 import { formatTimestamp } from "../../utils";
 import axios from "axios";
 import { OrdersContext } from "../../contexts";
+import EditOrderedProductsForm from "./EditOrderedProductsForm";
 
 const EditOrderForm = ({
   _id,
@@ -23,6 +24,7 @@ const EditOrderForm = ({
   sellingPlatform,
   status,
   totalPaid,
+  products,
   otherFees,
   timestamp,
   timeline,
@@ -48,6 +50,7 @@ const EditOrderForm = ({
   const [sellingPlatformId, setSellingPlatformId] = useState(sellingPlatform._id);
   const [totalPaidValue, setTotalPaidValue] = useState(totalPaid);
   const [feesValue, setFeesValue] = useState(otherFees);
+  const [editProducts,setEditProducts] = useState(false);
 
 
 
@@ -170,6 +173,12 @@ const EditOrderForm = ({
     }
   }
 
+  const handleEditProducts = async () => {
+    setEditProducts(true);
+    // onClose();
+  }
+  
+
   return (
     <div className="fixed inset-4 flex items-center justify-end z-50">
       <div className="fixed inset-0 bg-black opacity-50 z-0" onClick={onClose}></div>
@@ -252,6 +261,13 @@ const EditOrderForm = ({
             <h1 className="font-bold text-md my-2">Alerts</h1>
             <Alerts orderid={id} />
           </div>
+          
+          <div className="flex justify-center">
+            <button className='btn btn-content text-white' onClick={handleEditProducts}>Edit Products</button>
+          </div>
+          {editProducts && (
+            <EditOrderedProductsForm onClose={ () => setEditProducts(false)} productslist={products} orderid={_id}/>
+          )}
           <div>
             <h1 className="font-bold text-md my-2">Status</h1>
             <div className="flex flex-row justify-evenly">
