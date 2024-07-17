@@ -6,41 +6,50 @@ import { productModel as Product } from '../models/productModel.js';
 
 // create
 router.post('/CreateOrder', async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
     try {
         const { id, timestamp, products, courier, trackingNumber, sellingPlatform, buyerName, buyerEmail, buyerPhone, totalPaid, otherFees, status, timeline, notes } = req.body;
 
         // Check if orderId is provided and if it's already used
         if (id) {
-            const existingOrder = await orderModel.findOne({ id });
+            const existingOrder = await orderModel.findOne({ id }).session(session);
             if (existingOrder) {
+                await session.abortTransaction();
+                session.endSession();
                 return res.status(400).send({ message: "Order ID is already used!" });
             }
         }
 
         if (!timestamp || !products || products.length === 0 || !courier || !sellingPlatform || !totalPaid || !status || !timeline) {
+            await session.abortTransaction();
+            session.endSession();
             return res.status(400).send({ message: "Send all required fields!" });
         }
 
         const productObjects = [];
+        let checker = true;
+
         for (let product of products) {
-            console.log(product)
             const { productId, name, quantity, price } = product;
 
-            if (!productId || !name || quantity === undefined || !price) {
-                return res.status(400).send({ message: "Send all required fields!" });
-            }
-
-            const productDoc = await Product.findOne({ _id: productId });
+            const productDoc = await Product.findOne({ _id: productId }).session(session);
 
             if (!productDoc) {
+                await session.abortTransaction();
+                session.endSession();
                 return res.status(404).send({ message: `Product ${name} not found` });
             }
 
             if (productDoc.stockLeft < quantity) {
+                checker = false;
+                await session.abortTransaction();
+                session.endSession();
                 return res.status(400).send({ message: `Insufficient stock for ${name}` });
             }
 
-            await Product.updateOne({ _id: productId }, { $inc: { stockLeft: -quantity } });
+            await Product.updateOne({ _id: productId }, { $inc: { stockLeft: -quantity } }).session(session);
 
             productObjects.push({
                 productId: new mongoose.Types.ObjectId(productId),
@@ -48,6 +57,12 @@ router.post('/CreateOrder', async (req, res) => {
                 quantity,
                 price
             });
+        }
+
+        if (!checker) {
+            await session.abortTransaction();
+            session.endSession();
+            return;
         }
 
         const newOrder = {
@@ -73,13 +88,19 @@ router.post('/CreateOrder', async (req, res) => {
             notes: notes || 'no notes'
         };
 
-        const order = await orderModel.create(newOrder);
+        const order = await orderModel.create([newOrder], { session: session });
+
+        await session.commitTransaction();
+        session.endSession();
         return res.status(201).send(order);
     } catch (err) {
         console.log(err.message);
+        await session.abortTransaction();
+        session.endSession();
         res.status(500).send({ message: err.message });
     }
 });
+
 
 
 // get all orders
@@ -353,12 +374,17 @@ router.put('/EditOrder/:id', async (req, res) => {
 
 // edit products order
 router.put('/EditProductsOrder/:id', async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
     try {
         const { id } = req.params;
         const { products } = req.body;
 
         const existingOrder = await orderModel.findById(id);
         if (!existingOrder) {
+            session.abortTransaction();
+            session.endSession();
             return res.status(404).send({ message: "Order not found" });
         }
 
@@ -371,6 +397,7 @@ router.put('/EditProductsOrder/:id', async (req, res) => {
         await orderModel.findByIdAndUpdate(id, { $set: { products: [] } });
 
         const productObjects = [];
+        let checker = true;
 
         for (let product of products) {
             const { productId, name, quantity, price } = product;
@@ -378,25 +405,34 @@ router.put('/EditProductsOrder/:id', async (req, res) => {
             const productDoc = await Product.findOne({ _id: productId });
 
             if (!productDoc) {
+                await session.abortTransaction();
+                session.endSession();
                 return res.status(404).send({ message: `Product with ID ${productId} not found` });
             }
 
             if (productDoc.stockLeft < quantity) {
+                checker = false;
+                await session.abortTransaction();
+                session.endSession();
                 return res.status(400).send({ message: `Insufficient stock for product ID ${productId}` });
             }
 
-            await Product.updateOne({ _id: productId }, { $inc: { stockLeft: -quantity } });
+            await Product.updateOne({ _id: productId }, { $inc: { stockLeft: -quantity } }).session(session);
 
-            const data = {
+            productObjects.push({
                 productId: new mongoose.Types.ObjectId(productId),
                 name,
                 quantity,
                 price
-            }
+            });
 
             console.log(data)
-            
-            productObjects.push(data);
+        }
+
+        if (!checker){
+            session.abortTransaction();
+            session.endSession();
+            return;
         }
 
         const updatedOrder = await orderModel.findByIdAndUpdate(
@@ -407,13 +443,13 @@ router.put('/EditProductsOrder/:id', async (req, res) => {
             { new: true }
         );
 
-        if (!updatedOrder) {
-            return res.status(404).send({ message: "Failed to update order" });
-        }
-
+        await session.commitTransaction();
+        session.endSession();
         return res.status(200).send({ message: "Products updated successfully!", order: updatedOrder });
     } catch (err) {
         console.log(err.message);
+        await session.abortTransaction();
+        session.endSession();
         res.status(500).send({ message: err.message });
     }
 });
