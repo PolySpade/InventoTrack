@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 const router = express.Router();
 import { orderModel } from '../models/orderModel.js';
+import { productModel as Product } from '../models/productModel.js';
 
 // create
 router.post('/CreateOrder', async (req, res) => {
@@ -21,8 +22,8 @@ router.post('/CreateOrder', async (req, res) => {
         }
 
         const productObjects = [];
-
         for (let product of products) {
+            console.log(product)
             const { productId, name, quantity, price } = product;
 
             if (!productId || !name || quantity === undefined || !price) {
@@ -32,11 +33,11 @@ router.post('/CreateOrder', async (req, res) => {
             const productDoc = await Product.findOne({ _id: productId });
 
             if (!productDoc) {
-                return res.status(404).send({ message: `Product with ID ${productId} not found` });
+                return res.status(404).send({ message: `Product ${name} not found` });
             }
 
             if (productDoc.stockLeft < quantity) {
-                return res.status(400).send({ message: `Insufficient stock for product ID ${productId}` });
+                return res.status(400).send({ message: `Insufficient stock for ${name}` });
             }
 
             await Product.updateOne({ _id: productId }, { $inc: { stockLeft: -quantity } });
@@ -386,12 +387,16 @@ router.put('/EditProductsOrder/:id', async (req, res) => {
 
             await Product.updateOne({ _id: productId }, { $inc: { stockLeft: -quantity } });
 
-            productObjects.push({
+            const data = {
                 productId: new mongoose.Types.ObjectId(productId),
                 name,
                 quantity,
                 price
-            });
+            }
+
+            console.log(data)
+            
+            productObjects.push(data);
         }
 
         const updatedOrder = await orderModel.findByIdAndUpdate(

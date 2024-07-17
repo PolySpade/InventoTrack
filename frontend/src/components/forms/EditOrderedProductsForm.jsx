@@ -1,17 +1,22 @@
 import React, { useContext, useState } from "react";
 import { XCircleFillIcon, SearchIcon } from "@primer/octicons-react";
 import { OrdersContext } from "../../contexts";
+import axios from "axios";
 
 const EditOrderedProductsForm = ({ productslist, onClose, orderid }) => {
-  const { products: allProducts } = useContext(OrdersContext);
+  const API_URL = import.meta.env.VITE_API_URL;
+  const { products: allProducts, refreshData } = useContext(OrdersContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [checkedItems, setCheckedItems] = useState(
     productslist.map((product) => ({
       sku: product.productId.sku,
       quantity: product.quantity,
       price: product.price,
+      name: product.name
     }))
   );
+
+  console.log(checkedItems)
 
   const [addItemBox, setAddItemBox] = useState(false);
   const [error, setError]= useState(false);
@@ -26,13 +31,16 @@ const EditOrderedProductsForm = ({ productslist, onClose, orderid }) => {
   );
 
   const handleCheckboxChange = (sku) => {
-    setCheckedItems((prev) =>
-      prev.some((item) => item.sku === sku)
-        ? prev.filter((item) => item.sku !== sku)
-        : [...prev, { sku, quantity: 1, price: 0 }]
-    );
+    setCheckedItems((prev) => {
+      const existingItem = prev.find((item) => item.sku === sku);
+      if (existingItem) {
+        return prev.filter((item) => item.sku !== sku);
+      } else {
+        const product = allProducts.find((item) => item.sku === sku);
+        return [...prev, { sku, quantity: 1, price: 0, name: product.name }];
+      }
+    });
   };
-
   const handleSave = async () => {
     const updatedProducts = checkedItems.map((item) => {
       const quantity = Number(document.getElementById(`${item.sku}-quantity`).value);
@@ -49,16 +57,17 @@ const EditOrderedProductsForm = ({ productslist, onClose, orderid }) => {
       })),
     };
     console.log(orderData)
-    // try {
-    //   await axios.put(`${API_URL}/orders/EditOrderProducts/${orderid}`, orderData);
-    //   refreshData();
-    //   onClose();
-    // } catch (error) {
-    //   console.error(error);
-    //   setError("An error occurred while saving the changes.");
-    // }
+    try {
+      await axios.put(`${API_URL}/orders/EditProductsOrder/${orderid}`, orderData);
+      refreshData();
+      onClose();
+    } catch (error) {
+      console.error(error);
+      setError("An error occurred while saving the changes.");
+    }
   };
 
+  
   const isChecked = (sku) => checkedItems.some((item) => item.sku === sku);
 
   return (
@@ -174,7 +183,7 @@ const ActionButtons = ({ onCancel,error, handleSave }) => (
       <dialog id="my_modal_1" className="modal">
         <div className="modal-box">
           <h3 className="font-bold text-lg">Warning!</h3>
-          <p className="py-4">Editing products will restock the old products and deduct the new products.</p>
+          <p className="py-4">Editing products will restock the old products and deduct the new products. Make sure to adjust your Total Paid and Fees!</p>
           <div className="modal-action">
             <form method="dialog">
             <button className="btn bg-error text-white border-none">Cancel</button>
