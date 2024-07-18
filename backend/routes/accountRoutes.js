@@ -110,6 +110,52 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+router.put('/editRole/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { role } = req.body;
+
+        if (!role) {
+            return res.status(400).send({ message: "Role is required" });
+        }
+
+        const accountToEdit = await accountModel.findByIdAndUpdate(id, { role: new mongoose.Types.ObjectId(role) }, { new: true });
+
+        if (!accountToEdit) {
+            return res.status(404).send({ message: "Account not found" });
+        }
+
+        return res.status(200).send({ message: "Role updated successfully!" });
+    } catch (err) {
+        console.log(err.message);
+        res.status(500).send({ message: err.message });
+    }
+});
+
+router.put('/editPassword/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { password } = req.body;
+
+        if (!password) {
+            return res.status(400).send({ message: "Password is required" });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const accountToEdit = await accountModel.findByIdAndUpdate(id, { password: hashedPassword }, { new: true });
+
+        if (!accountToEdit) {
+            return res.status(404).send({ message: "Account not found" });
+        }
+
+        return res.status(200).send({ message: "Password updated successfully!" });
+    } catch (err) {
+        console.log(err.message);
+        res.status(500).send({ message: err.message });
+    }
+});
+
+
 // edit
 router.put('/EditAccount/:id', async (req, res) => {
     try {

@@ -6,7 +6,9 @@ import {
   FileDirectoryIcon,
   GlobeIcon,
   InboxIcon,
+  PersonFillIcon,
   PersonIcon,
+  StackIcon,
   TagIcon,
 } from "@primer/octicons-react";
 import axios from "axios";
@@ -16,6 +18,8 @@ import WarehouseForm from "../components/forms/WarehouseForm";
 import CouriersForm from "../components/forms/CouriersForm";
 import RoleForm from "../components/forms/RoleForm";
 import RecordsHistory from "../components/table/RecordsHistory";
+import PlatformsForm from "../components/forms/PlatformsForm";
+import AccountsForm from "../components/forms/AccountsForm";
 
 const Preferences = () => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -35,8 +39,10 @@ const Preferences = () => {
   const [roleTypes, setRoleTypes] = useState([]);
   const [accounts,setAccounts] = useState([]);
   const [histories,setHistories] = useState([]);
+  const [platforms, setPlatforms] = useState([]);
   const [recordsTable, setRecordsTable] = useState(false);
-
+  const [platformsForm, setPlatformsForm] = useState(false);
+  const [accountsForm,setAccountsForm] = useState(false);
   const getExpenseTypes = () => {
     axios
       .get(`${API_URL}/expensesTypes/`)
@@ -135,6 +141,17 @@ const Preferences = () => {
       });
   };
 
+  const getPlatforms = () => {
+    axios
+      .get(`${API_URL}/platforms/`)
+      .then((response) => {
+        setPlatforms(response.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   const refreshData = () => {
     getExpenseTypes();
     getOrdersData();
@@ -146,6 +163,7 @@ const Preferences = () => {
     getRoles();
     getAccounts();
     getHistory();
+    getPlatforms();
   };
 
   useEffect(() => {
@@ -165,6 +183,7 @@ const Preferences = () => {
         accounts,
         roleTypes,
         histories,
+        platforms,
         refreshData,
       }}
     >
@@ -183,9 +202,16 @@ const Preferences = () => {
           <button onClick={() => setCouriersForm( (prev) => !prev)}>
             <Box icon={<GlobeIcon size={100} />} text="Couriers" />
           </button>
+          <button onClick={() => setPlatformsForm( (prev) => !prev)}>
+            <Box icon={<StackIcon size={100} />} text="Platforms" />
+          </button>
           <button onClick={() => setRoleForm( (prev) => !prev)}>
             <Box icon={<PersonIcon size={100} />} text="Roles" />
           </button>
+          <button onClick={() => setAccountsForm( (prev) => !prev)}>
+            <Box icon={<PersonFillIcon size={100} />} text="Accounts" />
+          </button>
+          
           <button onClick={() => setRecordsTable( (prev) => !prev)}>
             <Box
               icon={<FileDirectoryIcon size={100} />}
@@ -211,6 +237,16 @@ const Preferences = () => {
           {
             recordsTable && (
               <RecordsHistory onClose={()=> setRecordsTable(false)}/>
+            )
+          }
+          {
+            platformsForm && (
+              <PlatformsForm onClose={() => setPlatformsForm(false)}/>
+            )
+          }
+          {
+            accountsForm && (
+              <AccountsForm onClose={() => setAccountsForm(false)}/>
             )
           }
         </div>

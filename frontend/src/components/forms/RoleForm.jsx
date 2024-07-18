@@ -23,7 +23,8 @@ const RoleForm = ({ onClose }) => {
     modifyWarehouses: false,
     modifyCouriers: false,
     recordsHistory: false,
-    modifyAccounts: false
+    modifyAccounts: false,
+    modifyPlatforms: false
   });
 
   const selectedRoleType = roleTypes.find(item => item._id === selectedRole);
@@ -48,11 +49,30 @@ const RoleForm = ({ onClose }) => {
         modifyWarehouses: selectedRoleType.permissions.includes("modifyWarehouses"),
         modifyCouriers: selectedRoleType.permissions.includes("modifyCouriers"),
         recordsHistory: selectedRoleType.permissions.includes("recordsHistory"),
-        modifyAccounts: selectedRoleType.permissions.includes("modifyAccounts")
+        modifyAccounts: selectedRoleType.permissions.includes("modifyAccounts"),
+        modifyPlatforms: selectedRoleType.permissions.includes("modifyPlatforms")
       });
     }
   }
 
+  const resetRolePerm = () => {
+    setPermissions({
+      inventory: false,
+      expenses: false,
+      reports: false,
+      orders: false,
+      dashboard: false,
+      cog: false,
+      roleManagement: false,
+      modifyExpensesType: false,
+      modifyProductCategory: false,
+      modifyWarehouses: false,
+      modifyCouriers: false,
+      recordsHistory: false,
+      modifyAccounts: false,
+      modifyPlatforms: false
+    })
+  }
 
 
   const setEdit = () => {
@@ -64,11 +84,16 @@ const RoleForm = ({ onClose }) => {
   }
 
   const setAdd = () => {
-    setAddMode((prev) => !prev)
+    setAddMode((prev) => !prev) 
     setError("")
+    resetRolePerm();
   }
 
   const handleEdit = async () => {
+    if (selectedRoleType && selectedRoleType.roleName.toLowerCase() === "admin") {
+      setError("Cannot edit the admin role");
+      return;
+    }
     const data = {
       roleName: newRole,
       permissions: Object.keys(permissions).filter(key => permissions[key]),
@@ -97,6 +122,10 @@ const RoleForm = ({ onClose }) => {
   }
   
   const handleDelete = async () => {
+    if (selectedRoleType && selectedRoleType.roleName.toLowerCase() === "admin") {
+      setError("Cannot delete the admin role");
+      return;
+    }
     const _id = selectedRoleType._id;
 
     const isInProductsData = accounts.some(account => account.role._id === _id);
@@ -239,6 +268,11 @@ const RoleForm = ({ onClose }) => {
               <p className="ml-2">Modify Couriers</p>
             </div>
             <div className="flex flex-row">
+              <input type="checkbox" className="checkbox checkbox-secondary" value="modifyPlatforms" checked={permissions.modifyPlatforms} onChange={handleCheckboxChange} />
+              <p className="ml-2">Modify Platforms</p>
+            </div>
+
+            <div className="flex flex-row">
               <input type="checkbox" className="checkbox checkbox-secondary" value="roleManagement" checked={permissions.roleManagement} onChange={handleCheckboxChange} />
               <p className="ml-2">Role Management</p>
             </div>
@@ -251,6 +285,7 @@ const RoleForm = ({ onClose }) => {
               <input type="checkbox" className="checkbox checkbox-secondary" value="modifyAccounts" checked={permissions.modifyAccounts} onChange={handleCheckboxChange} />
               <p className="ml-2">Modify Accounts</p>
             </div>
+            
           </div>
           <div className="flex justify-evenly mt-5">
             <button className="btn text-white" onClick={setEdit}>
@@ -318,6 +353,10 @@ const RoleForm = ({ onClose }) => {
             <div className="flex flex-row">
               <input type="checkbox" className="checkbox checkbox-secondary" value="modifyCouriers" checked={permissions.modifyCouriers} onChange={handleCheckboxChange} />
               <p className="ml-2">Modify Couriers</p>
+            </div>
+            <div className="flex flex-row">
+              <input type="checkbox" className="checkbox checkbox-secondary" value="modifyPlatforms" checked={permissions.modifyPlatforms} onChange={handleCheckboxChange} />
+              <p className="ml-2">Modify Platforms</p>
             </div>
             <div className="flex flex-row">
               <input type="checkbox" className="checkbox checkbox-secondary" value="roleManagement" checked={permissions.roleManagement} onChange={handleCheckboxChange} />
