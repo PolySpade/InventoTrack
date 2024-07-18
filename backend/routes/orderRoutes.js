@@ -6,63 +6,46 @@ import { productModel as Product } from '../models/productModel.js';
 
 // create
 router.post('/CreateOrder', async (req, res) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
     try {
         const { id, timestamp, products, courier, trackingNumber, sellingPlatform, buyerName, buyerEmail, buyerPhone, totalPaid, otherFees, status, timeline, notes } = req.body;
 
         // Check if orderId is provided and if it's already used
         if (id) {
-            const existingOrder = await orderModel.findOne({ id }).session(session);
+            const existingOrder = await orderModel.findOne({ id });
             if (existingOrder) {
-                await session.abortTransaction();
-                session.endSession();
                 return res.status(400).send({ message: "Order ID is already used!" });
             }
         }
 
         if (!timestamp || !products || products.length === 0 || !courier || !sellingPlatform || !totalPaid || !status || !timeline) {
-            await session.abortTransaction();
-            session.endSession();
             return res.status(400).send({ message: "Send all required fields!" });
         }
 
-        const productObjects = [];
-        let checker = true;
-
+        // First pass: Check if all products are available in stock
         for (let product of products) {
-            const { productId, name, quantity, price } = product;
-
-            const productDoc = await Product.findOne({ _id: productId }).session(session);
+            const { productId, name, quantity } = product;
+            const productDoc = await Product.findOne({ _id: productId });
 
             if (!productDoc) {
-                await session.abortTransaction();
-                session.endSession();
                 return res.status(404).send({ message: `Product ${name} not found` });
             }
 
             if (productDoc.stockLeft < quantity) {
-                checker = false;
-                await session.abortTransaction();
-                session.endSession();
                 return res.status(400).send({ message: `Insufficient stock for ${name}` });
             }
+        }
 
-            await Product.updateOne({ _id: productId }, { $inc: { stockLeft: -quantity } }).session(session);
-
+        // Second pass: Deduct stock quantities and prepare product objects
+        const productObjects = [];
+        for (let product of products) {
+            const { productId, name, quantity, price } = product;
+            await Product.updateOne({ _id: productId }, { $inc: { stockLeft: -quantity } });
             productObjects.push({
                 productId: new mongoose.Types.ObjectId(productId),
                 name,
                 quantity,
                 price
             });
-        }
-
-        if (!checker) {
-            await session.abortTransaction();
-            session.endSession();
-            return;
         }
 
         const newOrder = {
@@ -88,19 +71,14 @@ router.post('/CreateOrder', async (req, res) => {
             notes: notes || 'no notes'
         };
 
-        const order = await orderModel.create([newOrder], { session: session });
+        const order = await orderModel.create(newOrder);
 
-        await session.commitTransaction();
-        session.endSession();
         return res.status(201).send(order);
     } catch (err) {
         console.log(err.message);
-        await session.abortTransaction();
-        session.endSession();
         res.status(500).send({ message: err.message });
     }
 });
-
 
 
 // get all orders
@@ -374,65 +352,49 @@ router.put('/EditOrder/:id', async (req, res) => {
 
 // edit products order
 router.put('/EditProductsOrder/:id', async (req, res) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
     try {
         const { id } = req.params;
         const { products } = req.body;
 
         const existingOrder = await orderModel.findById(id);
         if (!existingOrder) {
-            session.abortTransaction();
-            session.endSession();
             return res.status(404).send({ message: "Order not found" });
         }
 
-        for (let oldProduct of existingOrder.products) {
-            const { productId, quantity } = oldProduct;
-
-            await Product.updateOne({ _id: productId }, { $inc: { stockLeft: quantity } });
-        }
-
-        await orderModel.findByIdAndUpdate(id, { $set: { products: [] } });
-
-        const productObjects = [];
-        let checker = true;
-
+        // First pass: Check if all new products are available in stock considering the quantities from the old order
         for (let product of products) {
-            const { productId, name, quantity, price } = product;
-
+            const { productId, name, quantity } = product;
             const productDoc = await Product.findOne({ _id: productId });
 
             if (!productDoc) {
-                await session.abortTransaction();
-                session.endSession();
-                return res.status(404).send({ message: `Product with ID ${productId} not found` });
+                return res.status(404).send({ message: `Product: ${name} not found` });
             }
 
-            if (productDoc.stockLeft < quantity) {
-                checker = false;
-                await session.abortTransaction();
-                session.endSession();
-                return res.status(400).send({ message: `Insufficient stock for product ID ${productId}` });
+            const oldProduct = existingOrder.products.find(p => p.productId.toString() === productId);
+            const oldQuantity = oldProduct ? oldProduct.quantity : 0;
+
+            if (productDoc.stockLeft + oldQuantity < quantity) {
+                return res.status(400).send({ message: `Insufficient stock for product: ${name}` });
             }
+        }
 
-            await Product.updateOne({ _id: productId }, { $inc: { stockLeft: -quantity } }).session(session);
+        // Revert stock quantities for the existing products in the order
+        for (let oldProduct of existingOrder.products) {
+            const { productId, quantity } = oldProduct;
+            await Product.updateOne({ _id: productId }, { $inc: { stockLeft: quantity } });
+        }
 
+        // Second pass: Deduct stock quantities and prepare product objects
+        const productObjects = [];
+        for (let product of products) {
+            const { productId, name, quantity, price } = product;
+            await Product.updateOne({ _id: productId }, { $inc: { stockLeft: -quantity } });
             productObjects.push({
                 productId: new mongoose.Types.ObjectId(productId),
                 name,
                 quantity,
                 price
             });
-
-            console.log(data)
-        }
-
-        if (!checker){
-            session.abortTransaction();
-            session.endSession();
-            return;
         }
 
         const updatedOrder = await orderModel.findByIdAndUpdate(
@@ -443,13 +405,9 @@ router.put('/EditProductsOrder/:id', async (req, res) => {
             { new: true }
         );
 
-        await session.commitTransaction();
-        session.endSession();
         return res.status(200).send({ message: "Products updated successfully!", order: updatedOrder });
     } catch (err) {
         console.log(err.message);
-        await session.abortTransaction();
-        session.endSession();
         res.status(500).send({ message: err.message });
     }
 });

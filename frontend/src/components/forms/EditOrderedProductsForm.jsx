@@ -56,14 +56,20 @@ const EditOrderedProductsForm = ({ productslist, onClose, orderid }) => {
         name: item.name
       })),
     };
-    console.log(orderData)
+    const hasZeroQuantity = updatedProducts.some(item => item.quantity === 0);
+
+    if (hasZeroQuantity) {
+      setError("Some products have a quantity of 0. Please update the quantity.");
+      return;
+    }
+
     try {
       await axios.put(`${API_URL}/orders/EditProductsOrder/${orderid}`, orderData);
       refreshData();
       onClose();
     } catch (error) {
       console.error(error);
-      setError("An error occurred while saving the changes.");
+      setError(error.response.data.message);
     }
   };
 
