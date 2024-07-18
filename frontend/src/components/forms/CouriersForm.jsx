@@ -76,6 +76,10 @@ const CouriersForm = ({ onClose }) => {
   }
 
   const handleAdd = async () => {
+    if (!newCourier) {
+      setError("Input is Blank");
+      return;
+    }
     const data = {
       name: newCourier
     }
@@ -145,6 +149,7 @@ const CouriersForm = ({ onClose }) => {
             defaultValue={selectedCourierType.name} 
             className="input input-bordered w-full"
             onChange={(e) => setNewCourier(e.target.value)} 
+
           />
           <div className="flex justify-evenly mt-5">
           <button className="btn text-white" onClick={setEdit}>
@@ -165,6 +170,7 @@ const CouriersForm = ({ onClose }) => {
           <input 
             className="input input-bordered w-full"
             onChange={(e) => setNewCourier(e.target.value)} 
+            placeholder="Input your new Courier"
           />
           <div className="flex justify-evenly mt-5">
           <button className="btn text-white" onClick={setAdd}>

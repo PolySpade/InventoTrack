@@ -172,7 +172,7 @@ const AccountsForm = ({ onClose }) => {
                 Edit
               </button>
               <button className="btn text-white" onClick={setAdd}>
-                Add
+                Create Account
               </button>
             </div>
           </div>

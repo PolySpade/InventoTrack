@@ -91,8 +91,6 @@ router.get('/', async (req, res) => {
 });
 
 
-
-
 // get specific account
 router.get('/:id', async (req, res) => {
     try {

@@ -94,23 +94,29 @@ const RoleForm = ({ onClose }) => {
       setError("Cannot edit the admin role");
       return;
     }
+  
     const data = {
       roleName: newRole,
       permissions: Object.keys(permissions).filter(key => permissions[key]),
     };
-    
-    if (!newRole) {
-      setError("Input is Blank");
+  
+    if (!newRole.trim()) {
+      setError("Role name cannot be blank");
       return;
     }
-
+  
+    if (data.permissions.length === 0) {
+      setError("At least one permission must be selected");
+      return;
+    }
+  
     const isInRolesType = roleTypes.some(role => role.roleName === newRole && role._id !== selectedRoleType._id);
-
+  
     if (isInRolesType) {
       setError("Existing Role Type");
       return;
     }
-    
+  
     const _id = selectedRoleType._id;
     try {
       const response = await axios.put(`${API_URL}/roles/EditRole/${_id}`, data);
@@ -119,7 +125,7 @@ const RoleForm = ({ onClose }) => {
     } catch (error) {
       setError(error.response.data.message);
     }
-  }
+  };
   
   const handleDelete = async () => {
     if (selectedRoleType && selectedRoleType.roleName.toLowerCase() === "admin") {
@@ -148,6 +154,15 @@ const RoleForm = ({ onClose }) => {
       roleName: newRole,
       permissions: Object.keys(permissions).filter(key => permissions[key]),
     };
+    if (!newRole.trim()) {
+      setError("Role name cannot be blank");
+      return;
+    }
+  
+    if (data.permissions.length === 0) {
+      setError("At least one permission must be selected");
+      return;
+    }
     const isInRolesType = roleTypes.some(role => role.roleName === newRole);
 
     if (isInRolesType) {

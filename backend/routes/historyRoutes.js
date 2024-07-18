@@ -13,7 +13,7 @@ router.post('/CreateHistory', async (req, res) => {
 
         const newHistory = {
             timestamp,
-            role: new mongoose.Types.ObjectId(role),
+            role,
             email,
             action
         }
@@ -29,7 +29,7 @@ router.post('/CreateHistory', async (req, res) => {
 // get all of the history content
 router.get('/', async (req, res) => {
     try {
-        const histories = await historyModel.find({}).populate('role')
+        const histories = await historyModel.find({})
         return res.status(200).json(histories);
     } catch (err) {
         console.log(err.message);

@@ -76,6 +76,10 @@ const CategoryForm = ({ onClose }) => {
   }
 
   const handleAdd = async () => {
+    if (!newCategory) {
+      setError("Input is Blank");
+      return;
+    }
     const data = {
       name: newCategory
     }

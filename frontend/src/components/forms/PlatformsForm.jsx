@@ -78,6 +78,11 @@ const PlatformsForm = ({ onClose }) => {
     const data = {
       name: newPlatform
     }
+    if (!newPlatform) {
+      setError("Input is Blank");
+      return;
+    }
+
     const isInPlatformsType = platformTypes.some(platform => platform.name === newPlatform);
 
     if (isInPlatformsType) {
@@ -164,6 +169,7 @@ const PlatformsForm = ({ onClose }) => {
           <input 
             className="input input-bordered w-full"
             onChange={(e) => setNewPlatform(e.target.value)} 
+            placeholder="Input your new Platform"
           />
           <div className="flex justify-evenly mt-5">
           <button className="btn text-white" onClick={setAdd}>

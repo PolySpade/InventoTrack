@@ -76,6 +76,10 @@ const WarehouseForm = ({ onClose }) => {
   }
 
   const handleAdd = async () => {
+    if (!newWarehouse) {
+      setError("Input is Blank");
+      return;
+    }
     const data = {
       name: newWarehouse
     }
@@ -165,6 +169,7 @@ const WarehouseForm = ({ onClose }) => {
           <input 
             className="input input-bordered w-full"
             onChange={(e) => setNewWarehouse(e.target.value)} 
+                        placeholder="Input your new Warehouse"
           />
           <div className="flex justify-evenly mt-5">
           <button className="btn text-white" onClick={setAdd}>

@@ -76,6 +76,10 @@ const ExpenseTypeForm = ({ onClose }) => {
   }
 
   const handleAdd = async () => {
+    if (!newExpense) {
+      setError("Input is Blank");
+      return;
+    }
     const data = {
       name: newExpense
     }
@@ -165,6 +169,7 @@ const ExpenseTypeForm = ({ onClose }) => {
           <input 
             className="input input-bordered w-full"
             onChange={(e) => setNewExpense(e.target.value)} 
+            placeholder="Input your new Expense Type"
           />
           <div className="flex justify-evenly mt-5">
           <button className="btn text-white" onClick={setAdd}>

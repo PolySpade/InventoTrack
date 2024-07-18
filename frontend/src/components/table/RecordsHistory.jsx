@@ -34,7 +34,7 @@ const RecordsHistory = ({ onClose }) => {
                 <tr key={item._id}>
                   <th>{formatTimestamp(item.timestamp)}</th>
                   <td>{item.email}</td>
-                  <td>{item.role.roleName}</td>
+                  <td>{item.role}</td>
                   <td style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'wrap' }}>
                     {item.action}
                   </td>
