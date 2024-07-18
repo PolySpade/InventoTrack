@@ -82,7 +82,7 @@ router.get('/status', authMiddleware, (req, res) => {
 // get all accounts
 router.get('/', async (req, res) => {
     try {
-        const accounts = await accountModel.find({});
+        const accounts = await accountModel.find({}).populate('role');
         return res.status(200).json(accounts);
     } catch (err) {
         console.log(err.message);
