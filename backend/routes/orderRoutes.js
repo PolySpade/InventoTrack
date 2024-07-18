@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 const router = express.Router();
 import { orderModel } from '../models/orderModel.js';
+import { productModel as Product } from '../models/productModel.js';
 
 // create
 router.post('/CreateOrder', async (req, res) => {
@@ -20,18 +21,32 @@ router.post('/CreateOrder', async (req, res) => {
             return res.status(400).send({ message: "Send all required fields!" });
         }
 
-        const productObjects = products.map(product => {
-            const { productId, name, quantity, price } = product;
-            if (!productId || !name || quantity === undefined || !price) {
-                throw new Error('Each product must have sku, name, quantity, and price');
+        // First pass: Check if all products are available in stock
+        for (let product of products) {
+            const { productId, name, quantity } = product;
+            const productDoc = await Product.findOne({ _id: productId });
+
+            if (!productDoc) {
+                return res.status(404).send({ message: `Product ${name} not found` });
             }
-            return {
+
+            if (productDoc.stockLeft < quantity) {
+                return res.status(400).send({ message: `Insufficient stock for ${name}` });
+            }
+        }
+
+        // Second pass: Deduct stock quantities and prepare product objects
+        const productObjects = [];
+        for (let product of products) {
+            const { productId, name, quantity, price } = product;
+            await Product.updateOne({ _id: productId }, { $inc: { stockLeft: -quantity } });
+            productObjects.push({
                 productId: new mongoose.Types.ObjectId(productId),
                 name,
                 quantity,
                 price
-            };
-        });
+            });
+        }
 
         const newOrder = {
             id,
@@ -57,6 +72,7 @@ router.post('/CreateOrder', async (req, res) => {
         };
 
         const order = await orderModel.create(newOrder);
+
         return res.status(201).send(order);
     } catch (err) {
         console.log(err.message);
@@ -328,6 +344,68 @@ router.put('/EditOrder/:id', async (req, res) => {
         }
 
         return res.status(200).send({ message: "Update Successful!", order: orderToEdit });
+    } catch (err) {
+        console.log(err.message);
+        res.status(500).send({ message: err.message });
+    }
+});
+
+// edit products order
+router.put('/EditProductsOrder/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { products } = req.body;
+
+        const existingOrder = await orderModel.findById(id);
+        if (!existingOrder) {
+            return res.status(404).send({ message: "Order not found" });
+        }
+
+        // First pass: Check if all new products are available in stock considering the quantities from the old order
+        for (let product of products) {
+            const { productId, name, quantity } = product;
+            const productDoc = await Product.findOne({ _id: productId });
+
+            if (!productDoc) {
+                return res.status(404).send({ message: `Product: ${name} not found` });
+            }
+
+            const oldProduct = existingOrder.products.find(p => p.productId.toString() === productId);
+            const oldQuantity = oldProduct ? oldProduct.quantity : 0;
+
+            if (productDoc.stockLeft + oldQuantity < quantity) {
+                return res.status(400).send({ message: `Insufficient stock for product: ${name}` });
+            }
+        }
+
+        // Revert stock quantities for the existing products in the order
+        for (let oldProduct of existingOrder.products) {
+            const { productId, quantity } = oldProduct;
+            await Product.updateOne({ _id: productId }, { $inc: { stockLeft: quantity } });
+        }
+
+        // Second pass: Deduct stock quantities and prepare product objects
+        const productObjects = [];
+        for (let product of products) {
+            const { productId, name, quantity, price } = product;
+            await Product.updateOne({ _id: productId }, { $inc: { stockLeft: -quantity } });
+            productObjects.push({
+                productId: new mongoose.Types.ObjectId(productId),
+                name,
+                quantity,
+                price
+            });
+        }
+
+        const updatedOrder = await orderModel.findByIdAndUpdate(
+            id,
+            {
+                $set: { products: productObjects }
+            },
+            { new: true }
+        );
+
+        return res.status(200).send({ message: "Products updated successfully!", order: updatedOrder });
     } catch (err) {
         console.log(err.message);
         res.status(500).send({ message: err.message });

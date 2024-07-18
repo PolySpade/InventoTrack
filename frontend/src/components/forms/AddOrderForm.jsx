@@ -51,33 +51,41 @@ const AddOrderForm = ({ onClose }) => {
     const totalPaid = document.getElementById('totalpaid').value;
     const otherFees = document.getElementById('fees').value;
     const notes = document.getElementById('notes').value;
-
+  
     if (!orderId) {
       orderId = generateOrderId();
     }
-
+  
     if (!courierId) {
       setError("Please select a courier.");
       return; 
     }
-
+  
     if (!salesPlatformId) {
       setError("Please select a sales platform.");
       return;
     }
-
+  
     if (checkedProducts.length === 0) {
       setError("Please add at least one product to the order.");
       return;
     }
-
+  
     if (totalPaid <= 0) {
       setError("Total paid must be greater than zero.");
       return;
     }
-
-
-    
+  
+    // Check if any product has a quantity of 0
+    const hasZeroQuantity = checkedProducts.some(product => 
+      Number(document.getElementById(`${product.sku}-quantity`).value) === 0
+    );
+  
+    if (hasZeroQuantity) {
+      setError("Some products have a quantity of 0. Please update the quantity.");
+      return;
+    }
+  
     const orderData = {
       id: orderId,
       timestamp: new Date().toISOString(),
@@ -94,7 +102,7 @@ const AddOrderForm = ({ onClose }) => {
       buyerEmail: customerEmail,
       buyerPhone: customerPhone,
       totalPaid: totalPaid,
-      otherFees: otherFees,
+      otherFees: otherFees || 0,
       status: 'To Process',
       timeline: [
         {
