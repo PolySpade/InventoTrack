@@ -5,7 +5,7 @@ import { useContext } from 'react';
 
 const AddExpenseForm = ({ onClose }) => {
   const API_URL = import.meta.env.VITE_API_URL;
-  const { expenseTypes: expense_types } = useContext(ExpenseContext);
+  const { expenseTypes: expense_types, refreshData } = useContext(ExpenseContext);
 
 
   const handleSubmit = async (event) => {
@@ -17,11 +17,10 @@ const AddExpenseForm = ({ onClose }) => {
       expensestype: formData.get('expense_types'),
       description: formData.get('description')
     };
-    console.log(data)
     try {
       await axios.post(`${API_URL}/expenses/CreateExpense`, data);
-
-      window.location.reload();
+      refreshData();
+      onClose();
     } catch (error) {
       console.error('Error submitting the form:', error);
       // Optionally handle the error here, e.g., show an error message to the user

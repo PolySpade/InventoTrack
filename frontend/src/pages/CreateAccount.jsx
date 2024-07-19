@@ -8,7 +8,6 @@ import {
   EyeClosedIcon,
   PersonIcon,
 } from "@primer/octicons-react";
-import { roles } from "../constants";
 import axios from "axios";
 
 const CreateAccount = () => {

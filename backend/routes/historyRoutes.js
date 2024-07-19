@@ -13,7 +13,7 @@ router.post('/CreateHistory', async (req, res) => {
 
         const newHistory = {
             timestamp,
-            role: new mongoose.Types.ObjectId(role),
+            role,
             email,
             action
         }

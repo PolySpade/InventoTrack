@@ -7,17 +7,6 @@ const Expenses = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const [data, setData] = useState([]);
   const [expenseTypes, setExpenseTypes] = useState([]);
-  const [currencies,setCurrencies] = useState([]);
-
-
-  const getCurrencies = () => {
-    axios.get(`${API_URL}/currencies/`)
-      .then( (response) => {
-        setCurrencies(response.data);
-      }).catch( (err) => {
-        console.log(err);
-      })
-  }
 
   const getExpenseTypes = () => {
     axios.get(`${API_URL}/expensesTypes/`)
@@ -37,15 +26,18 @@ const Expenses = () => {
         console.log(err);
       });
   };
-
-  useEffect(() => {
-    getCurrencies();
+  const refreshData = () => {
     getExpenses();
     getExpenseTypes();
+  }
+  useEffect(() => {
+    refreshData();
   }, []);
 
+
+
   return (
-    <ExpenseContext.Provider value={{ data ,expenseTypes, currencies}}>
+    <ExpenseContext.Provider value={{ data ,expenseTypes, refreshData}}>
       <div className='flex flex-row justify-center items-center'>
         <div className='m-10 w-full'>
           <ExpensesTable />

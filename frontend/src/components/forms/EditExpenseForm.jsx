@@ -5,7 +5,7 @@ import axios from 'axios';
 
 const EditExpenseForm = ({ onClose, _id, timestamp, amount, expensestype, description }) => {
   const API_URL = import.meta.env.VITE_API_URL;
-  const { expenseTypes: expense_types } = useContext(ExpenseContext);
+  const { expenseTypes: expense_types, refreshData } = useContext(ExpenseContext);
 
   const [formValues, setFormValues] = useState({
     amount,
@@ -33,7 +33,8 @@ const EditExpenseForm = ({ onClose, _id, timestamp, amount, expensestype, descri
         throw new Error('Failed to update expense');
       }
       console.log(response.data.message);
-      window.location.reload();
+      refreshData();
+      onClose();
     } catch (error) {
       console.error(error.message);
     }

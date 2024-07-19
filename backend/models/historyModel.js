@@ -6,8 +6,7 @@ const historySchema = new mongoose.Schema({
         required: true
     },
     role: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'roles',
+        type: String,
         required: true
     },
     email: {
