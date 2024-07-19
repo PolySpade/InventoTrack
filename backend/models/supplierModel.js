@@ -11,14 +11,20 @@ const supplierSchema = new mongoose.Schema({
     },
     phoneNo: {
         type: String,
-        required: true
+        default: "Supplier has no phone number"
     },
     productList: [{ 
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'products',
-        required: true
-        
+        sku: {
+            type: String
+        },
+        name: {
+            type: String,
+            required: true
+        },
+        price: {
+            type: Number // Changed to Number for proper price handling
+        }
     }]
 });
 
-export const supplierModel = mongoose.model("suppliers", supplierSchema);
+export const supplierModel = mongoose.model("Supplier", supplierSchema);

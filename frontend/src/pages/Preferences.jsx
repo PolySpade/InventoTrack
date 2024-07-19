@@ -205,6 +205,11 @@ const Preferences = () => {
           <button onClick={() => setPlatformsForm( (prev) => !prev)}>
             <Box icon={<StackIcon size={100} />} text="Platforms" />
           </button>
+
+          <button onClick={() => setPlatformsForm( (prev) => !prev)}>
+            <Box icon={<StackIcon size={100} />} text="Platforms" />
+          </button>
+          
           <button onClick={() => setRoleForm( (prev) => !prev)}>
             <Box icon={<PersonIcon size={100} />} text="Roles" />
           </button>
