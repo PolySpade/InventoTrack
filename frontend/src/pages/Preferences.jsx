@@ -188,7 +188,7 @@ const Preferences = () => {
       }}
     >
       <div className="overflow-y-hidden flex flex-row justify-center items- h-full">
-        <div className="m-10 w-full flex flex-row justify-evenly">
+        <div className="m-10 w-full flex flex-row justify-evenly flex-wrap w-6/12">
           <button onClick={() => setExpenseForm((prev) => !prev)}>
             <Box icon={<CreditCardIcon size={100} />} text="Expenses" />
           </button>
