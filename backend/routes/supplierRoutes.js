@@ -8,8 +8,8 @@ router.post('/RegisterSupplier', async (req, res) => {
     try {
         const { supplierName, website, phoneNo, productList } = req.body;
 
-        if (!supplierName || !phoneNo || !productList || productList.length === 0) {
-            return res.status(400).send({ message: "Please provide all required fields!" });
+        if (!supplierName) {
+            return res.status(400).send({ message: "Please provide supplier name!" });
         }
 
         const newSupplier = {

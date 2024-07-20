@@ -1,76 +1,68 @@
 import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { SuppliersContext } from '../../contexts';
-import { XIcon, PencilIcon, ArchiveIcon, XCircleFillIcon, PlusIcon, TrashIcon } from '@primer/octicons-react';
-import { formatTimestamp } from '../../utils';
+import { XIcon, PlusIcon, TrashIcon } from '@primer/octicons-react';
 
-const EditSupplierForm = ({ _id, supplierName, website, phoneNo, productList, onClose }) => {
+const AddSupplierForm = ({ onClose }) => {
   const { refreshData } = useContext(SuppliersContext);
   const API_URL = import.meta.env.VITE_API_URL;
 
-  const [editSupplierName, setEditSupplierName] = useState(supplierName);
-  const [editWebsite, setEditWebsite] = useState(website);
-  const [editPhoneNo, setEditPhoneNo] = useState(phoneNo);
-  const [editProducts, setEditProducts] = useState(productList);
+  const [supplierName, setSupplierName] = useState('');
+  const [website, setWebsite] = useState('');
+  const [phoneNo, setPhoneNo] = useState('');
+  const [productList, setProductList] = useState([]);
   const [showProducts, setShowProducts] = useState(false);
-  const [error,setError] = useState("")
+  const [error, setError] = useState('');
 
   const handleAddProduct = () => {
-    setEditProducts([...editProducts, { sku: '', name: '', price: '' }]);
+    setProductList([...productList, { sku: '', name: '', price: '' }]);
   };
 
   const handleRemoveProduct = (index) => {
-    const newProducts = editProducts.filter((_, i) => i !== index);
-    setEditProducts(newProducts);
+    const newProducts = productList.filter((_, i) => i !== index);
+    setProductList(newProducts);
   };
 
   const handleProductChange = (index, field, value) => {
-    const newProducts = editProducts.map((product, i) => {
+    const newProducts = productList.map((product, i) => {
       if (i === index) {
         return { ...product, [field]: value };
       }
       return product;
     });
-    setEditProducts(newProducts);
-  };  
+    setProductList(newProducts);
+  };
+  console.log(productList)
   const handleSave = async () => {
     const data = {
-      supplierName: editSupplierName,
-      website: editWebsite,
-      phoneNo: editPhoneNo,
-      productList: editProducts,
+      supplierName,
+      website,
+      phoneNo,
+      productList,
     };
+    
+    if (supplierName === '') {
+        setError('Supplier Name must not be blank');
+        return;
+    }
 
-    if(editSupplierName === ""){
-      setError("Supplier Name must not be blank")
-      return
+    if(productList){
+        if (productList.some(item => item.sku === '' || item.name === '')) {
+            setError('Products SKU / Name must not be blank');
+            return;
+          }
     }
     
-    if(editProducts.some( item => (item.sku === "") || (item.name === ""))){
-      setError("Products SKU / Name must not be blank")
-      return
-    }
-
-
     try {
-      const response = await axios.put(`${API_URL}/suppliers/EditSupplier/${_id}`, data);
-      console.log('Supplier Updated:', response);
+      const response = await axios.post(`${API_URL}/suppliers/RegisterSupplier`, data);
+      console.log('Supplier Added:', response);
       refreshData();
       onClose();
     } catch (err) {
       console.log(err);
+      setError(err.response.data.message);
     }
   };
-
-  const handleDelete = async () => {
-    try{
-        const response = await axios.delete(`${API_URL}/suppliers/DeleteSupplier/${_id}`);
-        refreshData();
-        onClose();
-    } catch( err){
-        console.log(err)
-    }
-  }
 
   return (
     <div className="fixed inset-4 flex items-center justify-center z-50">
@@ -80,7 +72,7 @@ const EditSupplierForm = ({ _id, supplierName, website, phoneNo, productList, on
           <button onClick={onClose} className="absolute top-6 right-6 font-bold text-white">
             <XIcon size={20} />
           </button>
-          <h2 className="text-xl font-bold mb-2">Edit Supplier</h2>
+          <h2 className="text-xl font-bold mb-2">Add Supplier</h2>
         </div>
         <div className="w-full p-6">
           <div className="space-y-4">
@@ -88,8 +80,8 @@ const EditSupplierForm = ({ _id, supplierName, website, phoneNo, productList, on
               <label className="text-sm">Supplier Name</label>
               <input
                 type="text"
-                value={editSupplierName}
-                onChange={(e) => setEditSupplierName(e.target.value)}
+                value={supplierName}
+                onChange={(e) => setSupplierName(e.target.value)}
                 className="input w-full pt-0 leading-tight h-8 bg-primary text-xs"
               />
             </div>
@@ -97,8 +89,8 @@ const EditSupplierForm = ({ _id, supplierName, website, phoneNo, productList, on
               <label className="text-sm">Website</label>
               <input
                 type="text"
-                value={editWebsite}
-                onChange={(e) => setEditWebsite(e.target.value)}
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
                 className="input w-full pt-0 leading-tight h-8 bg-primary text-xs"
               />
             </div>
@@ -106,8 +98,8 @@ const EditSupplierForm = ({ _id, supplierName, website, phoneNo, productList, on
               <label className="text-sm">Phone Number</label>
               <input
                 type="text"
-                value={editPhoneNo}
-                onChange={(e) => setEditPhoneNo(e.target.value)}
+                value={phoneNo}
+                onChange={(e) => setPhoneNo(e.target.value)}
                 className="input w-full pt-0 leading-tight h-8 bg-primary text-xs"
               />
             </div>
@@ -116,14 +108,10 @@ const EditSupplierForm = ({ _id, supplierName, website, phoneNo, productList, on
                 {showProducts ? 'Hide Products' : 'Show Products'}
               </button>
               <button className="btn text-white bg-secondary border-none" onClick={handleSave}>
-                Save Changes
+                Add Supplier
               </button>
-              <button className="btn text-white bg-error border-none" onClick={handleDelete}>
-                Delete Supplier
-              </button>
-              
             </div>
-            <p className=' text-xs text-error justify-center flex'>{error}</p>
+            <p className='text-xs text-error justify-center flex'>{error}</p>
           </div>
           {showProducts && (
             <div className="mt-4">
@@ -131,14 +119,14 @@ const EditSupplierForm = ({ _id, supplierName, website, phoneNo, productList, on
               <table className="table w-full">
                 <thead className="text-white">
                   <tr className="border-opacity-50">
-                    <th className='  w-14'>Product SKU</th>
+                    <th className='w-14'>Product SKU</th>
                     <th>Product Name</th>
-                    <th className=' w-1/4' >Price</th>
+                    <th className='w-1/4'>Price</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {editProducts.map((product, index) => (
+                  {productList.map((product, index) => (
                     <tr key={index} className="border-none">
                       <td>
                         <input
@@ -184,4 +172,4 @@ const EditSupplierForm = ({ _id, supplierName, website, phoneNo, productList, on
   );
 };
 
-export default EditSupplierForm;
+export default AddSupplierForm;

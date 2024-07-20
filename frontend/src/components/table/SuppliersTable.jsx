@@ -1,7 +1,8 @@
 import React, { useState, useContext } from 'react';
 import { SuppliersContext } from '../../contexts';
-import { SearchIcon, KebabHorizontalIcon, PencilIcon } from '@primer/octicons-react';
+import { SearchIcon, KebabHorizontalIcon } from '@primer/octicons-react';
 import EditSupplierForm from '../forms/EditSupplierForm';
+import AddSupplierForm from '../forms/AddSupplierForm';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -10,6 +11,7 @@ const SuppliersTable = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [editSupplier, setEditSupplier] = useState(null);
+  const [addSupplier, setAddSupplier] = useState(false);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -25,6 +27,7 @@ const SuppliersTable = () => {
         product.name.toLowerCase().includes(searchTerm.toLowerCase())
       )
   );
+  
   const totalPages = Math.ceil(filteredSuppliers.length / ITEMS_PER_PAGE);
   const currentItems = filteredSuppliers.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
@@ -35,7 +38,6 @@ const SuppliersTable = () => {
   const handleEditSupplier = (supplier) => {
     setEditSupplier(supplier);
   };
-  
 
   return (
     <div className="overflow-x-auto overflow-y-hidden min-h-96">
@@ -50,7 +52,7 @@ const SuppliersTable = () => {
         />
       </div>
       <div className="flex justify-start flex-row mb-4">
-        <button onClick={() => setEditSupplier({})} className="btn text-white bg-secondary border-none">
+        <button onClick={() => setAddSupplier(true)} className="btn text-white bg-secondary border-none">
           Add Supplier
         </button>
       </div>
@@ -74,10 +76,28 @@ const SuppliersTable = () => {
           ))}
         </tbody>
       </table>
+      <div className="flex justify-center mt-4">
+        <div className="join">
+          {[...Array(totalPages)].map((_, i) => (
+            <button
+              key={i}
+              onClick={() => handlePageChange(i + 1)}
+              className={`join-item btn ${currentPage === i + 1 ? "btn-active" : ""}`}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </div>
+      </div>
       {editSupplier && (
         <EditSupplierForm
           {...editSupplier}
           onClose={() => setEditSupplier(null)}
+        />
+      )}
+      {addSupplier && (
+        <AddSupplierForm
+          onClose={() => setAddSupplier(false)}
         />
       )}
     </div>
