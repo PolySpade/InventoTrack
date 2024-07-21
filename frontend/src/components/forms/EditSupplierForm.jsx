@@ -46,9 +46,15 @@ const EditSupplierForm = ({ _id, supplierName, website, phoneNo, productList, on
       return
     }
     
-    if(editProducts.some( item => (item.sku === "") || (item.name === ""))){
-      setError("Products SKU / Name must not be blank")
-      return
+    if(editProducts){
+      if (editProducts.some(item => item.sku === '' || item.name === '')) {
+          setError('Products SKU / Name must not be blank');
+          return;
+        }
+        if (editProducts.some(item => item.price < 0)) {  
+          setError('Products Price must not be negative');
+          return;
+        }
     }
 
 
