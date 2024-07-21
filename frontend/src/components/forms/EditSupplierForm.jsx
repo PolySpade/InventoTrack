@@ -45,13 +45,17 @@ const EditSupplierForm = ({ _id, supplierName, website, phoneNo, productList, on
       setError("Supplier Name must not be blank")
       return
     }
-    
-    if(editProducts.some( item => (item.sku === "") || (item.name === ""))){
-      setError("Products SKU / Name must not be blank")
-      return
+
+    if(editProducts){
+      if (editProducts.some(item => item.sku === '' || item.name === '')) {
+          setError('Products SKU / Name must not be blank');
+          return;
+        }
+        if (editProducts.some(item => item.price < 0)) {  
+          setError('Products Price must not be negative');
+          return;
+        }
     }
-
-
     try {
       const response = await axios.put(`${API_URL}/suppliers/EditSupplier/${_id}`, data);
       console.log('Supplier Updated:', response);
