@@ -6,4 +6,6 @@ const Dashboard = () => {
   )
 }
 
+//TODO: To Process Orders, Processing, Charts of Sales Revenue, orders Today, Best Sellers, Alerts Side Panel
+
 export default Dashboard
