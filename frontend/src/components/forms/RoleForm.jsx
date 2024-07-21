@@ -16,6 +16,7 @@ const RoleForm = ({ onClose }) => {
     reports: false,
     orders: false,
     dashboard: false,
+    suppliers:false,
     cog: false,
     roleManagement: false,
     modifyExpensesType: false,
@@ -43,6 +44,7 @@ const RoleForm = ({ onClose }) => {
         orders: selectedRoleType.permissions.includes("orders"),
         dashboard: selectedRoleType.permissions.includes("dashboard"),
         cog: selectedRoleType.permissions.includes("cog"),
+        suppliers: selectedRoleType.permissions.includes("suppliers"),
         roleManagement: selectedRoleType.permissions.includes("roleManagement"),
         modifyExpensesType: selectedRoleType.permissions.includes("modifyExpensesType"),
         modifyProductCategory: selectedRoleType.permissions.includes("modifyProductCategory"),
@@ -63,6 +65,7 @@ const RoleForm = ({ onClose }) => {
       orders: false,
       dashboard: false,
       cog: false,
+      suppliers: false,
       roleManagement: false,
       modifyExpensesType: false,
       modifyProductCategory: false,
@@ -259,6 +262,10 @@ const RoleForm = ({ onClose }) => {
               <input type="checkbox" className="checkbox checkbox-secondary" value="reports" checked={permissions.reports} onChange={handleCheckboxChange} />
               <p className="ml-2">Reports</p>
             </div>
+            <div className="flex flex-row">
+              <input type="checkbox" className="checkbox checkbox-secondary" value="reports" checked={permissions.suppliers} onChange={handleCheckboxChange} />
+              <p className="ml-2">Suppliers</p>
+            </div>
 
             <p>Sensitive Information</p>
             <div className="flex flex-row">
@@ -346,6 +353,11 @@ const RoleForm = ({ onClose }) => {
               <input type="checkbox" className="checkbox checkbox-secondary" value="reports" checked={permissions.reports} onChange={handleCheckboxChange} />
               <p className="ml-2">Reports</p>
             </div>
+            <div className="flex flex-row">
+              <input type="checkbox" className="checkbox checkbox-secondary" value="reports" checked={permissions.suppliers} onChange={handleCheckboxChange} />
+              <p className="ml-2">Suppliers</p>
+            </div>
+
 
             <p>Sensitive Information</p>
             <div className="flex flex-row">

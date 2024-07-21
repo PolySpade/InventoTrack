@@ -10,6 +10,7 @@ import Expenses from '../pages/Expenses';
 import Reports from '../pages/Reports';
 import Preferences from '../pages/Preferences';
 import Dashboard from '../pages/Dashboard';
+import Suppliers from '../pages/Suppliers';
 
 const Layout = () => {
     return (
@@ -37,6 +38,7 @@ const AppRoutes = () => {
                     <Route path="/expenses" element={<Expenses />}/>
                     <Route path="/reports" element={<Reports />}/>
                     <Route path="/preferences" element={<Preferences/>} />
+                    <Route path="/suppliers" element={<Suppliers/>} />
                     <Route path="/dashboard" element={<Dashboard/>} />
                 </Route>
             </Routes>
