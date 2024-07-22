@@ -188,7 +188,7 @@ const Preferences = () => {
       }}
     >
       <div className="overflow-y-hidden flex flex-row justify-center items- h-full">
-        <div className="m-10 w-full flex flex-row justify-evenly flex-wrap w-6/12">
+        <div className="m-10 w-full flex flex-row justify-evenly flex-wrap">
           <button onClick={() => setExpenseForm((prev) => !prev)}>
             <Box icon={<CreditCardIcon size={100} />} text="Expenses" />
           </button>
@@ -204,12 +204,7 @@ const Preferences = () => {
           </button>
           <button onClick={() => setPlatformsForm( (prev) => !prev)}>
             <Box icon={<StackIcon size={100} />} text="Platforms" />
-          </button>
-
-          <button onClick={() => setPlatformsForm( (prev) => !prev)}>
-            <Box icon={<StackIcon size={100} />} text="Platforms" />
-          </button>
-          
+          </button>           
           <button onClick={() => setRoleForm( (prev) => !prev)}>
             <Box icon={<PersonIcon size={100} />} text="Roles" />
           </button>

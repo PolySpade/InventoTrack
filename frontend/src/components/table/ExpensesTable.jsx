@@ -89,7 +89,7 @@ const ExpensesTable = () => {
       <table className="table table-pin-rows flex-1">
         <thead>
           <tr className="border-none text-white">
-            <th>
+            {/* <th>
               <label>
                 <input
                   type="checkbox"
@@ -98,7 +98,7 @@ const ExpensesTable = () => {
                   checked={checkedItems.length === filteredExpenses.length}
                 />
               </label>
-            </th>
+            </th> */}
             <th>Date</th>
             <th>Amount</th>
             <th>Type</th>
@@ -163,7 +163,7 @@ const TableContents = ({
 
   return (
     <tr className="border-none text-white bg-base-content">
-      <th>
+      {/* <th>
         <label>
           <input
             type="checkbox"
@@ -172,7 +172,7 @@ const TableContents = ({
             onChange={() => onCheckboxChange(_id)}
           />
         </label>
-      </th>
+      </th> */}
       <td>{formattedTimestamp}</td>
       <td>{amount}</td>
       <td>{expensestype.name}</td>

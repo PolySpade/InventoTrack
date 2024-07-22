@@ -39,7 +39,8 @@ const timelineSchema = new mongoose.Schema({
 const orderSchema = new mongoose.Schema({
     id: { 
         type: String, 
-        required: true 
+        required: true,
+        unique: true    
     },
     timestamp: {
         type: Date,

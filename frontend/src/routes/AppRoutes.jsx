@@ -35,6 +35,8 @@ const AppRoutes = () => {
                     <Route path="*" element={<Home />} />
                     <Route path="/inventory" element={<Inventory />} />
                     <Route path="/orders" element={<Orders />} />
+                    <Route path="/orders/:status" element={<Orders />} /> {/* Dynamic route for order statuses */}
+                    <Route path="/orders/:status/:status" element={<Orders />} />
                     <Route path="/expenses" element={<Expenses />}/>
                     <Route path="/reports" element={<Reports />}/>
                     <Route path="/preferences" element={<Preferences/>} />

@@ -40,20 +40,20 @@ const Orders = () => {
       color: "bg-purple-500", // Tailwind CSS class for background color
     },
     {
-      name: "Delivered",
+      name: "Completed",
       timeline: {
-        status: "Delivered",
+        status: "Completed",
         timestamp: new Date().toISOString(),
-        details: "Order has been delivered to the customer",
+        details: "Order has been completed",
       },
       color: "bg-green-500", // Tailwind CSS class for background color
     },
     {
-      name: "Returned",
+      name: "Cancelled",
       timeline: {
-        status: "Returned",
+        status: "Cancelled",
         timestamp: new Date().toISOString(),
-        details: "Order has been returned",
+        details: "Order has been cancelled",
       },
       color: "bg-red-500", // Tailwind CSS class for background color
     },

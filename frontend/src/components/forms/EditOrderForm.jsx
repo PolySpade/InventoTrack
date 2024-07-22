@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   XIcon,
   PencilIcon,
@@ -51,9 +51,51 @@ const EditOrderForm = ({
   const [totalPaidValue, setTotalPaidValue] = useState(totalPaid);
   const [feesValue, setFeesValue] = useState(otherFees);
   const [editProducts,setEditProducts] = useState(false);
+  const [alerts,setAlerts] = useState([])
+  useEffect(() => {
+    const generateAlerts = () => {
+      const newAlerts = [];
+  
+      // Late shipment risk
+      if (status === 'To Process') {
+        const oneDay = 24 * 60 * 60 * 1000; // milliseconds in one day
+        const orderDate = new Date(timestamp);
+        const currentDate = new Date();
+        const difference = currentDate - orderDate;
+  
+        if (difference > oneDay) {
+          newAlerts.push({
+            alertType: 'Warning',
+            message: 'Risk of late shipment',
+          });
+        }
+      }
+  
+      // Payment issues (assuming `totalPaid` should be greater than 0)
+      if (totalPaid <= 0) {
+        newAlerts.push({
+          alertType: 'Alert',
+          message: 'Payment issue: Total paid is zero or negative',
+        });
+      }
+  
+      // Missing tracking information
+      if (status === 'Shipped' && (!trackingNumber || trackingNumber.trim() === '')) {
+        newAlerts.push({
+          alertType: 'Alert',
+          message: 'Tracking information is missing',
+        });
+      }
+  
+  
+      setAlerts(newAlerts);
+    };
+  
+    generateAlerts();
+  }, [status, timestamp, totalPaid, trackingNumber]);
+  
 
-
-
+  console.log(status)
   const saveNotes = async () => {
     setEditNotes(false);
     const data = {
@@ -259,7 +301,7 @@ const EditOrderForm = ({
           <hr className="bg-white w-full h-px my-3" />
           <div className="mb-4">
             <h1 className="font-bold text-md my-2">Alerts</h1>
-            <Alerts orderid={id} />
+            <Alerts alerts={alerts} />
           </div>
           
           <div className="flex justify-center">
@@ -543,39 +585,37 @@ const EditOrderForm = ({
 
 export default EditOrderForm;
 
-const Alerts = ({ orderid }) => {
+const Alerts = ({ alerts }) => {
+  const getIcon = (alertType) => {
+    switch (alertType) {
+      case 'Warning':
+        return <StopIcon size={16} className="text-warning" />;
+      case 'Notification':
+        return <BellIcon size={16} className="text-success" />;
+      case 'Alert':
+        return <AlertIcon size={16} className="text-error" />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="space-y-2">
-      <div className="flex flex-row w-full bg-secondary rounded-lg h-11 items-center">
-        <div className="flex items-center justify-center rounded-full ml-3 w-9 h-9 bg-base-100">
-          <StopIcon size={16} className="text-warning" />
+      {alerts.map((alert, index) => (
+        <div key={index} className="flex flex-row w-full bg-secondary rounded-lg h-11 items-center">
+          <div className="flex items-center justify-center rounded-full ml-3 w-9 h-9 bg-base-100">
+            {getIcon(alert.alertType)}
+          </div>
+          <div className="ml-3 flex flex-col text-xs">
+            <div className="font-bold">{alert.alertType}</div>
+            <div>{alert.message}</div>
+          </div>
         </div>
-        <div className="ml-3 flex flex-col text-xs">
-          <div className="font-bold">Warning</div>
-          <div>Message</div>
-        </div>
-      </div>
-      <div className="flex flex-row w-full bg-secondary rounded-lg h-11 items-center">
-        <div className="flex items-center justify-center rounded-full ml-3 w-9 h-9 bg-base-100">
-          <BellIcon size={16} className="text-success" />
-        </div>
-        <div className="ml-3 flex flex-col text-xs">
-          <div className="font-bold">Notification</div>
-          <div>Warning Message</div>
-        </div>
-      </div>
-      <div className="flex flex-row w-full bg-secondary rounded-lg h-11 items-center">
-        <div className="flex items-center justify-center rounded-full ml-3 w-9 h-9 bg-base-100">
-          <AlertIcon size={16} className="text-error" />
-        </div>
-        <div className="ml-3 flex flex-col text-xs">
-          <div className="font-bold">Alert</div>
-          <div>Message</div>
-        </div>
-      </div>
+      ))}
     </div>
   );
 };
+
 
 const Timeline = ({ data }) => {
   data = data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));

@@ -1,4 +1,5 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { SearchIcon, KebabHorizontalIcon } from "@primer/octicons-react";
 import AddOrderForm from "../forms/AddOrderForm";
 import EditOrderForm from "../forms/EditOrderForm";
@@ -9,7 +10,7 @@ import BulkEditPlatformForm from "../forms/BulkEditPlatformForm";
 const ITEMS_PER_PAGE = 10;
 
 const OrdersTable = () => {
-  const { ordersData: orders,  refreshData, couriers, salesplatforms } = useContext(OrdersContext);
+  const { ordersData: orders, refreshData, couriers, salesplatforms } = useContext(OrdersContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [addOrder, setAddOrder] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -19,6 +20,27 @@ const OrdersTable = () => {
   const [checkedItems, setCheckedItems] = useState([]);
   const [changeStatus, setChangeStatus] = useState(false);
   const [changePlatform, setChangePlatform] = useState(false);
+
+  const location = useLocation();
+
+  useEffect(() => {
+    const path = location.pathname.split('/');
+    if (path[2] === "Today") {
+      setFilterDate(new Date().toISOString().split('T')[0]);
+    }
+    else if(path[2] === "ToProcess"){  
+      setFilterStatus("To Process")
+    }
+    else if (path[2]) {
+      setFilterStatus(path[2]);
+    }
+    
+    if(path[2] === "search"){
+      setSearchTerm(path[3]);
+      setFilterStatus("");
+    }
+
+  }, [location]);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -110,8 +132,8 @@ const OrdersTable = () => {
             <li><a onClick={() => handleStatusFilterChange("To Process")}>To Process</a></li>
             <li><a onClick={() => handleStatusFilterChange("Processing")}>Processing</a></li>
             <li><a onClick={() => handleStatusFilterChange("Shipped")}>Shipped</a></li>
-            <li><a onClick={() => handleStatusFilterChange("Delivered")}>Delivered</a></li>
-            <li><a onClick={() => handleStatusFilterChange("Returned")}>Returned</a></li>
+            <li><a onClick={() => handleStatusFilterChange("Completed")}>Completed</a></li>
+            <li><a onClick={() => handleStatusFilterChange("Cancelled")}>Cancelled</a></li>
           </ul>
         </div>
         
@@ -217,7 +239,9 @@ const TableContents = ({
   setOrderDetailsId,
 }) => {
   const [showProducts, setShowProducts] = useState(false);
-
+  if(status === "To Process"){
+    status = "To Process"
+}
   return (
     <>
       <tr className="border-none text-white bg-base-content">
