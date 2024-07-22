@@ -11,12 +11,12 @@ const InventoryLevelsTable = () => {
   }, [products]);
 
   return (
-    <div className="overflow-x-auto overflow-y-scroll bg-neutral p-4 rounded-xl h-full">
+    <div className="overflow-y-auto bg-neutral p-4 rounded-xl h-full">
       <h2 className="text-lg font-bold">Low Stock Inventory (&lt;= 10) </h2>
       <div>
       <table className="table table-pin-rows flex-1">
         <thead>
-          <tr className="border-none text-white bg-neutral">
+          <tr className="b  order-none text-white bg-neutral">
             <th>SKU</th>
             <th>Name</th>
             <th>Stock Quantity</th>

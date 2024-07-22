@@ -95,7 +95,7 @@ const InventoryTable = () => {
       <table className="table table-pin-rows flex-1">
         <thead>
           <tr className="border-none text-white">
-            <th>
+            {/* <th>
               <label>
                 <input
                   type="checkbox"
@@ -110,7 +110,7 @@ const InventoryTable = () => {
                   checked={currentItems.length > 0 && currentItems.every(item => checkedItems.includes(item.sku))}
                 />
               </label>
-            </th>
+            </th> */}
             <th>SKU</th>
             <th>Name</th>
             <th>Category</th>
@@ -190,7 +190,7 @@ const TableContents = ({
   };
   return (
     <tr className="border-none text-white bg-base-content">
-      <th>
+      {/* <th>
         <label>
           <input
             type="checkbox"
@@ -199,7 +199,7 @@ const TableContents = ({
             onChange={() => onCheckboxChange(sku)}
           />
         </label>
-      </th>
+      </th> */}
       <td>{sku}</td>
       <td>{name}</td>
       <td>{category.name}</td>

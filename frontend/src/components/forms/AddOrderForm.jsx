@@ -1,19 +1,15 @@
-import React, { useContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useContext, useState } from "react";
 import { SearchIcon, XCircleFillIcon } from "@primer/octicons-react";
 import { OrdersContext } from "../../contexts";
 import axios from "axios";
 
 const AddOrderForm = ({ onClose }) => {
   const API_URL = import.meta.env.VITE_API_URL;
-  const { couriers, salesplatforms, products } = useContext(OrdersContext);
+  const { couriers, salesplatforms, products, refreshData } = useContext(OrdersContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [addItemBox, setAddItemBox] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
-  const [fees, setFees] = useState(0);
-  const [totalPrice, setTotalPrice] = useState(0);
   const [error, setError] = useState("");
-  const { refreshData} = useContext(OrdersContext)
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -28,7 +24,6 @@ const AddOrderForm = ({ onClose }) => {
   const checkedProducts = products.filter((product) =>
     checkedItems.includes(product.sku)
   );
-
 
   const generateOrderId = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -48,44 +43,24 @@ const AddOrderForm = ({ onClose }) => {
     const customerName = document.getElementById('customerName').value;
     const customerEmail = document.getElementById('customerEmail').value;
     const customerPhone = document.getElementById('customerPhone').value;
-    const totalPaid = document.getElementById('totalpaid').value;
-    const otherFees = document.getElementById('fees').value;
+    const totalPaid = parseFloat(document.getElementById('totalpaid').value);
+    const otherFees = parseFloat(document.getElementById('fees').value);
     const notes = document.getElementById('notes').value;
-  
-    if (!orderId) {
-      orderId = generateOrderId();
-    }
-  
-    if (!courierId) {
-      setError("Please select a courier.");
-      return; 
-    }
-  
-    if (!salesPlatformId) {
-      setError("Please select a sales platform.");
-      return;
-    }
-  
-    if (checkedProducts.length === 0) {
-      setError("Please add at least one product to the order.");
-      return;
-    }
-  
-    if (totalPaid <= 0) {
-      setError("Total paid must be greater than zero.");
-      return;
-    }
-  
-    // Check if any product has a quantity of 0
-    const hasZeroQuantity = checkedProducts.some(product => 
-      Number(document.getElementById(`${product.sku}-quantity`).value) === 0
-    );
-  
-    if (hasZeroQuantity) {
-      setError("Some products have a quantity of 0. Please update the quantity.");
-      return;
-    }
-  
+
+    // Validation checks
+    if (!orderId) orderId = generateOrderId();
+    if (!courierId) return setError("Please select a courier.");
+    if (!salesPlatformId) return setError("Please select a sales platform.");
+    if (checkedProducts.length === 0) return setError("Please add at least one product to the order.");
+    if (totalPaid <= 0) return setError("Total paid must be greater than zero.");
+    if (!trackingNumber) return setError("Tracking number cannot be empty.");
+    if (!validateEmail(customerEmail) && customerEmail != ""){ return setError("Please enter a valid email address.")};
+    if (checkedProducts.some(product => Number(document.getElementById(`${product.sku}-quantity`).value) === 0))
+      return setError("Some products have a quantity of 0. Please update the quantity.");
+    if (checkedProducts.some(product => Number(document.getElementById(`${product.sku}-price`).value) <= 0))
+      return setError("Product unit price must be greater than zero.");
+    if (totalPaid < 0 || otherFees < 0) return setError("Total paid and other fees cannot be negative.");
+
     const orderData = {
       id: orderId,
       timestamp: new Date().toISOString(),
@@ -127,6 +102,11 @@ const AddOrderForm = ({ onClose }) => {
         setError("An unexpected error occurred. Please try again.");
       }
     }
+  };
+
+  const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
   };
 
   const handleAddItem = () => {
@@ -173,11 +153,11 @@ const AddOrderForm = ({ onClose }) => {
 
 const Notes = () =>(
   <div>
-        <hr className="bg-white w-full h-px my-2" />
-        <h2 className="text-base">Notes</h2>
+    <hr className="bg-white w-full h-px my-2" />
+    <h2 className="text-base">Notes</h2>
     <input id="notes" type="text" placeholder="Order Notes" className="input input-bordered w-full" />
-    </div>
-)
+  </div>
+);
 
 const OrderDetails = ({ couriers, salesplatforms }) => (
   <div className="flex flex-col">
@@ -235,12 +215,12 @@ const CustomerDetails = () => (
   </>
 );
 
-const ActionButtons = ({ onCancel,error }) => (
+const ActionButtons = ({ onCancel, error }) => (
   <div>
-  <div className="pt-4 flex flex-row justify-around">
-    <button type="button" onClick={onCancel} className="btn text-white">Cancel</button>
-    <button type="submit" className="btn text-white">Publish</button>
-  </div>
+    <div className="pt-4 flex flex-row justify-around">
+      <button type="button" onClick={onCancel} className="btn text-white">Cancel</button>
+      <button type="submit" className="btn text-white">Publish</button>
+    </div>
     {error && <div className="text-red-500 text-sm flex justify-center">{error}</div>}
   </div>
 );
@@ -273,6 +253,7 @@ const ProductSection = ({
               <tr>
                 <th>Item SKU</th>
                 <th>Item Name</th>
+                <th>Stock Left</th>
                 <th></th>
               </tr>
             </thead>
@@ -310,20 +291,21 @@ const ProductSection = ({
     <div className="absolute bottom-0 z-10 w-full flex flex-col items-end">
       <div className="mt-3">
         Total Paid:
-        <input type="number" id="totalpaid" className="input w-16 px-2" step="0.01" />
+        <input type="number" id="totalpaid" className="input w-16 px-2" step="0.01" min="0.01" />
       </div>
       <div className="mt-3">
         Other Fees:
-        <input type="number" id="fees" className="input w-16 px-2" step="0.01" />
+        <input type="number" id="fees" className="input w-16 px-2" step="0.01" min="0" />
       </div>
     </div>
   </div>
 );
 
-const SearchContents = ({ sku, name, isChecked, onCheckboxChange }) => (
+const SearchContents = ({ sku, name, stockLeft, isChecked, onCheckboxChange }) => (
   <tr>
     <td>{sku}</td>
     <td>{name}</td>
+    <td>{stockLeft}</td>
     <th>
       <label>
         <input type="checkbox" className="checkbox checkbox-secondary" checked={isChecked} onChange={() => onCheckboxChange(sku)} />
@@ -337,10 +319,10 @@ const TableContents = ({ sku, name, isChecked, onCheckboxChange }) => (
     <td>{sku}</td>
     <td>{name}</td>
     <td>
-      <input type="number" className="input input-xs w-12" id={`${sku}-quantity`} />
+      <input type="number" className="input input-xs w-12" id={`${sku}-quantity`} min="1" />
     </td>
     <td>
-      <input type="number" className="input input-xs w-14" id={`${sku}-price`} step="0.01" />
+      <input type="number" className="input input-xs w-14" id={`${sku}-price`} step="0.01" min="0.01" />
     </td>
     <th>
       <label>

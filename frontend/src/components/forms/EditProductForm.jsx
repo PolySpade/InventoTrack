@@ -1,9 +1,10 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import axios from "axios";
 import { InventoryContext } from "../../contexts";
 
 const EditProductForm = ({ onClose, item }) => {
   const { category, warehouse } = useContext(InventoryContext);
+  const [error, setError] = useState("tset  ");
   const {
     _id,
     sku,
@@ -22,9 +23,55 @@ const EditProductForm = ({ onClose, item }) => {
     onClose();
   };
 
+
+
+  
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
+    
+    if (formData.get("product_name") === "") {
+      setError("Input Product Name");
+      return;
+    } else if (parseFloat(formData.get("unit_cost")) < 0) {
+      setError("Negative Unit Cost");
+      return;
+    } else if (isNaN(parseFloat(formData.get("unit_cost")))) {
+      setError("Invalid Unit Cost");
+      return;
+    } else if (parseFloat(formData.get("weight")) < 0) {
+      setError("Negative Weight");
+      return;
+    } else if (isNaN(parseFloat(formData.get("weight")))) {
+      setError("Invalid Weight");
+      return;
+    } else if (parseFloat(formData.get("length")) < 0) {
+      setError("Negative Length");
+      return;
+    } else if (isNaN(parseFloat(formData.get("length")))) {
+      setError("Invalid Length");
+      return;
+    } else if (parseFloat(formData.get("width")) < 0) {
+      setError("Negative Width  ");
+      return;
+    } else if (isNaN(parseFloat(formData.get("width")))) {
+      setError("Invalid Width");
+      return;
+    } else if (parseFloat(formData.get("height")) < 0) {
+      setError("Negative Height");
+      return;
+    } else if (isNaN(parseFloat(formData.get("height")))) {
+      setError("Invalid Height");
+      return;
+    } else if (parseInt(formData.get("quantity"), 10) < 0) {
+      setError("Negative Quantity");
+      return;
+    } else if (isNaN(parseInt(formData.get("quantity"), 10))) {
+      setError("Invalid Quantity");
+      return;
+    }
+
+
     const data = {
       sku,
       name: formData.get("product_name"),
@@ -251,6 +298,7 @@ const EditProductForm = ({ onClose, item }) => {
           </button>
           <button type="button" onClick={handleDelete} className='btn text-white bg-error hover:bg-red-400 outline-none border-none'>Delete</button>
         </div>
+                {error && <p className='flex justify-center text-error'>{error}</p>}
       </form>
     </div>
   );

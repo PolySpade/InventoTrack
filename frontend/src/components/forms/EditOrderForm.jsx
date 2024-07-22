@@ -9,6 +9,7 @@ import {
   BellIcon,
   StopIcon,
   CheckCircleFillIcon,
+  QuestionIcon,
 } from "@primer/octicons-react";
 import { formatTimestamp } from "../../utils";
 import axios from "axios";
@@ -52,6 +53,9 @@ const EditOrderForm = ({
   const [feesValue, setFeesValue] = useState(otherFees);
   const [editProducts,setEditProducts] = useState(false);
   const [alerts,setAlerts] = useState([])
+
+  const [error,setError] = useState("")
+
   useEffect(() => {
     const generateAlerts = () => {
       const newAlerts = [];
@@ -71,13 +75,13 @@ const EditOrderForm = ({
         }
       }
   
-      // Payment issues (assuming `totalPaid` should be greater than 0)
-      if (totalPaid <= 0) {
-        newAlerts.push({
-          alertType: 'Alert',
-          message: 'Payment issue: Total paid is zero or negative',
-        });
-      }
+      // // Payment issues (assuming `totalPaid` should be greater than 0)
+      // if (totalPaid <= 0) {
+      //   newAlerts.push({
+      //     alertType: 'Alert',
+      //     message: 'Payment issue: Total paid is zero or negative',
+      //   });
+      // }
   
       // Missing tracking information
       if (status === 'Shipped' && (!trackingNumber || trackingNumber.trim() === '')) {
@@ -94,8 +98,6 @@ const EditOrderForm = ({
     generateAlerts();
   }, [status, timestamp, totalPaid, trackingNumber]);
   
-
-  console.log(status)
   const saveNotes = async () => {
     setEditNotes(false);
     const data = {
@@ -126,7 +128,13 @@ const EditOrderForm = ({
   };
 
   const saveBuyer = async () => {
-    setEditBuyer(false);
+    console.log(buyerEmail)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(buyerEmail) && buyerEmail) {
+      alert("Please enter a valid email address");
+      return;
+    }
     const data = {
       buyer: {
         buyerName,
@@ -137,6 +145,7 @@ const EditOrderForm = ({
 
     try {
       const response = await axios.put(`${API_URL}/orders/EditBuyer/${_id}`, data);
+      setEditBuyer(false);
       refreshData();
     } catch (err) {
       console.log(err);
@@ -175,14 +184,20 @@ const EditOrderForm = ({
   };
 
   const saveTotalPaid = async () => {
-    setEditTotalPaid(false);
+    const totalPaidnum = Number(totalPaidValue);
+    if (isNaN(totalPaidnum) || totalPaidnum < 0 || totalPaidValue ===  "") {
+      alert("Please enter a valid non-negative number for the fees");
+      return;
+    }
+
     const data = {
-      totalPaid: Number(totalPaidValue).toFixed(2),
+      totalPaid: totalPaidnum.toFixed(2),
     };
 
     try {
       const response = await axios.put(`${API_URL}/orders/EditTotal/${_id}`, data);
       console.log(response);
+      setEditTotalPaid(false);
       refreshData();
     } catch (err) {
       console.log(err);
@@ -190,14 +205,19 @@ const EditOrderForm = ({
   };
 
   const saveFees = async () => {
-    setEditFees(false);
+    const feesNum = Number(feesValue);
+    if (isNaN(feesNum) || feesNum < 0 || feesValue === "") {
+      alert("Please enter a valid non-negative number for the fees");
+      return;
+    }
     const data = {
-      otherFees: Number(feesValue).toFixed(2),
+      otherFees: feesNum.toFixed(2),
     };
 
     try {
       const response = await axios.put(`${API_URL}/orders/EditFees/${_id}`, data);
       console.log(response);
+      setEditFees(false);
       refreshData();
     } catch (err) {
       console.log(err);
@@ -571,6 +591,7 @@ const EditOrderForm = ({
                 </div>
               </div>
             </div>
+            <p className="text-sm text-error flex justify-center">{error}</p>
             <div className="mt-4 tooltip tooltip-right" data-tip="Delete Order Record">
               <button className="p-1" onClick={handleDelete}>
                 <TrashIcon className="text-error" />
@@ -595,7 +616,7 @@ const Alerts = ({ alerts }) => {
       case 'Alert':
         return <AlertIcon size={16} className="text-error" />;
       default:
-        return null;
+        return <QuestionIcon size={16} className="text-white"/>;
     }
   };
 
@@ -612,6 +633,17 @@ const Alerts = ({ alerts }) => {
           </div>
         </div>
       ))}
+      {alerts.length === 0 ? (
+      <div className="flex flex-row w-full bg-secondary rounded-lg h-11 items-center">
+        <div className="flex items-center justify-center rounded-full ml-3 w-9 h-9 bg-base-100">
+          {getIcon("null")}
+        </div>
+        <div className="ml-3 flex flex-col text-xs">
+          <div className="font-bold">None</div>
+          <div>Nothing to see here</div>
+        </div>
+      </div>
+    ) : (<></>)}
     </div>
   );
 };
