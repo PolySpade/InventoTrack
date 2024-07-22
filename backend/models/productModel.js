@@ -19,13 +19,13 @@ const productSchema = new mongoose.Schema({
         type: Number,
         set: v => parseFloat(v.toFixed(2)), // Ensuring two decimal places
         get: v => v.toFixed(2), // Ensuring two decimal places on retrieval
-        required: true
+        required: true,
+        default: 0
     },
     weightKG: {
         type: Number,
         set: v => parseFloat(v.toFixed(2)), // Ensuring two decimal places
         get: v => v.toFixed(2), // Ensuring two decimal places on retrieval
-        required: true
     },
     warehouse: {
         type: mongoose.Schema.Types.ObjectId,
@@ -37,24 +37,25 @@ const productSchema = new mongoose.Schema({
             type: Number,
             set: v => parseFloat(v.toFixed(2)), // Ensuring two decimal places
             get: v => v.toFixed(2), // Ensuring two decimal places on retrieval
-            required: true
         },
         widthCM: {
             type: Number,
             set: v => parseFloat(v.toFixed(2)), // Ensuring two decimal places
             get: v => v.toFixed(2), // Ensuring two decimal places on retrieval
-            required: true
         },
         heightCM: {
             type: Number,
             set: v => parseFloat(v.toFixed(2)), // Ensuring two decimal places
             get: v => v.toFixed(2), // Ensuring two decimal places on retrieval
-            required: true
         }
     },
     stockLeft: {
         type: Number,
         required: true
+    },
+    shown: {
+        type: Boolean,
+        default: true
     }
 });
 
