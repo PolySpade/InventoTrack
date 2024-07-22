@@ -46,15 +46,15 @@ const AddSupplierForm = ({ onClose }) => {
         return;
     }
 
-    if(productList){
-        if (productList.some(item => item.sku === '' || item.name === '')) {
-            setError('Products SKU / Name must not be blank');
-            return;
-          }
-          if (productList.some(item => item.price < 0)) {
-            setError('Products Price must not be negative');
-            return;
-          }
+    if (productList) {
+      if (productList.some((item) => item.sku === "" || item.name === "")) {
+        setError("Products SKU / Name must not be blank");
+        return;
+      }
+      if (productList.some((item) => item.price < 0)) {
+        setError("Products Price must not be negative");
+        return;
+      } 
     }
     
     try {
