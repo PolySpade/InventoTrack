@@ -6,16 +6,32 @@ import { productModel } from '../models/productModel.js';
 // Create 
 router.post('/AddProduct', async (req, res) => {
     try {
-        const { name, category, unitCost, weightKG, warehouse, dimensions, stockLeft, sku } = req.body;
+        const { name, category, unitCost, weightKG, warehouse, dimensions, stockLeft, sku, shown } = req.body;
 
-        // Validate the presence of all required fields
-        if (!name || !category || !unitCost || !weightKG || !warehouse || !dimensions || !dimensions.lengthCM || !dimensions.widthCM || !dimensions.heightCM || !stockLeft || !sku) {
+        // Validate the presence of all required fields; removed unitCost since it will always have a default value (0)
+        if (!name || !category || !weightKG || !warehouse || !dimensions || !dimensions.lengthCM || ! dimensions.widthCM || !dimensions.heightCM || !stockLeft || !sku || !shown) {
             return res.status(400).send({ message: "Please provide all required fields!" });
         }
 
-        // Validate numeric fields
-        if (isNaN(unitCost) || isNaN(weightKG) || isNaN(stockLeft) || isNaN(dimensions.lengthCM) || isNaN(dimensions.widthCM) || isNaN(dimensions.heightCM)) {
-            return res.status(400).send({ message: "Numeric fields must be numbers!" });
+        const numericFields = {
+            unitCost,
+            weightKG,
+            'dimensions.lengthCM': dimensions.lengthCM,
+            'dimensions.widthCM': dimensions.widthCM,
+            'dimensions.heightCM': dimensions.heightCM,
+            stockLeft
+        };
+
+        const invalidFields = [];
+
+        for (const [key, value] of Object.entries(numericFields)) {
+            if (isNaN(value)) {
+                invalidFields.push(key);
+            }
+        }
+
+        if (invalidFields.length != 0) {
+            return res.status(400).send({ message: `Numeric fields must be valid numbers: ${invalidFields.join(', ')}` });
         }
 
         const newProduct = {
@@ -30,7 +46,8 @@ router.post('/AddProduct', async (req, res) => {
                 widthCM: parseFloat(dimensions.widthCM),
                 heightCM: parseFloat(dimensions.heightCM)
             },
-            stockLeft: parseInt(stockLeft, 10)
+            stockLeft: parseInt(stockLeft, 10),
+            shown
         };
 
         const product = await productModel.create(newProduct);
@@ -93,11 +110,14 @@ router.put('/EditProduct/:id', async (req, res) => {
 router.delete('/DeleteProduct/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const productToDelete = await productModel.findByIdAndDelete(id);
+        const product = await productModel.findById(id);
 
-        if (!productToDelete) {
+        if (!product) {
             return res.status(404).json({ message: "Product not found!" });
         }
+
+        product.shown = false;
+        await product.save();
 
         return res.status(200).send({ message: "Delete Successful!" });
     } catch (err) {
