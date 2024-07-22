@@ -85,11 +85,11 @@ const NotificationsDashboard = () => {
   };
 
   return (
-    <div className="w-96 bg-neutral rounded-lg p-4 h-full">
+    <div className="w-96 bg-neutral rounded-lg p-4 h-[50rem] overflow-y-auto">
       <p className="mb-3">Order Notifications</p>
       <div className="space-y-2">
         {alerts.map((alert) => (
-          <div key={alert.id} className="flex flex-row w-full bg-secondary rounded-lg min-h-16 items-center">
+          <div key={alert._id} className="flex flex-row w-full bg-secondary rounded-lg min-h-16 items-center">
             <div className="flex items-center justify-center rounded-full ml-3 w-9 h-9 bg-base-100">
               {getIcon(alert.alertType)}
             </div>

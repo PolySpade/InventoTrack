@@ -85,7 +85,7 @@ const EditProductForm = ({ onClose, item }) => {
         heightCM: parseFloat(formData.get("height")) || 0,
       },
       stockLeft: parseInt(formData.get("quantity"), 10),
-      shown: true 
+      shown: item.shown 
     };
     try {
       const response = await axios.put(

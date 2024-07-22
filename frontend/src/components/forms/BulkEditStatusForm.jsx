@@ -29,7 +29,7 @@ const BulkEditStatusForm = ({ onClose, checkedItems}) => {
             <div className="p-6 flex flex-col bg-neutral z-10">
                 <h1 className='text-white'> Bulk Edit Order Status</h1>
                 <select id="couriers" className="input input-bordered text-white" defaultValue="" onChange={(e) => setStatus(e.target.value)}>
-          <option disabled value="">Select a Courier</option>
+          <option disabled value="">Select a Status</option>
           {statustypes.map((item) => (
             <option key={item.name} value={item.name}>{item.name}</option>
           ))}

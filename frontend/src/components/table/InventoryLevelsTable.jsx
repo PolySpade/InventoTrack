@@ -11,7 +11,7 @@ const InventoryLevelsTable = () => {
   }, [products]);
 
   return (
-    <div className="overflow-y-auto bg-neutral p-4 rounded-xl h-full">
+    <div className="overflow-y-auto bg-neutral p-4 rounded-xl h-5/6">
       <h2 className="text-lg font-bold">Low Stock Inventory (&lt;= 10) </h2>
       <div>
       <table className="table table-pin-rows flex-1">

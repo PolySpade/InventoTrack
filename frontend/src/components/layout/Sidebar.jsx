@@ -1,79 +1,111 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
 import {
   ArchiveIcon,
-  ArrowRightIcon,
-  ContainerIcon,
   CreditCardIcon,
   GearIcon,
   GraphIcon,
   HomeIcon,
-  InfoIcon,
-  KebabHorizontalIcon,
   PackageIcon,
-  PeopleIcon,
-  PersonAddIcon,
-  PersonFillIcon,
-  PersonIcon,
+  ContainerIcon,
   SignInIcon,
   SignOutIcon,
 } from "@primer/octicons-react";
 import {
-  logo_default,
-  logo_default_text,
   logo_white,
-  logo_white_text,
 } from "../../assets/logo";
-import { useLocation } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
+import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
+import axios from "axios";
 
 const SidebarContext = createContext();
 
 const Sidebar = () => {
+  const API_URL = import.meta.env.VITE_API_URL;
+  const [roleData, setRoleData] = useState([]);
+  const [permissions, setPermissions] = useState([]);
+  const authUser = useAuthUser();
+
+  const getRoleData = () => {
+    axios
+      .get(`${API_URL}/roles/`)
+      .then((response) => {
+        setRoleData(response.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  useEffect(() => {
+    getRoleData();
+  }, []);
+
+  useEffect(() => {
+    if (authUser) {
+      const role_id = authUser.role_id;
+      const findRole = role_id ? roleData.find((role) => role._id === role_id) : null;
+      setPermissions(findRole ? findRole.permissions : []);
+    }
+  }, [authUser, roleData]);
+
   const [expanded, setExpanded] = useState(false);
   const location = useLocation();
   const pathname = location.pathname;
-
   return (
     <SidebarContext.Provider value={{ expanded, pathname }}>
       <aside id="sidebar" className="top-0 left-0 min-h-screen z-50">
         <div className="h-full flex flex-col py-4 overflow-y-auto overflow-x-clip bg-neutral">
           <div className="p-2">
             <div className="flex items-center justify-center p-2">
+              <Link to="/">
               <img src={logo_white} className="h-6"></img>
+              </Link>
             </div>
           </div>
           <div className="flex-1">
             <ul className="menu menu-lg rounded-box text-base-300">
-              <SidebarItem
-                icon={<HomeIcon size={24} />}
-                text="Dashboard"
-                link="/dashboard"
-              />
-              <SidebarItem
-                icon={<PackageIcon size={24} />}
-                text="Orders"
-                link="/orders"
-              />
-              <SidebarItem
-                icon={<ArchiveIcon size={24} />}
-                text="Inventory"
-                link="/inventory"
-              />
-              <SidebarItem
-                icon={<CreditCardIcon size={24} />}
-                text="Expenses"
-                link="/expenses"
-              />
-              <SidebarItem
-                icon={<ContainerIcon size={24} />}
-                text="Suppliers"
-                link="/suppliers"
-              />
-              <SidebarItem
-                icon={<GraphIcon size={24} />}
-                text="Reports"
-                link="/reports"
-              />
+              {permissions.includes('dashboard') && (
+                <SidebarItem
+                  icon={<HomeIcon size={24} />}
+                  text="Dashboard"
+                  link="/dashboard"
+                />
+              )}
+              {permissions.includes('orders') && (
+                <SidebarItem
+                  icon={<PackageIcon size={24} />}
+                  text="Orders"
+                  link="/orders"
+                />
+              )}
+              {permissions.includes('inventory') && (
+                <SidebarItem
+                  icon={<ArchiveIcon size={24} />}
+                  text="Inventory"
+                  link="/inventory"
+                />
+              )}
+              {permissions.includes('expenses') && (
+                <SidebarItem
+                  icon={<CreditCardIcon size={24} />}
+                  text="Expenses"
+                  link="/expenses"
+                />
+              )}
+              {permissions.includes('suppliers') && (
+                <SidebarItem
+                  icon={<ContainerIcon size={24} />}
+                  text="Suppliers"
+                  link="/suppliers"
+                />
+              )}
+              {permissions.includes('reports') && (
+                <SidebarItem
+                  icon={<GraphIcon size={24} />}
+                  text="Reports"
+                  link="/reports"
+                />
+              )}
               <SidebarItem
                 icon={<GearIcon size={24} />}
                 text="Preferences"
@@ -104,7 +136,6 @@ const SidebarItem = ({ icon, text, link }) => {
   const { pathname } = useContext(SidebarContext);
   const isActive = pathname === link;
   console.log(isActive);
-  // ${isActive ? `bg-base-100` : `group-hover:bg-base-100`}
   return (
     <Link to={link}>
       <div className={`static flex group items-center text-base-300`}>

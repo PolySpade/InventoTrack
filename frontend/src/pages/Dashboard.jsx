@@ -55,16 +55,16 @@ const Dashboard = () => {
   return (
     <DashboardContext.Provider value ={{ordersData,inventorydata,alertsData}}>
       <div className='flex flex-row  justify-center  items-center'>
-        <div className='flex flex-row m-10 w-full text-white'>
+        <div className='flex flex-row m-10 w-full justify-center text-white'>
           {/* For Orders */}
-          <div className='max-w-3xl h-full flex-col pr-5'>
+          <div className='max-w-3xl flex-col pr-5 max-h-screen'>
             <OrdersDashboard />
             <BestSellerThisWeekTable/>
           </div>
-          <div className='max-w-2xl pr-5'>
+          <div className='max-w-2xl pr-5 max-h-screen'>
             <InventoryLevelsTable/>
           </div>
-          <div className=' max-w-3xl'>
+          <div className=' max-w-3xl max-h-screen'>
             <NotificationsDashboard/>
           </div>
         </div>
@@ -72,6 +72,8 @@ const Dashboard = () => {
     </DashboardContext.Provider>
   )
 }
+
+
 
 //TODO: To Process Orders, Processing, Charts of Sales Revenue, orders Today, Best Sellers, Alerts Side Panel
 

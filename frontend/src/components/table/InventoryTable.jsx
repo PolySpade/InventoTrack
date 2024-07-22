@@ -17,8 +17,7 @@ const InventoryTable = () => {
   const [openEditFormId, setOpenEditFormId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState("active");
-
-  const { inventorydata: products, warehouse, category } = useContext(InventoryContext);
+  const { inventorydata: products, warehouse, category, permissions } = useContext(InventoryContext);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -62,6 +61,8 @@ const InventoryTable = () => {
   const currentItems = filteredProducts.slice(
     (currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE
   );
+
+  const hasCogPermission = permissions.includes("cog");
 
   return (
     <div className="overflow-x-auto overflow-y-hidden">
@@ -124,7 +125,7 @@ const InventoryTable = () => {
             <th>SKU</th>
             <th>Name</th>
             <th>Category</th>
-            <th>Unit Cost</th>
+            {hasCogPermission && (<th>Unit Cost</th>)}
             <th>Weight</th>
             <th>Warehouse</th>
             <th>Product Dimensions</th>
@@ -141,6 +142,7 @@ const InventoryTable = () => {
               onCheckboxChange={handleCheckboxChange}
               openEditFormId={openEditFormId}
               setOpenEditFormId={setOpenEditFormId}
+              hasCogPermission={hasCogPermission}
             />
           ))}
         </tbody>
@@ -181,6 +183,7 @@ const TableContents = ({
   onCheckboxChange,
   openEditFormId,
   setOpenEditFormId,
+  hasCogPermission
 }) => {
 
   const {
@@ -203,7 +206,7 @@ const TableContents = ({
       <td>{sku}</td>
       <td>{name}</td>
       <td>{category.name}</td>
-      <td>₱{cost}</td>
+      {hasCogPermission && (<td>₱{cost}</td>)}
       <td>{weight} kg</td>
       <td>{warehouse.name}</td>
       <td>
