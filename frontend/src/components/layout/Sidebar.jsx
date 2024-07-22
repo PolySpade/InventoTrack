@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext } from "react";
 import {
   ArchiveIcon,
   ArrowRightIcon,
+  ContainerIcon,
   CreditCardIcon,
   GearIcon,
   GraphIcon,
@@ -10,6 +11,8 @@ import {
   KebabHorizontalIcon,
   PackageIcon,
   PeopleIcon,
+  PersonAddIcon,
+  PersonFillIcon,
   PersonIcon,
   SignInIcon,
   SignOutIcon,
@@ -60,6 +63,11 @@ const Sidebar = () => {
                 icon={<CreditCardIcon size={24} />}
                 text="Expenses"
                 link="/expenses"
+              />
+              <SidebarItem
+                icon={<ContainerIcon size={24} />}
+                text="Suppliers"
+                link="/suppliers"
               />
               <SidebarItem
                 icon={<GraphIcon size={24} />}
