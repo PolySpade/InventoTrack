@@ -3,8 +3,8 @@ import axios from "axios";
 import { InventoryContext } from "../../contexts";
 
 const EditProductForm = ({ onClose, item }) => {
-  const { category, warehouse } = useContext(InventoryContext);
-  const [error, setError] = useState("tset  ");
+  const { category, warehouse, refreshData } = useContext(InventoryContext);
+  const [error, setError] = useState("");
   const {
     _id,
     sku,
@@ -15,6 +15,7 @@ const EditProductForm = ({ onClose, item }) => {
     warehouse: warehouseVal,
     dimensions,
     stockLeft: quantity,
+    shown,
   } = item;
 
   const API_URL = import.meta.env.VITE_API_URL;
@@ -23,9 +24,6 @@ const EditProductForm = ({ onClose, item }) => {
     onClose();
   };
 
-
-
-  
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
@@ -69,22 +67,25 @@ const EditProductForm = ({ onClose, item }) => {
     } else if (isNaN(parseInt(formData.get("quantity"), 10))) {
       setError("Invalid Quantity");
       return;
-    }
-
+      }else if (formData.get("quantity") % 1 !== 0) {
+        setError("Stock Quantity must be an integer");
+        return;
+      }
 
     const data = {
       sku,
       name: formData.get("product_name"),
       category: formData.get("category"),
       unitCost: parseFloat(formData.get("unit_cost")),
-      weightKG: parseFloat(formData.get("weight")),
+      weightKG: parseFloat(formData.get("weight")) || 0,
       warehouse: formData.get("warehouse"),
       dimensions: {
-        lengthCM: parseFloat(formData.get("length")),
-        widthCM: parseFloat(formData.get("width")),
-        heightCM: parseFloat(formData.get("height")),
+        lengthCM: parseFloat(formData.get("length")) || 0,
+        widthCM: parseFloat(formData.get("width")) || 0,
+        heightCM: parseFloat(formData.get("height")) || 0,
       },
-      stockLeft: parseInt(formData.get("quantity"), 10), // Assuming stockLeft should be an integer
+      stockLeft: parseInt(formData.get("quantity"), 10),
+      shown: true 
     };
     try {
       const response = await axios.put(
@@ -95,9 +96,11 @@ const EditProductForm = ({ onClose, item }) => {
         throw new Error("Failed to update product");
       }
       console.log(response.data.message);
-      window.location.reload();
+      onClose();
+      refreshData();
     } catch (error) {
       console.error(error.message);
+      setError(error.response.data.message);
     }
     onClose();
   };
@@ -114,6 +117,39 @@ const EditProductForm = ({ onClose, item }) => {
       window.location.reload();
     } catch (error) {
       console.error(error.message);
+    }
+  };
+
+  const handleRestore = async () => {
+    const data = {
+      sku,
+      name,
+      category: categoryVal._id,
+      unitCost: cost,
+      weightKG: weight || 0,
+      warehouse: warehouseVal._id,
+      dimensions: {
+        lengthCM: dimensions.lengthCM || 0,
+        widthCM: dimensions.widthCM || 0,
+        heightCM: dimensions.heightCM || 0,
+      },
+      stockLeft: quantity,
+      shown: true 
+    };
+    try {
+      const response = await axios.put(
+        `${API_URL}/products/EditProduct/${_id}`,
+        data
+      );
+      if (response.status !== 200) {
+        throw new Error("Failed to restore product");
+      }
+      console.log(response.data.message);
+      onClose();
+      refreshData();
+    } catch (error) {
+      console.error(error.message);
+      setError(error.response.data.message);
     }
   };
 
@@ -296,9 +332,17 @@ const EditProductForm = ({ onClose, item }) => {
           <button type="submit" className="btn text-white">
             Save
           </button>
-          <button type="button" onClick={handleDelete} className='btn text-white bg-error hover:bg-red-400 outline-none border-none'>Delete</button>
+          {shown ? (
+            <button type="button" onClick={handleDelete} className="btn text-white bg-error hover:bg-red-400 outline-none border-none">
+              Delete
+            </button>
+          ) : (
+            <button type="button" onClick={handleRestore} className="btn text-white bg-success hover:bg-green-400 outline-none border-none">
+              Restore
+            </button>
+          )}
         </div>
-                {error && <p className='flex justify-center text-error'>{error}</p>}
+        {error && <p className="flex justify-center text-error">{error}</p>}
       </form>
     </div>
   );

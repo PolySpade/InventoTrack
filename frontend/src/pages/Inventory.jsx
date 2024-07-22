@@ -45,6 +45,7 @@ const Inventory = () => {
         console.log(err);
       })
   }
+  
 
   const refreshData = () => {
     getCategory();

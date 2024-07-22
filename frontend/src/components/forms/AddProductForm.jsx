@@ -3,8 +3,8 @@ import { InventoryContext } from '../../contexts';
 import axios from 'axios';
 
 const AddProductForm = ({ onClose }) => {
-  const { category, warehouse } = useContext(InventoryContext);
-  const API_URL = import.meta.env.VITE_API_URL;
+  const { category, warehouse, refreshData } = useContext(InventoryContext);
+  const API_URL = import.meta.env.VITE_API_URL; 
   const [error, setError] = useState("");
 
   const validateForm = (data) => {
@@ -28,15 +28,17 @@ const AddProductForm = ({ onClose }) => {
       name: formData.get('product_name'),
       category: formData.get('category'),
       unitCost: formData.get('unit_cost'),
-      weightKG: formData.get('weight'),
+      weightKG: formData.get('weight') || 0,
       warehouse: formData.get('warehouse'),
       dimensions: {
-        lengthCM: formData.get('length'),
-        widthCM: formData.get('width'),
-        heightCM: formData.get('height')
+        lengthCM: formData.get('length') || 0,
+        widthCM: formData.get('width') || 0,
+        heightCM: formData.get('height') || 0
       },
-      stockLeft: formData.get('quantity')
+      stockLeft: formData.get('quantity'),
+      shown: true
     };
+    console.log(data)
 
     const validationError = validateForm(data);
     if (validationError) {
@@ -45,8 +47,9 @@ const AddProductForm = ({ onClose }) => {
     }
 
     try {
-      await axios.post(`${API_URL}/products/AddProduct`, data);
-      window.location.reload();
+      const response = await axios.post(`${API_URL}/products/AddProduct`, data);
+      refreshData();
+      onClose();
     } catch (error) {
       console.error('Error submitting the form:', error);
       setError(error.response.data.message);

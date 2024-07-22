@@ -16,9 +16,9 @@ const AddOrderForm = ({ onClose }) => {
   };
 
   const filteredProducts = products.filter(
-    (product) =>
+    (product) => product.shown && (
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.sku.toLowerCase().includes(searchTerm.toLowerCase())
+      product.sku.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const checkedProducts = products.filter((product) =>
