@@ -6,14 +6,13 @@ import { alertModel } from '../models/alertModel.js';
 // Create 
 router.post('/CreateAlert', async (req, res) => {
     try {
-        const { orderID, alertType, message } = req.body;
+        const { alertType, message } = req.body;
 
-        if (!orderID || !alertType || !message ) {
+        if (!alertType || !message ) {
             return res.status(400).send({ message: "Send all fields!" });
         }
 
         const newAlert = {
-            orderID: new mongoose.Types.ObjectId(orderID),
             alertType,
             message
         };

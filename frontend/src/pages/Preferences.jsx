@@ -9,7 +9,6 @@ import {
   PersonFillIcon,
   PersonIcon,
   StackIcon,
-  TagIcon,
 } from "@primer/octicons-react";
 import axios from "axios";
 import ExpenseTypeForm from "../components/forms/ExpenseTypeForm";
@@ -20,6 +19,7 @@ import RoleForm from "../components/forms/RoleForm";
 import RecordsHistory from "../components/table/RecordsHistory";
 import PlatformsForm from "../components/forms/PlatformsForm";
 import AccountsForm from "../components/forms/AccountsForm";
+import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 
 const Preferences = () => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -43,6 +43,9 @@ const Preferences = () => {
   const [recordsTable, setRecordsTable] = useState(false);
   const [platformsForm, setPlatformsForm] = useState(false);
   const [accountsForm,setAccountsForm] = useState(false);
+  const authUser = useAuthUser();
+  const [permissions, setPermissions] = useState([]);
+
   const getExpenseTypes = () => {
     axios
       .get(`${API_URL}/expensesTypes/`)
@@ -107,7 +110,6 @@ const Preferences = () => {
       .catch((err) => console.log(err));
   };
 
-  
   const getRoles = () => {
     axios
       .get(`${API_URL}/roles/`)
@@ -170,6 +172,14 @@ const Preferences = () => {
     refreshData();
   }, []);
 
+  useEffect(() => {
+    if (authUser) {
+      const role_id = authUser.role_id;
+      const findRole = role_id ? roleTypes.find((role) => role._id === role_id) : null;
+      setPermissions(findRole ? findRole.permissions : []);
+    }
+  }, [authUser, roleTypes]);
+
   return (
     <PreferencesContext.Provider
       value={{
@@ -188,41 +198,47 @@ const Preferences = () => {
       }}
     >
       <div className="overflow-y-hidden flex flex-row justify-center items- h-full">
-        <div className="m-10 w-full flex flex-row justify-evenly flex-wrap w-6/12">
-          <button onClick={() => setExpenseForm((prev) => !prev)}>
-            <Box icon={<CreditCardIcon size={100} />} text="Expenses" />
-          </button>
-          <button onClick={() => setCategoryForm((prev) => !prev)}>
-            <Box icon={<ArchiveIcon size={100} />} text="Product Category" />
-          </button>
-          <button onClick={() => setWarehouseForm((prev) => !prev)}>
-            <Box icon={<InboxIcon size={100} />} text="Warehouse" />
-          </button>
-
-          <button onClick={() => setCouriersForm( (prev) => !prev)}>
-            <Box icon={<GlobeIcon size={100} />} text="Couriers" />
-          </button>
-          <button onClick={() => setPlatformsForm( (prev) => !prev)}>
-            <Box icon={<StackIcon size={100} />} text="Platforms" />
-          </button>
-
-          <button onClick={() => setPlatformsForm( (prev) => !prev)}>
-            <Box icon={<StackIcon size={100} />} text="Platforms" />
-          </button>
-          
-          <button onClick={() => setRoleForm( (prev) => !prev)}>
-            <Box icon={<PersonIcon size={100} />} text="Roles" />
-          </button>
-          <button onClick={() => setAccountsForm( (prev) => !prev)}>
-            <Box icon={<PersonFillIcon size={100} />} text="Accounts" />
-          </button>
-          
-          <button onClick={() => setRecordsTable( (prev) => !prev)}>
-            <Box
-              icon={<FileDirectoryIcon size={100} />}
-              text="Records History"
-            />
-          </button>
+        <div className="m-10 w-full flex flex-row justify-evenly flex-wrap">
+          {permissions.includes('modifyExpensesType') && (
+            <button onClick={() => setExpenseForm((prev) => !prev)}>
+              <Box icon={<CreditCardIcon size={100} />} text="Expenses" />
+            </button>
+          )}
+          {permissions.includes('modifyProductCategory') && (
+            <button onClick={() => setCategoryForm((prev) => !prev)}>
+              <Box icon={<ArchiveIcon size={100} />} text="Product Category" />
+            </button>
+          )}
+          {permissions.includes('modifyWarehouses') && (
+            <button onClick={() => setWarehouseForm((prev) => !prev)}>
+              <Box icon={<InboxIcon size={100} />} text="Warehouse" />
+            </button>
+          )}
+          {permissions.includes('modifyCouriers') && (
+            <button onClick={() => setCouriersForm((prev) => !prev)}>
+              <Box icon={<GlobeIcon size={100} />} text="Couriers" />
+            </button>
+          )}
+          {permissions.includes('modifyPlatforms') && (
+            <button onClick={() => setPlatformsForm((prev) => !prev)}>
+              <Box icon={<StackIcon size={100} />} text="Platforms" />
+            </button>
+          )}
+          {permissions.includes('roleManagement') && (
+            <button onClick={() => setRoleForm((prev) => !prev)}>
+              <Box icon={<PersonIcon size={100} />} text="Roles" />
+            </button>
+          )}
+          {permissions.includes('modifyAccounts') && (
+            <button onClick={() => setAccountsForm((prev) => !prev)}>
+              <Box icon={<PersonFillIcon size={100} />} text="Accounts" />
+            </button>
+          )}
+          {permissions.includes('recordsHistory') && (
+            <button onClick={() => setRecordsTable((prev) => !prev)}>
+              <Box icon={<FileDirectoryIcon size={100} />} text="Records History" />
+            </button>
+          )}
           {expenseForm && (
             <ExpenseTypeForm onClose={() => setExpenseForm(false)} />
           )}
@@ -233,27 +249,20 @@ const Preferences = () => {
             <WarehouseForm onClose={() => setWarehouseForm(false)} />
           )}
           {couriersForm && (
-            <CouriersForm onClose={() => setCouriersForm(false)}/>
+            <CouriersForm onClose={() => setCouriersForm(false)} />
           )}
           {roleForm && (
-            <RoleForm onClose={() => setRoleForm(false)}/>
-          )
-          }
-          {
-            recordsTable && (
-              <RecordsHistory onClose={()=> setRecordsTable(false)}/>
-            )
-          }
-          {
-            platformsForm && (
-              <PlatformsForm onClose={() => setPlatformsForm(false)}/>
-            )
-          }
-          {
-            accountsForm && (
-              <AccountsForm onClose={() => setAccountsForm(false)}/>
-            )
-          }
+            <RoleForm onClose={() => setRoleForm(false)} />
+          )}
+          {recordsTable && (
+            <RecordsHistory onClose={() => setRecordsTable(false)} />
+          )}
+          {platformsForm && (
+            <PlatformsForm onClose={() => setPlatformsForm(false)} />
+          )}
+          {accountsForm && (
+            <AccountsForm onClose={() => setAccountsForm(false)} />
+          )}
         </div>
       </div>
     </PreferencesContext.Provider>
@@ -261,7 +270,7 @@ const Preferences = () => {
 };
 
 const Box = ({ icon, text }) => (
-  <div className=" flex items-center flex-col justify-center w-56 text-white bg-base-content h-56 rounded-xl border border-white border-opacity-50 hover:bg-base-100">
+  <div className=" flex items-center flex-col justify-center w-72 h-72 text-white bg-base-content rounded-xl border border-white border-opacity-50 hover:bg-base-100">
     {icon}
     <p className=" text-sm">{text}</p>
   </div>

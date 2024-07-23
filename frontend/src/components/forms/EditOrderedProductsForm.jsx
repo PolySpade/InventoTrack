@@ -25,9 +25,9 @@ const EditOrderedProductsForm = ({ productslist, onClose, orderid }) => {
   };
 
   const filteredProducts = allProducts.filter(
-    (product) =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.sku.toLowerCase().includes(searchTerm.toLowerCase())
+    (product) => product.shown && 
+      (product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.sku.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const handleCheckboxChange = (sku) => {

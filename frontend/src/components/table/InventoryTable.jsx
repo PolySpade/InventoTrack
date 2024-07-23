@@ -16,8 +16,8 @@ const InventoryTable = () => {
   const [checkedItems, setCheckedItems] = useState([]);
   const [openEditFormId, setOpenEditFormId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-
-  const { inventorydata: products, warehouse, category } = useContext(InventoryContext);
+  const [statusFilter, setStatusFilter] = useState("active");
+  const { inventorydata: products, warehouse, category, permissions } = useContext(InventoryContext);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -32,10 +32,23 @@ const InventoryTable = () => {
 
   const isChecked = (sku) => checkedItems.includes(sku);
 
-  const filteredProducts = products.filter((item) =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.sku.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleStatusFilterChange = (status) => {
+    setStatusFilter(status);
+    setCurrentPage(1);
+  };
+
+  const filteredProducts = products.filter((item) => {
+    const matchesStatus = 
+      statusFilter === "" ||
+      (statusFilter === "active" && item.shown) ||
+      (statusFilter === "deleted" && !item.shown);
+
+    const matchesSearch = 
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.sku.toLowerCase().includes(searchTerm.toLowerCase());
+
+    return matchesStatus && matchesSearch;
+  });
 
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
 
@@ -48,6 +61,8 @@ const InventoryTable = () => {
   const currentItems = filteredProducts.slice(
     (currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE
   );
+
+  const hasCogPermission = permissions.includes("cog");
 
   return (
     <div className="overflow-x-auto overflow-y-hidden">
@@ -62,12 +77,24 @@ const InventoryTable = () => {
         />
       </div>
       <div className="flex justify-between">
+        <div>
         <button
           onClick={() => setAddProduct((prev) => !prev)}
-          className="btn text-white bg-secondary border-none"
+          className="btn text-white bg-secondary border-none pr-5"
         >
           Add Product
         </button>
+
+        <div className="dropdown dropdown-bottom ml-3">
+          <label tabIndex={0} className="btn text-white">Filter Status</label>
+          <ul tabIndex={0} className="dropdown-content text-white z-10 menu p-2 shadow bg-neutral rounded-box w-52">
+            <li><a onClick={() => handleStatusFilterChange("")}>All</a></li>
+            <li><a onClick={() => handleStatusFilterChange("active")}>Active</a></li>
+            <li><a onClick={() => handleStatusFilterChange("deleted")}>Deleted</a></li>
+          </ul>
+        </div>
+        </div>
+
         <div className="flex flex-row">
           <button onClick={() => setStockIn((prev) => !prev)} className="btn text-white bg-secondary border-none mr-4">
             Stock-In
@@ -95,26 +122,10 @@ const InventoryTable = () => {
       <table className="table table-pin-rows flex-1">
         <thead>
           <tr className="border-none text-white">
-            <th>
-              <label>
-                <input
-                  type="checkbox"
-                  className="checkbox checkbox-secondary"
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setCheckedItems(currentItems.map(item => item.sku));
-                    } else {
-                      setCheckedItems([]);
-                    }
-                  }}
-                  checked={currentItems.length > 0 && currentItems.every(item => checkedItems.includes(item.sku))}
-                />
-              </label>
-            </th>
             <th>SKU</th>
             <th>Name</th>
             <th>Category</th>
-            <th>Unit Cost</th>
+            {hasCogPermission && (<th>Unit Cost</th>)}
             <th>Weight</th>
             <th>Warehouse</th>
             <th>Product Dimensions</th>
@@ -131,6 +142,7 @@ const InventoryTable = () => {
               onCheckboxChange={handleCheckboxChange}
               openEditFormId={openEditFormId}
               setOpenEditFormId={setOpenEditFormId}
+              hasCogPermission={hasCogPermission}
             />
           ))}
         </tbody>
@@ -171,6 +183,7 @@ const TableContents = ({
   onCheckboxChange,
   openEditFormId,
   setOpenEditFormId,
+  hasCogPermission
 }) => {
 
   const {
@@ -190,20 +203,10 @@ const TableContents = ({
   };
   return (
     <tr className="border-none text-white bg-base-content">
-      <th>
-        <label>
-          <input
-            type="checkbox"
-            className="checkbox checkbox-secondary"
-            checked={isChecked}
-            onChange={() => onCheckboxChange(sku)}
-          />
-        </label>
-      </th>
       <td>{sku}</td>
       <td>{name}</td>
       <td>{category.name}</td>
-      <td>₱{cost}</td>
+      {hasCogPermission && (<td>₱{cost}</td>)}
       <td>{weight} kg</td>
       <td>{warehouse.name}</td>
       <td>

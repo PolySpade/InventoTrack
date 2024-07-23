@@ -6,6 +6,8 @@ import axios from 'axios';
 const EditExpenseForm = ({ onClose, _id, timestamp, amount, expensestype, description }) => {
   const API_URL = import.meta.env.VITE_API_URL;
   const { expenseTypes: expense_types, refreshData } = useContext(ExpenseContext);
+  const [error,setError] = useState("")
+
 
   const [formValues, setFormValues] = useState({
     amount,
@@ -19,6 +21,28 @@ const EditExpenseForm = ({ onClose, _id, timestamp, amount, expensestype, descri
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+
+    if (formValues.amount === "") {
+      setError("Input Amount");
+      return;
+    }
+  
+    if (isNaN(formValues.amount)) {
+      setError("Amount must be a number");
+      return;
+    }
+  
+    if (parseFloat(formValues.amount) < 0) {
+      setError("Input a Non-Negative Number");
+      return;
+    }
+
+    if(formValues.description === ""){
+      setError("Short Description must not be blank")
+      return
+    }
+
 
     const updatedExpense = {
       timestamp,
@@ -47,9 +71,10 @@ const EditExpenseForm = ({ onClose, _id, timestamp, amount, expensestype, descri
         throw new Error('Failed to delete expense');
       }
       console.log(response.data.message);
-      window.location.reload();
+      refreshData();
     } catch (error) {
       console.error(error.message);
+      setError(error.response.data.message);
     }
     onClose();
   };
@@ -94,6 +119,7 @@ const EditExpenseForm = ({ onClose, _id, timestamp, amount, expensestype, descri
             <button type="submit" className="btn text-white my-2">Save</button>
             <button type="button" onClick={handleDelete} className='btn text-white my-2 bg-error hover:bg-red-400 outline-none border-none'>Delete</button>
           </div>
+          {error && (<p className='flex justify-center text-sm text-error'>{error}</p>)}
         </form>
       </div>
     </div>

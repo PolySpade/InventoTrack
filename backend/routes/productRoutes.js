@@ -7,7 +7,7 @@ import { productModel } from '../models/productModel.js';
 router.post('/AddProduct', async (req, res) => {
     try {
         const { name, category, unitCost, weightKG, warehouse, dimensions, stockLeft, sku, shown } = req.body;
-
+        console.log(req.body)
         // Validate the presence of all required fields; removed unitCost since it will always have a default value (0)
         if (!name || !category || !weightKG || !warehouse || !dimensions || !dimensions.lengthCM || ! dimensions.widthCM || !dimensions.heightCM || !stockLeft || !sku || !shown) {
             return res.status(400).send({ message: "Please provide all required fields!" });
@@ -21,6 +21,12 @@ router.post('/AddProduct', async (req, res) => {
             'dimensions.heightCM': dimensions.heightCM,
             stockLeft
         };
+
+        const skuDoc = await productModel.findOne({ sku: sku });
+
+        if (skuDoc) {
+            return res.status(404).send({ message: `SKU: ${sku} exists` });
+        }
 
         const invalidFields = [];
 

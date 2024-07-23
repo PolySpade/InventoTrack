@@ -1,19 +1,48 @@
 import { getCurrentDate } from '../../utils';
 import axios from 'axios';
 import { ExpenseContext } from '../../contexts';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 
 const AddExpenseForm = ({ onClose }) => {
   const API_URL = import.meta.env.VITE_API_URL;
   const { expenseTypes: expense_types, refreshData } = useContext(ExpenseContext);
-
+  const [error,setError] = useState("")
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
+    const numAmount = parseFloat(formData.get('amount'))
+    console.log(formData.get('expense_types'))
+    if(formData.get('expense_types') === null){
+      setError("Set An Expense Type");
+      return
+    }
+
+
+    if (formData.get('amount') === "") {
+      setError("Input Amount");
+      return;
+    }
+  
+    if (isNaN(numAmount)) {
+      setError("Amount must be a number");
+      return;
+    }
+  
+    if (numAmount < 0) {
+      setError("Input a Non-Negative Number");
+      return;
+    }
+
+    if(formData.get('description') === ""){
+      setError("Input a short description")
+      return
+    }
+
+
     const data = {
       timestamp: formData.get('date'),
-      amount: formData.get('amount'),
+      amount: numAmount,
       expensestype: formData.get('expense_types'),
       description: formData.get('description')
     };
@@ -22,7 +51,7 @@ const AddExpenseForm = ({ onClose }) => {
       refreshData();
       onClose();
     } catch (error) {
-      console.error('Error submitting the form:', error);
+      setError(error.response.data.message)
       // Optionally handle the error here, e.g., show an error message to the user
     }
   };
@@ -61,6 +90,7 @@ const AddExpenseForm = ({ onClose }) => {
           <button type="button" onClick={handleCancel} className='btn text-white'>Cancel</button>
           <button type="submit" className='btn text-white'>Submit</button>
         </div>
+        {error && (<p className='flex justify-center text-sm text-error'>{error}</p>)}
       </form>
     </div>
   );

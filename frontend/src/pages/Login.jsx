@@ -33,6 +33,10 @@ const Login = () => {
     setHidePass(!hidePass);
   };
 
+  const handleCreate = () => {
+    alert("Contact Admin to Create an Account");
+  }
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
@@ -40,7 +44,6 @@ const Login = () => {
       email: formData.get("email"),
       password: formData.get("password")
     };
-    //console.log(data.email);
     try {
       const response = await axios.post(`${API_URL}/accounts/login/`, data);
       if (response.status === 200) {
@@ -52,11 +55,12 @@ const Login = () => {
           expiresIn: response.data.expiresIn,
           tokenType: "bearer",
           userState: {
-            email: data.email,
-            role_id: response.data.user.role
+            email: response.data.user.email,
+            role_id: response.data.user.role,
+            name: response.data.user.name
           }
         });
-        navigate("/dashboard");
+        navigate("/");
       }
     } catch (error) {
       console.log(error);
@@ -71,9 +75,9 @@ const Login = () => {
   return (
     <div className="min-h-screen flex flex-col mx-5">
       <div className="flex flex-col max-w-full">
-        <Link to="/create-account" className="flex justify-end pt-2 pb-1 hover:text-primary">
+        <button onClick={handleCreate} className="flex justify-end pt-2 pb-1 hover:text-primary">
           Create Account
-        </Link>
+        </button>
         <hr className="h-px border-0 bg-black" />
       </div>
       <form onSubmit={handleSubmit} method="post" className="my-auto flex justify-center">

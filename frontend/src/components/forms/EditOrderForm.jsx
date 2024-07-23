@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   XIcon,
   PencilIcon,
@@ -9,6 +9,7 @@ import {
   BellIcon,
   StopIcon,
   CheckCircleFillIcon,
+  QuestionIcon,
 } from "@primer/octicons-react";
 import { formatTimestamp } from "../../utils";
 import axios from "axios";
@@ -51,9 +52,52 @@ const EditOrderForm = ({
   const [totalPaidValue, setTotalPaidValue] = useState(totalPaid);
   const [feesValue, setFeesValue] = useState(otherFees);
   const [editProducts,setEditProducts] = useState(false);
+  const [alerts,setAlerts] = useState([])
 
+  const [error,setError] = useState("")
 
-
+  useEffect(() => {
+    const generateAlerts = () => {
+      const newAlerts = [];
+  
+      // Late shipment risk
+      if (status === 'To Process') {
+        const oneDay = 24 * 60 * 60 * 1000; // milliseconds in one day
+        const orderDate = new Date(timestamp);
+        const currentDate = new Date();
+        const difference = currentDate - orderDate;
+  
+        if (difference > oneDay) {
+          newAlerts.push({
+            alertType: 'Warning',
+            message: 'Risk of late shipment',
+          });
+        }
+      }
+  
+      // // Payment issues (assuming `totalPaid` should be greater than 0)
+      // if (totalPaid <= 0) {
+      //   newAlerts.push({
+      //     alertType: 'Alert',
+      //     message: 'Payment issue: Total paid is zero or negative',
+      //   });
+      // }
+  
+      // Missing tracking information
+      if (status === 'Shipped' && (!trackingNumber || trackingNumber.trim() === '')) {
+        newAlerts.push({
+          alertType: 'Alert',
+          message: 'Tracking information is missing',
+        });
+      }
+  
+  
+      setAlerts(newAlerts);
+    };
+  
+    generateAlerts();
+  }, [status, timestamp, totalPaid, trackingNumber]);
+  
   const saveNotes = async () => {
     setEditNotes(false);
     const data = {
@@ -84,7 +128,13 @@ const EditOrderForm = ({
   };
 
   const saveBuyer = async () => {
-    setEditBuyer(false);
+    console.log(buyerEmail)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(buyerEmail) && buyerEmail) {
+      alert("Please enter a valid email address");
+      return;
+    }
     const data = {
       buyer: {
         buyerName,
@@ -95,6 +145,7 @@ const EditOrderForm = ({
 
     try {
       const response = await axios.put(`${API_URL}/orders/EditBuyer/${_id}`, data);
+      setEditBuyer(false);
       refreshData();
     } catch (err) {
       console.log(err);
@@ -133,14 +184,20 @@ const EditOrderForm = ({
   };
 
   const saveTotalPaid = async () => {
-    setEditTotalPaid(false);
+    const totalPaidnum = Number(totalPaidValue);
+    if (isNaN(totalPaidnum) || totalPaidnum < 0 || totalPaidValue ===  "") {
+      alert("Please enter a valid non-negative number for the fees");
+      return;
+    }
+
     const data = {
-      totalPaid: Number(totalPaidValue).toFixed(2),
+      totalPaid: totalPaidnum.toFixed(2),
     };
 
     try {
       const response = await axios.put(`${API_URL}/orders/EditTotal/${_id}`, data);
       console.log(response);
+      setEditTotalPaid(false);
       refreshData();
     } catch (err) {
       console.log(err);
@@ -148,14 +205,19 @@ const EditOrderForm = ({
   };
 
   const saveFees = async () => {
-    setEditFees(false);
+    const feesNum = Number(feesValue);
+    if (isNaN(feesNum) || feesNum < 0 || feesValue === "") {
+      alert("Please enter a valid non-negative number for the fees");
+      return;
+    }
     const data = {
-      otherFees: Number(feesValue).toFixed(2),
+      otherFees: feesNum.toFixed(2),
     };
 
     try {
       const response = await axios.put(`${API_URL}/orders/EditFees/${_id}`, data);
       console.log(response);
+      setEditFees(false);
       refreshData();
     } catch (err) {
       console.log(err);
@@ -259,7 +321,7 @@ const EditOrderForm = ({
           <hr className="bg-white w-full h-px my-3" />
           <div className="mb-4">
             <h1 className="font-bold text-md my-2">Alerts</h1>
-            <Alerts orderid={id} />
+            <Alerts alerts={alerts} />
           </div>
           
           <div className="flex justify-center">
@@ -529,6 +591,7 @@ const EditOrderForm = ({
                 </div>
               </div>
             </div>
+            <p className="text-sm text-error flex justify-center">{error}</p>
             <div className="mt-4 tooltip tooltip-right" data-tip="Delete Order Record">
               <button className="p-1" onClick={handleDelete}>
                 <TrashIcon className="text-error" />
@@ -543,39 +606,48 @@ const EditOrderForm = ({
 
 export default EditOrderForm;
 
-const Alerts = ({ orderid }) => {
+const Alerts = ({ alerts }) => {
+  const getIcon = (alertType) => {
+    switch (alertType) {
+      case 'Warning':
+        return <StopIcon size={16} className="text-warning" />;
+      case 'Notification':
+        return <BellIcon size={16} className="text-success" />;
+      case 'Alert':
+        return <AlertIcon size={16} className="text-error" />;
+      default:
+        return <QuestionIcon size={16} className="text-white"/>;
+    }
+  };
+
   return (
     <div className="space-y-2">
+      {alerts.map((alert, index) => (
+        <div key={index} className="flex flex-row w-full bg-secondary rounded-lg h-11 items-center">
+          <div className="flex items-center justify-center rounded-full ml-3 w-9 h-9 bg-base-100">
+            {getIcon(alert.alertType)}
+          </div>
+          <div className="ml-3 flex flex-col text-xs">
+            <div className="font-bold">{alert.alertType}</div>
+            <div>{alert.message}</div>
+          </div>
+        </div>
+      ))}
+      {alerts.length === 0 ? (
       <div className="flex flex-row w-full bg-secondary rounded-lg h-11 items-center">
         <div className="flex items-center justify-center rounded-full ml-3 w-9 h-9 bg-base-100">
-          <StopIcon size={16} className="text-warning" />
+          {getIcon("null")}
         </div>
         <div className="ml-3 flex flex-col text-xs">
-          <div className="font-bold">Warning</div>
-          <div>Message</div>
+          <div className="font-bold">None</div>
+          <div>Nothing to see here</div>
         </div>
       </div>
-      <div className="flex flex-row w-full bg-secondary rounded-lg h-11 items-center">
-        <div className="flex items-center justify-center rounded-full ml-3 w-9 h-9 bg-base-100">
-          <BellIcon size={16} className="text-success" />
-        </div>
-        <div className="ml-3 flex flex-col text-xs">
-          <div className="font-bold">Notification</div>
-          <div>Warning Message</div>
-        </div>
-      </div>
-      <div className="flex flex-row w-full bg-secondary rounded-lg h-11 items-center">
-        <div className="flex items-center justify-center rounded-full ml-3 w-9 h-9 bg-base-100">
-          <AlertIcon size={16} className="text-error" />
-        </div>
-        <div className="ml-3 flex flex-col text-xs">
-          <div className="font-bold">Alert</div>
-          <div>Message</div>
-        </div>
-      </div>
+    ) : (<></>)}
     </div>
   );
 };
+
 
 const Timeline = ({ data }) => {
   data = data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
