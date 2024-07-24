@@ -1,6 +1,8 @@
 import React, { useContext, useState } from "react";
 import { PreferencesContext } from "../../contexts";
 import axios from "axios";
+import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
+
 
 const WarehouseForm = ({ onClose }) => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -11,6 +13,16 @@ const WarehouseForm = ({ onClose }) => {
 
   const [newWarehouse, setNewWarehouse] = useState("");
   const [error, setError] = useState("");
+
+  let user_email, user_role;
+  const authUser = useAuthUser()
+  if(authUser){
+    user_email = authUser.email;
+    user_role = authUser.role_id;
+  }else{
+    user_email = "N/A"
+    user_role = "N/A"
+  }
 
   const selectedWarehouseType = warehouseTypes.find(item => item._id === selectedWarehouse);
 
@@ -46,8 +58,20 @@ const WarehouseForm = ({ onClose }) => {
     
     
     const _id = selectedWarehouseType._id
+
+
+    const old_name = warehouseTypes.find(war => war._id === _id).name;
+
+    const history_data = {
+      timestamp: new Date().toISOString(),
+      role: user_role,
+      email: user_email,
+      action: `Edited Warehouse: ${old_name} to ${newWarehouse}`
+    }
+
     try {
       const response = await axios.put(`${API_URL}/warehouses/EditWarehouse/${_id}`, data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
       refreshData();
       onClose();
     } catch (error) {
@@ -65,9 +89,19 @@ const WarehouseForm = ({ onClose }) => {
       setError("Cannot delete this warehouse type because it is associated with existing product.");
       return;
     }
+    const old_name = warehouseTypes.find(war => war._id === _id).name;
+
+    const history_data = {
+      timestamp: new Date().toISOString(),
+      role: user_role,
+      email: user_email,
+      action: `Deleted Warehouse: ${old_name}`
+    }
 
     try {
       const response = await axios.delete(`${API_URL}/warehouses/DeleteWarehouse/${_id}`);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+  
       refreshData();
       onClose();
     } catch (error) {
@@ -89,8 +123,19 @@ const WarehouseForm = ({ onClose }) => {
       setError("Existing Warehouse Type");
       return;
     }
+
+
+    const history_data = {
+      timestamp: new Date().toISOString(),
+      role: user_role,
+      email: user_email,
+      action: `Added a Warehouse: ${newWarehouse}`
+    }
+
     try {
       const response = await axios.post(`${API_URL}/warehouses/CreateWarehouse`,data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+  
       refreshData();
       onClose();
     } catch (error) {
@@ -157,10 +202,36 @@ const WarehouseForm = ({ onClose }) => {
           <button className="btn text-white" onClick={handleEdit}>
               Save
           </button>
-          <button className="btn text-white bg-error border-none" onClick={handleDelete}>
+          <button className="btn text-white bg-error border-none" onClick={() =>
+    document.getElementById("my_modal_1").showModal()
+  }>
               Delete
           </button>
           </div>
+          <dialog id="my_modal_1" className="modal">
+              <div className="modal-box">
+                <h3 className="font-bold text-lg text-left">Warning!</h3>
+                <p className="py-4 pb-0 text-left">
+                  This action will delete your warehouse!
+                </p>
+                <div className="modal-action">
+                  <form method="dialog">
+                    <button className="btn bg-error text-white border-none">
+                      Cancel
+                    </button>
+                  </form>
+                  <button
+                    className="btn text-white border-none"
+                    onClick={handleDelete}
+                  >
+                    Confirm
+                  </button>
+                </div>
+                <p className="text-sm text-error flex justify-center mt-2">
+                  {error}
+                </p>
+              </div>
+            </dialog>
           <p className="text-sm text-error flex justify-center mt-2">{error}</p>
         </div>
         )}

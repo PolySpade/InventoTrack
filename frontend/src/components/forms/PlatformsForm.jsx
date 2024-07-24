@@ -201,10 +201,37 @@ const PlatformsForm = ({ onClose }) => {
           <button className="btn text-white" onClick={handleEdit}>
               Save
           </button>
-          <button className="btn text-white bg-error border-none" onClick={handleDelete}>
+          <button className="btn text-white bg-error border-none"   onClick={() =>
+    document.getElementById("my_modal_1").showModal()
+  }>
               Delete
           </button>
           </div>
+          <dialog id="my_modal_1" className="modal">
+              <div className="modal-box">
+                <h3 className="font-bold text-lg text-left">Warning!</h3>
+                <p className="py-4 pb-0 text-left">
+                  This action will delete a platform!
+                </p>
+                <div className="modal-action">
+                  <form method="dialog">
+                    <button className="btn bg-error text-white border-none">
+                      Cancel
+                    </button>
+                  </form>
+                  <button
+                    className="btn text-white border-none"
+                    onClick={handleDelete}
+                  >
+                    Confirm
+                  </button>
+                </div>
+                <p className="text-sm text-error flex justify-center mt-2">
+                  {error}
+                </p>
+              </div>
+            </dialog>
+
           <p className="text-sm text-error flex justify-center mt-2">{error}</p>
         </div>
         )}

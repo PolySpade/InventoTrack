@@ -120,9 +120,9 @@ const Login = () => {
               </div>
 
               <div className="flex justify-center">
-                <Link to="/" className=" font-medium underline underline-offset-1">
+                <a onClick={() => alert("Contact Admin!")} className=" hover:cursor-pointer">
                   Can't login?
-                </Link>
+                </a>
               </div>
             </div>
           </div>
