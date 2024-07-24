@@ -20,6 +20,7 @@ import RecordsHistory from "../components/table/RecordsHistory";
 import PlatformsForm from "../components/forms/PlatformsForm";
 import AccountsForm from "../components/forms/AccountsForm";
 import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
+import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 const Preferences = () => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -46,9 +47,15 @@ const Preferences = () => {
   const authUser = useAuthUser();
   const [permissions, setPermissions] = useState([]);
 
+  const authHeader = useAuthHeader();
+  const headers = {
+    Authorization: authHeader,
+  };
+
+
   const getExpenseTypes = () => {
     axios
-      .get(`${API_URL}/expensesTypes/`)
+      .get(`${API_URL}/expensesTypes/`, { headers })
       .then((response) => {
         setExpenseTypes(response.data);
       })
@@ -58,14 +65,14 @@ const Preferences = () => {
   };
   const getOrdersData = () => {
     axios
-      .get(`${API_URL}/orders/`)
+      .get(`${API_URL}/orders/`, { headers })
       .then((response) => setOrdersData(response.data))
       .catch((err) => console.log(err));
   };
 
   const getExpenses = () => {
     axios
-      .get(`${API_URL}/expenses/`)
+      .get(`${API_URL}/expenses/`, { headers })
       .then((response) => {
         setExpensesData(response.data);
       })
@@ -76,7 +83,7 @@ const Preferences = () => {
 
   const getCategory = () => {
     axios
-      .get(`${API_URL}/categories/`)
+      .get(`${API_URL}/categories/`, { headers })
       .then((response) => {
         setCategoryTypes(response.data);
       })
@@ -87,7 +94,7 @@ const Preferences = () => {
 
   const getWarehouse = () => {
     axios
-      .get(`${API_URL}/warehouses/`)
+      .get(`${API_URL}/warehouses/`, { headers })
       .then((response) => {
         setWarehouseTypes(response.data);
       })
@@ -98,21 +105,21 @@ const Preferences = () => {
 
   const getProducts = () => {
     axios
-      .get(`${API_URL}/products/`)
+      .get(`${API_URL}/products/`, { headers })
       .then((response) => setProductsData(response.data))
       .catch((err) => console.log(err));
   };
 
   const getCouriers = () => {
     axios
-      .get(`${API_URL}/couriers/`)
+      .get(`${API_URL}/couriers/`, { headers })
       .then((response) => setCourierTypes(response.data))
       .catch((err) => console.log(err));
   };
 
   const getRoles = () => {
     axios
-      .get(`${API_URL}/roles/`)
+      .get(`${API_URL}/roles/`, { headers })
       .then((response) => {
         setRoleTypes(response.data);
       })
@@ -123,7 +130,7 @@ const Preferences = () => {
 
   const getAccounts = () => {
     axios
-      .get(`${API_URL}/accounts/`)
+      .get(`${API_URL}/accounts/`, { headers })
       .then((response) => {
         setAccounts(response.data);
       })
@@ -134,7 +141,7 @@ const Preferences = () => {
 
   const getHistory = () => {
     axios
-      .get(`${API_URL}/histories/`)
+      .get(`${API_URL}/histories/`, { headers })
       .then((response) => {
         setHistories(response.data);
       })
@@ -145,7 +152,7 @@ const Preferences = () => {
 
   const getPlatforms = () => {
     axios
-      .get(`${API_URL}/platforms/`)
+      .get(`${API_URL}/platforms/`, { headers })
       .then((response) => {
         setPlatforms(response.data);
       })

@@ -3,7 +3,7 @@ import { XCircleFillIcon, SearchIcon } from "@primer/octicons-react";
 import { OrdersContext } from "../../contexts";
 import axios from "axios";
 import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
-
+import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 const EditOrderedProductsForm = ({ productslist, onClose, orderid }) => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -17,7 +17,10 @@ const EditOrderedProductsForm = ({ productslist, onClose, orderid }) => {
       name: product.name
     }))
   );
-
+  const authHeader = useAuthHeader();
+  const headers = {
+      Authorization: authHeader,
+  };
   let user_email, user_role;
   const authUser = useAuthUser()
   if(authUser){
@@ -83,8 +86,8 @@ const EditOrderedProductsForm = ({ productslist, onClose, orderid }) => {
         action: `Edited the products of order ID: ${oldorderid}`
       }
     try {
-      const response = await axios.put(`${API_URL}/orders/EditProductsOrder/${orderid}`, orderData);
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const response = await axios.put(`${API_URL}/orders/EditProductsOrder/${orderid}`, orderData, { headers });
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       refreshData();
       onClose();
     } catch (error) {

@@ -3,6 +3,7 @@ import { ExpenseContext } from "../../contexts";
 import { useContext, useState } from "react";
 import axios from "axios";
 import useAuthUser from "react-auth-kit/hooks/useAuthUser";
+import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 const EditExpenseForm = ({
   onClose,
@@ -25,7 +26,10 @@ const EditExpenseForm = ({
     user_email = "N/A";
     user_role = "N/A";
   }
-
+  const authHeader = useAuthHeader();
+  const headers = {
+      Authorization: authHeader,
+  };
   const [formValues, setFormValues] = useState({
     amount,
     expensestype,
@@ -80,12 +84,12 @@ const EditExpenseForm = ({
     try {
       const response = await axios.put(
         `${API_URL}/expenses/EditExpense/${_id}`,
-        updatedExpense
+        updatedExpense, { headers }
       );
       if (response.status !== 200) {
         throw new Error("Failed to update expense");
       }
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       console.log(response.data.message);
       refreshData();
       onClose();
@@ -104,12 +108,12 @@ const EditExpenseForm = ({
     }
     try {
       const response = await axios.delete(
-        `${API_URL}/expenses/DeleteExpense/${_id}`
+        `${API_URL}/expenses/DeleteExpense/${_id}`, { headers }
       );
       if (response.status !== 200) {
         throw new Error("Failed to delete expense");
       }
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
    
       console.log(response.data.message);
       refreshData();

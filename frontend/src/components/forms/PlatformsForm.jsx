@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { PreferencesContext } from "../../contexts";
 import axios from "axios";
 import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
+import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 const PlatformsForm = ({ onClose }) => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -9,7 +10,11 @@ const PlatformsForm = ({ onClose }) => {
   const [selectedPlatform, setSelectedPlatform] = useState("");
   const [editMode, setEditMode] = useState(false);
   const [addMode, setAddMode] = useState(false);
-
+  const authHeader = useAuthHeader();
+  const headers = {
+      Authorization: authHeader,
+  };
+  
   const [newPlatform, setNewPlatform] = useState("");
   const [error, setError] = useState("");
   let user_email, user_role;
@@ -72,8 +77,8 @@ const PlatformsForm = ({ onClose }) => {
 
 
     try {
-      const response = await axios.put(`${API_URL}/platforms/EditPlatform/${_id}`, data);
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const response = await axios.put(`${API_URL}/platforms/EditPlatform/${_id}`, data, { headers });
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       refreshData();
       onClose();
     } catch (error) {
@@ -101,8 +106,8 @@ const PlatformsForm = ({ onClose }) => {
 
 
     try {
-      const response = await axios.delete(`${API_URL}/platforms/DeletePlatform/${_id}`);
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const response = await axios.delete(`${API_URL}/platforms/DeletePlatform/${_id}`, { headers });
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       
   
       refreshData();
@@ -133,8 +138,8 @@ const PlatformsForm = ({ onClose }) => {
       return;
     }
     try {
-      const response = await axios.post(`${API_URL}/platforms/CreatePlatform`,data);
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const response = await axios.post(`${API_URL}/platforms/CreatePlatform`,data, { headers });
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       refreshData();
       onClose();
     } catch (error) {

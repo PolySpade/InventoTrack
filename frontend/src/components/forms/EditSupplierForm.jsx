@@ -11,6 +11,7 @@ import {
 } from "@primer/octicons-react";
 import { formatTimestamp } from "../../utils";
 import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
+import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 
 
@@ -40,7 +41,11 @@ const EditSupplierForm = ({
     user_email = "N/A"
     user_role = "N/A"
   }
-
+  const authHeader = useAuthHeader();
+  const headers = {
+      Authorization: authHeader,
+  };
+  
   const handleAddProduct = () => {
     setEditProducts([...editProducts, { sku: "", name: "", price: "" }]);
   };
@@ -112,9 +117,9 @@ const EditSupplierForm = ({
     try {
       const response = await axios.put(
         `${API_URL}/suppliers/EditSupplier/${_id}`,
-        data
+        data, { headers }
       );
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       
       console.log("Supplier Updated:", response);
       refreshData();
@@ -133,9 +138,9 @@ const EditSupplierForm = ({
     }
     try {
       const response = await axios.delete(
-        `${API_URL}/suppliers/DeleteSupplier/${_id}`
+        `${API_URL}/suppliers/DeleteSupplier/${_id}`, { headers }
       );
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       refreshData();
       onClose();
     } catch (err) {

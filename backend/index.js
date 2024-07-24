@@ -21,9 +21,11 @@ import expensesTypeRoutes from './routes/expensesTypeRoutes.js';
 import expenseRoutes from './routes/expenseRoutes.js';
 import alertRoutes from './routes/alertRoutes.js';
 import historyRoutes from './routes/historyRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 // stock in & stock out
 import stockIn from './buttonFunc/stockIn.js';
 import stockOut from './buttonFunc/stockOut.js';
+import authMiddleware from './middlewares/authMiddleware.js';
 
 // Load environment variables
 config();
@@ -40,26 +42,39 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+// Use cookie parser
+app.use(cookieParser());
+
+// Initialize session
+app.use(session({
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: process.env.NODE_ENV === 'production' }
+}));
+
 // Initialize Passport
 app.use(passport.initialize());
+app.use(passport.session());
 
-app.use('/warehouses', warehouseRoutes);
-app.use('/products', productRoutes);
-app.use('/suppliers', supplierRoutes);
-app.use('/orders', orderRoutes);
-app.use('/accounts', accountRoutes);
-app.use('/roles', roleRoutes);
-app.use('/categories', categoryRoutes);
-app.use('/currencies', currencyRoutes);
-app.use('/platforms', platformRoutes);
-app.use('/couriers', courierRoutes);
-app.use('/expensesTypes', expensesTypeRoutes);
-app.use('/expenses', expenseRoutes);
-app.use('/alerts', alertRoutes);
-app.use('/histories', historyRoutes);
+app.use('/auth', authRoutes);
+app.use('/warehouses', authMiddleware, warehouseRoutes);
+app.use('/products', authMiddleware, productRoutes);
+app.use('/suppliers', authMiddleware, supplierRoutes);
+app.use('/orders', authMiddleware, orderRoutes);
+app.use('/accounts', authMiddleware, accountRoutes);
+app.use('/roles', authMiddleware, roleRoutes);
+app.use('/categories', authMiddleware, categoryRoutes);
+app.use('/currencies', authMiddleware, currencyRoutes);
+app.use('/platforms', authMiddleware, platformRoutes);
+app.use('/couriers', authMiddleware, courierRoutes);
+app.use('/expensesTypes', authMiddleware, expensesTypeRoutes);
+app.use('/expenses', authMiddleware, expenseRoutes);
+app.use('/alerts', authMiddleware, alertRoutes);
+app.use('/histories', authMiddleware, historyRoutes);
 // stock in & stock out
-app.use('/inventory/stockIn', stockIn);
-app.use('/inventory/stockOut', stockOut);
+app.use('/inventory/stockIn', authMiddleware, stockIn);
+app.use('/inventory/stockOut', authMiddleware, stockOut);
 
 app.get('/', (req, res) => {
     try {

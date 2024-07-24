@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { PreferencesContext } from "../../contexts";
 import axios from "axios";
 import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
-
+import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 const CategoryForm = ({ onClose }) => {
   const API_URL = import.meta.env.VITE_API_URL;
   const { productsData, categoryTypes, refreshData } = useContext(PreferencesContext);
@@ -21,7 +21,10 @@ const CategoryForm = ({ onClose }) => {
     user_email = "N/A"
     user_role = "N/A"
   }
-  
+  const authHeader = useAuthHeader();
+const headers = {
+    Authorization: authHeader,
+};
 
   const selectedCategoryType = categoryTypes.find(item => item._id === selectedCategory);
 
@@ -66,8 +69,8 @@ const CategoryForm = ({ onClose }) => {
   
     const _id = selectedCategoryType._id
     try {
-      const response = await axios.put(`${API_URL}/categories/EditCategory/${_id}`, data);
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const response = await axios.put(`${API_URL}/categories/EditCategory/${_id}`, data, { headers });
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       refreshData();
       onClose();
     } catch (error) {
@@ -95,8 +98,8 @@ const CategoryForm = ({ onClose }) => {
     }
 
     try {
-      const response = await axios.delete(`${API_URL}/categories/DeleteCategory/${_id}`);
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const response = await axios.delete(`${API_URL}/categories/DeleteCategory/${_id}`, { headers });
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       refreshData();
       onClose();
     } catch (error) {
@@ -126,8 +129,8 @@ const CategoryForm = ({ onClose }) => {
       action: `Added a new Category Type: ${newCategory}`
     }
     try {
-      const response = await axios.post(`${API_URL}/categories/CreateCategory`,data);
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const response = await axios.post(`${API_URL}/categories/CreateCategory`,data, { headers });
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       
       refreshData();
       onClose();

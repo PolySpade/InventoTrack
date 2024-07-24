@@ -3,7 +3,7 @@ import { SearchIcon, XCircleFillIcon } from "@primer/octicons-react";
 import { OrdersContext } from "../../contexts";
 import axios from "axios";
 import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
-
+import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 const AddOrderForm = ({ onClose }) => {
   const API_URL = import.meta.env.VITE_API_URL;
   const { couriers, salesplatforms, products, refreshData } = useContext(OrdersContext);
@@ -11,6 +11,11 @@ const AddOrderForm = ({ onClose }) => {
   const [addItemBox, setAddItemBox] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
   const [error, setError] = useState("");
+  const authHeader = useAuthHeader();
+  const headers = {
+      Authorization: authHeader,
+  };
+  
   let user_email, user_role;
   const authUser = useAuthUser()
   if(authUser){
@@ -107,8 +112,8 @@ const AddOrderForm = ({ onClose }) => {
     }
 
     try {
-      const response = await axios.post(`${API_URL}/orders/CreateOrder`, orderData);
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const response = await axios.post(`${API_URL}/orders/CreateOrder`, orderData, { headers });
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       refreshData();
       onClose();
     } catch (error) {

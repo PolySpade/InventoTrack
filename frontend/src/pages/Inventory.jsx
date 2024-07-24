@@ -3,7 +3,7 @@ import InventoryTable from '../components/table/InventoryTable';
 import axios from "axios";
 import { InventoryContext } from '../contexts';
 import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
-
+import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 const Inventory = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const [inventorydata, setInventorydata] = useState([]);
@@ -13,9 +13,13 @@ const Inventory = () => {
   const [roleData, setRoleData] = useState([]);
   const authUser = useAuthUser();
   const [permissions, setPermissions] = useState([]);
-
+  const authHeader = useAuthHeader();
+  const headers = {
+      Authorization: authHeader,
+  };
+  
   const getInventoryData = () => {
-    axios.get(`${API_URL}/products/`)
+    axios.get(`${API_URL}/products/`, { headers })
       .then((response) => {
         setInventorydata(response.data);
       }).catch((err) => {
@@ -24,7 +28,7 @@ const Inventory = () => {
   };
 
   const getWarehouse = () => {
-    axios.get(`${API_URL}/warehouses/`)
+    axios.get(`${API_URL}/warehouses/`, { headers })
       .then((response) => {
         setWarehouse(response.data);
       }).catch((err) => {
@@ -33,7 +37,7 @@ const Inventory = () => {
   };
 
   const getCategory = () => {
-    axios.get(`${API_URL}/categories/`)
+    axios.get(`${API_URL}/categories/`, { headers })
       .then((response) => {
         setCategory(response.data);
       }).catch((err) => {
@@ -42,7 +46,7 @@ const Inventory = () => {
   };
 
   const getSuppliers = () => {
-    axios.get(`${API_URL}/suppliers/`)
+    axios.get(`${API_URL}/suppliers/`, { headers })
       .then((response) => {
         setSuppliers(response.data);
       }).catch((err) => {
@@ -51,7 +55,7 @@ const Inventory = () => {
   };
 
   const getRoleData = () => {
-    axios.get(`${API_URL}/roles/`)
+    axios.get(`${API_URL}/roles/`, { headers })
       .then((response) => {
         setRoleData(response.data);
       }).catch((err) => {

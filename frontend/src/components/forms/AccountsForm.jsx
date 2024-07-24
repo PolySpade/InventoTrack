@@ -10,6 +10,7 @@ import {
 } from "@primer/octicons-react";
 import { logo_default_text } from "../../assets/logo";
 import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
+import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 const AccountsForm = ({ onClose }) => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -34,7 +35,10 @@ const AccountsForm = ({ onClose }) => {
     user_role = "N/A"
   }
   const selectedAccountData = accounts.find( (account) => account._id === selectedAccount);
-
+  const authHeader = useAuthHeader();
+  const headers = {
+      Authorization: authHeader,
+  };
   const setEdit = () => {
     if (selectedAccount) {
       setEditMode((prev) => !prev);
@@ -58,7 +62,7 @@ const AccountsForm = ({ onClose }) => {
 
   const getRoleData = () => {
     axios
-      .get(`${API_URL}/roles/`)
+      .get(`${API_URL}/roles/`, { headers })
       .then((response) => {
         setRoleData(response.data);
       })
@@ -86,8 +90,8 @@ const AccountsForm = ({ onClose }) => {
     } else {  
       const roleData = { role: newRole };
       try {
-        const respons = await axios.put(`${API_URL}/accounts/editRole/${_id}`, roleData);
-        const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+        const respons = await axios.put(`${API_URL}/accounts/editRole/${_id}`, roleData, { headers });
+        const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
  
       } catch (error) {
         setError(error.response.data.message);
@@ -105,8 +109,8 @@ const AccountsForm = ({ onClose }) => {
     if (newPassword) {
       const passwordData = { password: newPassword };
       try {
-        const response = await axios.put(`${API_URL}/accounts/editPassword/${_id}`, passwordData);
-        const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+        const response = await axios.put(`${API_URL}/accounts/editPassword/${_id}`, passwordData, { headers });
+        const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       } catch (error) {
         setError(error.response.data.message);
         hasError = true;
@@ -133,8 +137,8 @@ const AccountsForm = ({ onClose }) => {
     }
     
     try {
-      const res = await axios.delete(`${API_URL}/accounts/DeleteAccount/${_id}`);
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const res = await axios.delete(`${API_URL}/accounts/DeleteAccount/${_id}`, { headers });
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       refreshData();
       onClose();
     } catch (error) {
@@ -165,7 +169,7 @@ const AccountsForm = ({ onClose }) => {
       };
       console.log(data)
       try {
-        const response = await axios.post(`${API_URL}/accounts/CreateAccount`, data);
+        const response = await axios.post(`${API_URL}/accounts/CreateAccount`, data, { headers });
         if (response.status === 201) {
           refreshData();
           onClose();
