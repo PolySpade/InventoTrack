@@ -1,5 +1,4 @@
 import express from 'express';
-import { config } from 'dotenv';
 import mongoose from "mongoose";
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
@@ -28,7 +27,6 @@ import stockOut from './buttonFunc/stockOut.js';
 import authMiddleware from './middlewares/authMiddleware.js';
 
 // Load environment variables
-config();
 
 const app = express();
 
