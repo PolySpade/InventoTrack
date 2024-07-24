@@ -9,11 +9,11 @@ import {
   PersonIcon,
 } from "@primer/octicons-react";
 import { logo_default_text } from "../../assets/logo";
-import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
-import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
+import useAuthUser from "react-auth-kit/hooks/useAuthUser";
+import useAuthHeader from "react-auth-kit/hooks/useAuthHeader";
 
 const AccountsForm = ({ onClose }) => {
-  const API_URL =import.meta.env.VITE_API_URL;
+  const API_URL = import.meta.env.VITE_API_URL;
   const { accounts, roleTypes, refreshData } = useContext(PreferencesContext);
   const [selectedAccount, setSelectedAccount] = useState("");
   const [editMode, setEditMode] = useState(false);
@@ -26,28 +26,29 @@ const AccountsForm = ({ onClose }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   let user_email, user_role;
-  const authUser = useAuthUser()
-  if(authUser){
+  const authUser = useAuthUser();
+  if (authUser) {
     user_email = authUser.email;
     user_role = authUser.role_id;
-  }else{
-    user_email = "N/A"
-    user_role = "N/A"
+  } else {
+    user_email = "N/A";
+    user_role = "N/A";
   }
-  const selectedAccountData = accounts.find( (account) => account._id === selectedAccount);
+  const selectedAccountData = accounts.find(
+    (account) => account._id === selectedAccount
+  );
   const authHeader = useAuthHeader();
   const headers = {
-      Authorization: authHeader,
+    Authorization: authHeader,
   };
   const setEdit = () => {
     if (selectedAccount) {
       setEditMode((prev) => !prev);
     }
     setError("");
-    if(selectedAccountData){
+    if (selectedAccountData) {
       setNewRole(selectedAccountData.role._id);
     }
-
   };
 
   const setAdd = () => {
@@ -73,26 +74,31 @@ const AccountsForm = ({ onClose }) => {
 
   const handleEdit = async () => {
     const _id = selectedAccountData._id;
-    let hasError = false;   
-
+    let hasError = false;
 
     let history_data = {
       timestamp: new Date().toISOString(),
       role: user_role,
       email: user_email,
-      action: `Changed Role for ${selectedAccountData.email}`
-    }
+      action: `Changed Role for ${selectedAccountData.email}`,
+    };
 
-    
     if (!newRole) {
       setError("Role is blank");
       hasError = true;
-    } else {  
+    } else {
       const roleData = { role: newRole };
       try {
-        const respons = await axios.put(`${API_URL}/accounts/editRole/${_id}`, roleData, { headers });
-        const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
- 
+        const respons = await axios.put(
+          `${API_URL}/accounts/editRole/${_id}`,
+          roleData,
+          { headers }
+        );
+        const history_response = await axios.post(
+          `${API_URL}/histories/CreateHistory`,
+          history_data,
+          { headers }
+        );
       } catch (error) {
         setError(error.response.data.message);
         hasError = true;
@@ -103,14 +109,22 @@ const AccountsForm = ({ onClose }) => {
       timestamp: new Date().toISOString(),
       role: user_role,
       email: user_email,
-      action: `Changed Password for ${selectedAccountData.email}`
-    }
+      action: `Changed Password for ${selectedAccountData.email}`,
+    };
 
     if (newPassword) {
       const passwordData = { password: newPassword };
       try {
-        const response = await axios.put(`${API_URL}/accounts/editPassword/${_id}`, passwordData, { headers });
-        const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
+        const response = await axios.put(
+          `${API_URL}/accounts/editPassword/${_id}`,
+          passwordData,
+          { headers }
+        );
+        const history_response = await axios.post(
+          `${API_URL}/histories/CreateHistory`,
+          history_data,
+          { headers }
+        );
       } catch (error) {
         setError(error.response.data.message);
         hasError = true;
@@ -129,16 +143,23 @@ const AccountsForm = ({ onClose }) => {
       timestamp: new Date().toISOString(),
       role: user_role,
       email: user_email,
-      action: `Deleted Account of ${selectedAccountData.email}`
+      action: `Deleted Account of ${selectedAccountData.email}`,
+    };
+    if (selectedAccountData.email === user_email) {
+      setError("You cannot delete yourself!");
+      return;
     }
-    if(selectedAccountData.email === user_email){
-      setError("You cannot delete yourself!")
-      return
-    }
-    
+
     try {
-      const res = await axios.delete(`${API_URL}/accounts/DeleteAccount/${_id}`, { headers });
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
+      const res = await axios.delete(
+        `${API_URL}/accounts/DeleteAccount/${_id}`,
+        { headers }
+      );
+      const history_response = await axios.post(
+        `${API_URL}/histories/CreateHistory`,
+        history_data,
+        { headers }
+      );
       refreshData();
       onClose();
     } catch (error) {
@@ -151,25 +172,29 @@ const AccountsForm = ({ onClose }) => {
 
     const formData = new FormData(e.target);
 
-    if (formData.get('role') === null) {
-      setError('Select A Role!');
-    } else if (formData.get('name') === null) {
+    if (formData.get("role") === null) {
+      setError("Select A Role!");
+    } else if (formData.get("name") === null) {
       setError("Input your name!");
     } else if (newPassword !== confirmPassword) {
       setError("Passwords do not match");
-    } else if (formData.get('email') === null) {
+    } else if (formData.get("email") === null) {
       setError("Input your email!");
     } else {
       setError("");
       const data = {
         email: formData.get("email"),
-        name: formData.get('name'),
+        name: formData.get("name"),
         password: newPassword,
-        role: formData.get('role')
+        role: formData.get("role"),
       };
-      console.log(data)
+      console.log(data);
       try {
-        const response = await axios.post(`${API_URL}/accounts/CreateAccount`, data, { headers });
+        const response = await axios.post(
+          `${API_URL}/accounts/CreateAccount`,
+          data,
+          { headers }
+        );
         if (response.status === 201) {
           refreshData();
           onClose();
@@ -187,7 +212,10 @@ const AccountsForm = ({ onClose }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div className="fixed inset-0 bg-black opacity-50" onClick={onClose}></div>
+      <div
+        className="fixed inset-0 bg-black opacity-50"
+        onClick={onClose}
+      ></div>
       <div className="z-20 w-96 bg-neutral py-4 px-5">
         {!editMode && !addMode && (
           <div>
@@ -261,9 +289,12 @@ const AccountsForm = ({ onClose }) => {
               <button className="btn text-white" onClick={handleEdit}>
                 Save
               </button>
-              <button className="btn text-white bg-error border-none" onClick={() =>
-    document.getElementById("my_modal_1").showModal()
-  }>
+              <button
+                className="btn text-white bg-error border-none"
+                onClick={() =>
+                  document.getElementById("my_modal_1").showModal()
+                }
+              >
                 Delete
               </button>
               <dialog id="my_modal_1" className="modal">
@@ -288,7 +319,9 @@ const AccountsForm = ({ onClose }) => {
                 </div>
               </dialog>
             </div>
-            <p className="text-sm text-error flex justify-center mt-2">{error}</p>
+            <p className="text-sm text-error flex justify-center mt-2">
+              {error}
+            </p>
           </div>
         )}
         {addMode && (
@@ -305,7 +338,11 @@ const AccountsForm = ({ onClose }) => {
                     <label className="text-xs" htmlFor="warehouse">
                       Role
                     </label>
-                    <select name="role" id="role" className="input input-bordered w-full max-w-xs bg-white">
+                    <select
+                      name="role"
+                      id="role"
+                      className="input input-bordered w-full max-w-xs bg-white"
+                    >
                       <option disabled selected value="">
                         Select a Role
                       </option>
@@ -319,12 +356,22 @@ const AccountsForm = ({ onClose }) => {
 
                   <label className="input input-bordered flex items-center gap-2 bg-white">
                     <PersonIcon size={16} />
-                    <input name="name" type="name" className="grow border-none" placeholder="Name" />
+                    <input
+                      name="name"
+                      type="name"
+                      className="grow border-none"
+                      placeholder="Name"
+                    />
                   </label>
 
                   <label className="input input-bordered flex items-center gap-2 bg-white">
                     <MailIcon size={16} />
-                    <input name="email" type="email" className="grow border-none" placeholder="Email" />
+                    <input
+                      name="email"
+                      type="email"
+                      className="grow border-none"
+                      placeholder="Email"
+                    />
                   </label>
 
                   <label className="input input-bordered flex items-center gap-2 bg-white">
@@ -338,7 +385,11 @@ const AccountsForm = ({ onClose }) => {
                       onChange={(e) => setNewPassword(e.target.value)}
                     />
                     <button type="button" onClick={handleHide} className="mb-1">
-                      {hidePass ? <EyeClosedIcon size={16} /> : <EyeIcon size={16} />}
+                      {hidePass ? (
+                        <EyeClosedIcon size={16} />
+                      ) : (
+                        <EyeIcon size={16} />
+                      )}
                     </button>
                   </label>
 
@@ -352,7 +403,11 @@ const AccountsForm = ({ onClose }) => {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                     />
                     <button type="button" onClick={handleHide} className="mb-1">
-                      {hidePass ? <EyeClosedIcon size={16} /> : <EyeIcon size={16} />}
+                      {hidePass ? (
+                        <EyeClosedIcon size={16} />
+                      ) : (
+                        <EyeIcon size={16} />
+                      )}
                     </button>
                   </label>
 
@@ -361,7 +416,7 @@ const AccountsForm = ({ onClose }) => {
                   <div className="flex flex-col justify-center">
                     <button
                       type="submit"
-                      className="btn btn-secondary px-10 text-white transition ease-in-out delay-150 hover:bg-base-200 hover:-translate-y-1 hover:scale-105 mt-3" 
+                      className="btn btn-secondary px-10 text-white transition ease-in-out delay-150 hover:bg-base-200 hover:-translate-y-1 hover:scale-105 mt-3"
                     >
                       Create Account
                     </button>
