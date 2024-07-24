@@ -6,7 +6,7 @@ import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 
 const WarehouseForm = ({ onClose }) => {
-  const API_URL =process.env.VITE_API_URL;
+  const API_URL =import.meta.env.VITE_API_URL;
   const { productsData, warehouseTypes, refreshData } = useContext(PreferencesContext);
   const [selectedWarehouse, setSelectedWarehouse] = useState("");
   const [editMode, setEditMode] = useState(false);

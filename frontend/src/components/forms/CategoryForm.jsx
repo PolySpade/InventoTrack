@@ -4,7 +4,7 @@ import axios from "axios";
 import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 const CategoryForm = ({ onClose }) => {
-  const API_URL =process.env.VITE_API_URL;
+  const API_URL =import.meta.env.VITE_API_URL;
   const { productsData, categoryTypes, refreshData } = useContext(PreferencesContext);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [editMode, setEditMode] = useState(false);

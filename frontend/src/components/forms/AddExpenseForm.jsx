@@ -6,7 +6,7 @@ import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 const AddExpenseForm = ({ onClose }) => {
-  const API_URL =process.env.VITE_API_URL;
+  const API_URL =import.meta.env.VITE_API_URL;
   const { expenseTypes: expense_types, refreshData } = useContext(ExpenseContext);
   const [error,setError] = useState("")
   const authHeader = useAuthHeader();

@@ -6,7 +6,7 @@ import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 const BulkEditStatusForm = ({ onClose, checkedItems }) => {
   const { statustypes, refreshData, ordersData } = useContext(OrdersContext);
-  const API_URL =process.env.VITE_API_URL;
+  const API_URL =import.meta.env.VITE_API_URL;
   const [status, setStatus] = useState("");
   let user_email, user_role;
   const authHeader = useAuthHeader();
