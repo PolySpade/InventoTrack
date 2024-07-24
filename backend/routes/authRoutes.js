@@ -39,7 +39,7 @@ router.post('/logout', (req, res) => {
     });
 });
 
-router.get('/routes', async (req, res) => {
+router.get('/roles', async (req, res) => {
     try {
         const roles = await roleModel.find({});
         return res.status(200).json(roles);
