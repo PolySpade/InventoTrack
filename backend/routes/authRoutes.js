@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import "../strategies/local-strategy.js"; // Ensure this file configures Passport
 import authMiddleware from '../middlewares/authMiddleware.js';
+import { roleModel } from '../models/roleModel.js';
 
 const router = express.Router();
 const JWT_SECRET = process.env.SECRET;
@@ -36,6 +37,16 @@ router.post('/logout', (req, res) => {
         if (err) return res.status(400).send({ message: 'Error logging out' });
         res.sendStatus(200);
     });
+});
+
+router.get('/routes', async (req, res) => {
+    try {
+        const roles = await roleModel.find({});
+        return res.status(200).json(roles);
+    } catch (err) {
+        console.log(err.message);
+        res.status(500).send({ message: err.message });
+    }
 });
 
 export default router;

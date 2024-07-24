@@ -7,7 +7,6 @@ import React, {
 } from "react";
 import axios from "axios";
 import useAuthUser from "react-auth-kit/hooks/useAuthUser";
-import useAuthHeader from "react-auth-kit/hooks/useAuthHeader";
 const AuthContext = createContext();
 
 export const useAuth = () => {
@@ -15,18 +14,16 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const API_URL =process.env.VITE_API_URL;
+  const API_URL = process.env.VITE_API_URL;
+  console.log(API_URL)
   const [roleData, setRoleData] = useState([]);
   const [permissions, setPermissions] = useState([]);
   const authUser = useAuthUser();
-  const authHeader = useAuthHeader();
-  const headers = {
-    Authorization: authHeader,
-  };
+
 
   const getRoleData = useCallback(async () => {
     try {
-      const response = await axios.get(`${API_URL}/roles/`, { headers });
+      const response = await axios.get(`${API_URL}/auth/roles/`);
       setRoleData(response.data);
     } catch (err) {
       console.log(err);
