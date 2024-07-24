@@ -10,6 +10,9 @@ import {
   TrashIcon,
 } from "@primer/octicons-react";
 import { formatTimestamp } from "../../utils";
+import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
+
+
 
 const EditSupplierForm = ({
   _id,
@@ -28,6 +31,15 @@ const EditSupplierForm = ({
   const [editProducts, setEditProducts] = useState(productList);
   const [showProducts, setShowProducts] = useState(false);
   const [error, setError] = useState("");
+  let user_email, user_role;
+  const authUser = useAuthUser()
+  if(authUser){
+    user_email = authUser.email;
+    user_role = authUser.role_id;
+  }else{
+    user_email = "N/A"
+    user_role = "N/A"
+  }
 
   const handleAddProduct = () => {
     setEditProducts([...editProducts, { sku: "", name: "", price: "" }]);
@@ -81,11 +93,29 @@ const EditSupplierForm = ({
           return;
         }
     }
+    let history_data;
+    if(supplierName === editSupplierName){
+      history_data = {  
+        timestamp: new Date().toISOString(),
+        role: user_role,
+        email: user_email,
+        action: `Edited a Supplier: ${supplierName}`
+      }
+    }else{
+      history_data = {
+        timestamp: new Date().toISOString(),
+        role: user_role,
+        email: user_email,
+        action: `Edited a Supplier: ${supplierName} to ${editSupplierName}`
+      }
+    }
     try {
       const response = await axios.put(
         `${API_URL}/suppliers/EditSupplier/${_id}`,
         data
       );
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      
       console.log("Supplier Updated:", response);
       refreshData();
       onClose();
@@ -95,10 +125,17 @@ const EditSupplierForm = ({
   };
 
   const handleDelete = async () => {
+    const history_data = {  
+      timestamp: new Date().toISOString(),
+      role: user_role,
+      email: user_email,
+      action: `Deleted a Supplier: ${supplierName}`
+    }
     try {
       const response = await axios.delete(
         `${API_URL}/suppliers/DeleteSupplier/${_id}`
       );
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
       refreshData();
       onClose();
     } catch (err) {
@@ -166,10 +203,36 @@ const EditSupplierForm = ({
               </button>
               <button
                 className="btn text-white bg-error border-none"
-                onClick={handleDelete}
+                onClick={() =>
+                  document.getElementById("my_modal_1").showModal()
+                }
               >
                 Delete Supplier
               </button>
+              <dialog id="my_modal_1" className="modal">
+              <div className="modal-box">
+                <h3 className="font-bold text-lg text-left">Warning!</h3>
+                <p className="py-4 pb-0 text-left">
+                  This action will delete the supplier!
+                </p>
+                <div className="modal-action">
+                  <form method="dialog">
+                    <button className="btn bg-error text-white border-none">
+                      Cancel
+                    </button>
+                  </form>
+                  <button
+                    className="btn text-white border-none"
+                    onClick={handleDelete}
+                  >
+                    Confirm
+                  </button>
+                </div>
+                <p className="text-sm text-error flex justify-center mt-2">
+                  {error}
+                </p>
+              </div>
+            </dialog>
             </div>
             <p className=" text-xs text-error justify-center flex">{error}</p>
           </div>

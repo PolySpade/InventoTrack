@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
 import { PreferencesContext } from "../../contexts";
 import axios from "axios";
+import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 
 const CategoryForm = ({ onClose }) => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -11,6 +12,16 @@ const CategoryForm = ({ onClose }) => {
 
   const [newCategory, setNewCategory] = useState("");
   const [error, setError] = useState("");
+  let user_email, user_role;
+  const authUser = useAuthUser()
+  if(authUser){
+    user_email = authUser.email;
+    user_role = authUser.role_id;
+  }else{
+    user_email = "N/A"
+    user_role = "N/A"
+  }
+  
 
   const selectedCategoryType = categoryTypes.find(item => item._id === selectedCategory);
 
@@ -43,11 +54,20 @@ const CategoryForm = ({ onClose }) => {
       setError("Existing Category Type");
       return;
     }
+
+    const oldcategory = categoryTypes.find(cat => cat._id === selectedCategory).name
     
-    
+    const history_data = {
+      timestamp: new Date().toISOString(),
+      role: user_role,
+      email: user_email,
+      action: `Edited a Category Type: ${oldcategory} to ${newCategory}`
+    }
+  
     const _id = selectedCategoryType._id
     try {
       const response = await axios.put(`${API_URL}/categories/EditCategory/${_id}`, data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
       refreshData();
       onClose();
     } catch (error) {
@@ -60,6 +80,14 @@ const CategoryForm = ({ onClose }) => {
     const _id = selectedCategoryType._id
 
     const isInProductsData = productsData.some(product => product.category._id === _id);
+    const oldcategory = categoryTypes.find(cat => cat._id === selectedCategory).name
+
+    const history_data = {
+      timestamp: new Date().toISOString(),
+      role: user_role,
+      email: user_email,
+      action: `Deleted a Category Type: ${oldcategory}`
+    }
 
     if (isInProductsData) {
       setError("Cannot delete this category type because it is associated with existing product.");
@@ -68,6 +96,7 @@ const CategoryForm = ({ onClose }) => {
 
     try {
       const response = await axios.delete(`${API_URL}/categories/DeleteCategory/${_id}`);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
       refreshData();
       onClose();
     } catch (error) {
@@ -89,8 +118,17 @@ const CategoryForm = ({ onClose }) => {
       setError("Existing Category Type");
       return;
     }
+
+    const history_data = {
+      timestamp: new Date().toISOString(),
+      role: user_role,
+      email: user_email,
+      action: `Added a new Category Type: ${newCategory}`
+    }
     try {
       const response = await axios.post(`${API_URL}/categories/CreateCategory`,data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      
       refreshData();
       onClose();
     } catch (error) {
@@ -157,9 +195,35 @@ const CategoryForm = ({ onClose }) => {
           <button className="btn text-white" onClick={handleEdit}>
               Save
           </button>
-          <button className="btn text-white bg-error border-none" onClick={handleDelete}>
+          <button className="btn text-white bg-error border-none" onClick={() =>
+    document.getElementById("my_modal_1").showModal()
+  }>
               Delete
           </button>
+          <dialog id="my_modal_1" className="modal">
+              <div className="modal-box">
+                <h3 className="font-bold text-lg text-left">Warning!</h3>
+                <p className="py-4 pb-0 text-left">
+                  This action will delete a product category!
+                </p>
+                <div className="modal-action">
+                  <form method="dialog">
+                    <button className="btn bg-error text-white border-none">
+                      Cancel
+                    </button>
+                  </form>
+                  <button
+                    className="btn text-white border-none"
+                    onClick={handleDelete}
+                  >
+                    Confirm
+                  </button>
+                </div>
+                <p className="text-sm text-error flex justify-center mt-2">
+                  {error}
+                </p>
+              </div>
+            </dialog>
           </div>
           <p className="text-sm text-error flex justify-center mt-2">{error}</p>
         </div>

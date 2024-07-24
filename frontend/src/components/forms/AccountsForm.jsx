@@ -9,6 +9,7 @@ import {
   PersonIcon,
 } from "@primer/octicons-react";
 import { logo_default_text } from "../../assets/logo";
+import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 
 const AccountsForm = ({ onClose }) => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -23,15 +24,26 @@ const AccountsForm = ({ onClose }) => {
   const [roleData, setRoleData] = useState([]);
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
-
-  const selectedAccountData = accounts.find(account => account._id === selectedAccount);
+  let user_email, user_role;
+  const authUser = useAuthUser()
+  if(authUser){
+    user_email = authUser.email;
+    user_role = authUser.role_id;
+  }else{
+    user_email = "N/A"
+    user_role = "N/A"
+  }
+  const selectedAccountData = accounts.find( (account) => account._id === selectedAccount);
 
   const setEdit = () => {
     if (selectedAccount) {
       setEditMode((prev) => !prev);
     }
     setError("");
-    setNewRole(selectedAccountData.role._id);
+    if(selectedAccountData){
+      setNewRole(selectedAccountData.role._id);
+    }
+
   };
 
   const setAdd = () => {
@@ -59,23 +71,42 @@ const AccountsForm = ({ onClose }) => {
     const _id = selectedAccountData._id;
     let hasError = false;   
 
+
+    let history_data = {
+      timestamp: new Date().toISOString(),
+      role: user_role,
+      email: user_email,
+      action: `Changed Role for ${selectedAccountData.email}`
+    }
+
+    
     if (!newRole) {
       setError("Role is blank");
       hasError = true;
-    } else {
+    } else {  
       const roleData = { role: newRole };
       try {
-        await axios.put(`${API_URL}/accounts/editRole/${_id}`, roleData);
+        const respons = await axios.put(`${API_URL}/accounts/editRole/${_id}`, roleData);
+        const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+ 
       } catch (error) {
         setError(error.response.data.message);
         hasError = true;
       }
     }
 
+    history_data = {
+      timestamp: new Date().toISOString(),
+      role: user_role,
+      email: user_email,
+      action: `Changed Password for ${selectedAccountData.email}`
+    }
+
     if (newPassword) {
       const passwordData = { password: newPassword };
       try {
-        await axios.put(`${API_URL}/accounts/editPassword/${_id}`, passwordData);
+        const response = await axios.put(`${API_URL}/accounts/editPassword/${_id}`, passwordData);
+        const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
       } catch (error) {
         setError(error.response.data.message);
         hasError = true;
@@ -90,8 +121,20 @@ const AccountsForm = ({ onClose }) => {
 
   const handleDelete = async () => {
     const _id = selectedAccountData._id;
+    const history_data = {
+      timestamp: new Date().toISOString(),
+      role: user_role,
+      email: user_email,
+      action: `Deleted Account of ${selectedAccountData.email}`
+    }
+    if(selectedAccountData.email === user_email){
+      setError("You cannot delete yourself!")
+      return
+    }
+    
     try {
-      await axios.delete(`${API_URL}/accounts/DeleteAccount/${_id}`);
+      const res = await axios.delete(`${API_URL}/accounts/DeleteAccount/${_id}`);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
       refreshData();
       onClose();
     } catch (error) {
@@ -214,9 +257,32 @@ const AccountsForm = ({ onClose }) => {
               <button className="btn text-white" onClick={handleEdit}>
                 Save
               </button>
-              <button className="btn text-white bg-error border-none" onClick={handleDelete}>
+              <button className="btn text-white bg-error border-none" onClick={() =>
+    document.getElementById("my_modal_1").showModal()
+  }>
                 Delete
               </button>
+              <dialog id="my_modal_1" className="modal">
+                <div className="modal-box">
+                  <h3 className="font-bold text-lg">Warning!</h3>
+                  <p className="py-4 pb-0">
+                    This action will delete an account!
+                  </p>
+                  <div className="modal-action">
+                    <form method="dialog">
+                      <button className="btn bg-error text-white border-none">
+                        Cancel
+                      </button>
+                    </form>
+                    <button
+                      className="btn text-white border-none"
+                      onClick={handleDelete}
+                    >
+                      Confirm
+                    </button>
+                  </div>
+                </div>
+              </dialog>
             </div>
             <p className="text-sm text-error flex justify-center mt-2">{error}</p>
           </div>

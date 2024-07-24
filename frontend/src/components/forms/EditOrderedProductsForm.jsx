@@ -2,10 +2,12 @@ import React, { useContext, useState } from "react";
 import { XCircleFillIcon, SearchIcon } from "@primer/octicons-react";
 import { OrdersContext } from "../../contexts";
 import axios from "axios";
+import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
+
 
 const EditOrderedProductsForm = ({ productslist, onClose, orderid }) => {
   const API_URL = import.meta.env.VITE_API_URL;
-  const { products: allProducts, refreshData } = useContext(OrdersContext);
+  const { products: allProducts, refreshData, ordersData } = useContext(OrdersContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [checkedItems, setCheckedItems] = useState(
     productslist.map((product) => ({
@@ -16,7 +18,16 @@ const EditOrderedProductsForm = ({ productslist, onClose, orderid }) => {
     }))
   );
 
-  console.log(checkedItems)
+  let user_email, user_role;
+  const authUser = useAuthUser()
+  if(authUser){
+    user_email = authUser.email;
+    user_role = authUser.role_id;
+  }else{
+    user_email = "N/A"
+    user_role = "N/A"
+  }
+  
 
   const [addItemBox, setAddItemBox] = useState(false);
   const [error, setError]= useState(false);
@@ -63,8 +74,17 @@ const EditOrderedProductsForm = ({ productslist, onClose, orderid }) => {
       return;
     }
 
+    const oldorderid = ordersData.find(ord => ord._id === orderid).id
+
+    const history_data = {
+        timestamp: new Date().toISOString(),
+        role: user_role,
+        email: user_email,
+        action: `Edited the products of order ID: ${oldorderid}`
+      }
     try {
-      await axios.put(`${API_URL}/orders/EditProductsOrder/${orderid}`, orderData);
+      const response = await axios.put(`${API_URL}/orders/EditProductsOrder/${orderid}`, orderData);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
       refreshData();
       onClose();
     } catch (error) {

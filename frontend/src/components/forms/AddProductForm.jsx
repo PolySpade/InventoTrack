@@ -1,11 +1,24 @@
 import { useContext, useState } from 'react';
 import { InventoryContext } from '../../contexts';
 import axios from 'axios';
+import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 
 const AddProductForm = ({ onClose }) => {
   const { category, warehouse, refreshData } = useContext(InventoryContext);
   const API_URL = import.meta.env.VITE_API_URL; 
   const [error, setError] = useState("");
+
+  let user_email, user_role;
+  const authUser = useAuthUser()
+  if(authUser){
+    user_email = authUser.email;
+    user_role = authUser.role_id;
+  }else{
+    user_email = "N/A"
+    user_role = ""
+  }
+
+
 
   const validateForm = (data) => {
     if (!data.sku || !data.name || !data.category || !data.unitCost || !data.warehouse || !data.stockLeft) {
@@ -23,6 +36,8 @@ const AddProductForm = ({ onClose }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
+
+
     const data = {
       sku: formData.get('sku'),
       name: formData.get('product_name'),
@@ -38,7 +53,14 @@ const AddProductForm = ({ onClose }) => {
       stockLeft: formData.get('quantity'),
       shown: true
     };
-    console.log(data)
+
+    const history_data = {
+      timestamp: new Date().toISOString(),
+      role: user_role,
+      email: user_email,
+      action: `Added a Product: ${formData.get('sku')}`
+    }
+
 
     const validationError = validateForm(data);
     if (validationError) {
@@ -49,6 +71,7 @@ const AddProductForm = ({ onClose }) => {
     try {
       const response = await axios.post(`${API_URL}/products/AddProduct`, data);
       refreshData();
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
       onClose();
     } catch (error) {
       console.error('Error submitting the form:', error);

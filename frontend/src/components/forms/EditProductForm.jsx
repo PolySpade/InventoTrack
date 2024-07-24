@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
 import axios from "axios";
 import { InventoryContext } from "../../contexts";
+import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 
 const EditProductForm = ({ onClose, item }) => {
   const { category, warehouse, refreshData } = useContext(InventoryContext);
@@ -19,6 +20,15 @@ const EditProductForm = ({ onClose, item }) => {
   } = item;
 
   const API_URL = import.meta.env.VITE_API_URL;
+  let user_email, user_role;
+  const authUser = useAuthUser()
+  if(authUser){
+    user_email = authUser.email;
+    user_role = authUser.role_id;
+  }else{
+    user_email = "N/A"
+    user_role = "N/A"
+  }
 
   const handleCancel = () => {
     onClose();
@@ -87,6 +97,15 @@ const EditProductForm = ({ onClose, item }) => {
       stockLeft: parseInt(formData.get("quantity"), 10),
       shown: item.shown 
     };
+
+    
+      const history_data = {
+        timestamp: new Date().toISOString(),
+        role: user_role,
+        email: user_email,
+        action: `Edited a Product: ${sku}`
+      }
+
     try {
       const response = await axios.put(
         `${API_URL}/products/EditProduct/${_id}`,
@@ -95,6 +114,8 @@ const EditProductForm = ({ onClose, item }) => {
       if (response.status !== 200) {
         throw new Error("Failed to update product");
       }
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+ 
       console.log(response.data.message);
       onClose();
       refreshData();
@@ -106,6 +127,12 @@ const EditProductForm = ({ onClose, item }) => {
   };
 
   const handleDelete = async () => {
+    const history_data = {
+      timestamp: new Date().toISOString(),
+      role: user_role,
+      email: user_email,
+      action: `Deleted a Product: ${sku}`
+    }
     try {
       const response = await axios.delete(
         `${API_URL}/products/DeleteProduct/${_id}`
@@ -113,8 +140,11 @@ const EditProductForm = ({ onClose, item }) => {
       if (response.status !== 200) {
         throw new Error("Failed to delete product");
       }
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+  
       console.log(response.data.message);
-      window.location.reload();
+      refreshData();
+      onClose();
     } catch (error) {
       console.error(error.message);
     }
@@ -136,11 +166,19 @@ const EditProductForm = ({ onClose, item }) => {
       stockLeft: quantity,
       shown: true 
     };
+    const history_data = {
+      timestamp: new Date().toISOString(),
+      role: user_role,
+      email: user_email,
+      action: `Restored a Product: ${sku}`
+    }
     try {
       const response = await axios.put(
         `${API_URL}/products/EditProduct/${_id}`,
         data
       );
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+  
       if (response.status !== 200) {
         throw new Error("Failed to restore product");
       }
@@ -333,7 +371,9 @@ const EditProductForm = ({ onClose, item }) => {
             Save
           </button>
           {shown ? (
-            <button type="button" onClick={handleDelete} className="btn text-white bg-error hover:bg-red-400 outline-none border-none">
+            <button type="button" onClick={() =>
+              document.getElementById("my_modal_1").showModal()
+            } className="btn text-white bg-error hover:bg-red-400 outline-none border-none">
               Delete
             </button>
           ) : (
@@ -341,6 +381,30 @@ const EditProductForm = ({ onClose, item }) => {
               Restore
             </button>
           )}
+          <dialog id="my_modal_1" className="modal">
+              <div className="modal-box">
+                <h3 className="font-bold text-lg text-left">Warning!</h3>
+                <p className="py-4 pb-0 text-left">
+                  This action will delete the product, you can restore it onwards.
+                </p>
+                <div className="modal-action">
+                  <form method="dialog">
+                    <button className="btn bg-error text-white border-none">
+                      Cancel
+                    </button>
+                  </form>
+                  <button type='button'
+                    className="btn text-white border-none"
+                    onClick={handleDelete}
+                  >
+                    Confirm
+                  </button>
+                </div>
+                <p className="text-sm text-error flex justify-center mt-2">
+                  {error}
+                </p>
+              </div>
+            </dialog>
         </div>
         {error && <p className="flex justify-center text-error">{error}</p>}
       </form>
