@@ -34,6 +34,8 @@ const CouriersForm = ({ onClose }) => {
   const setEdit = () => {
     if (selectedCourier) {
       setEditMode((prev) => !prev);
+      const oldcourier = courierTypes.find(cor => cor._id === selectedCourier).name
+      setNewCourier(oldcourier)
     }
     setError("");
   };

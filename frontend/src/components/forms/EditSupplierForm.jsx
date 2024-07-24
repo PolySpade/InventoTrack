@@ -209,7 +209,10 @@ const EditSupplierForm = ({
               <button
                 className="btn text-white bg-error border-none"
                 onClick={() =>
-                  document.getElementById("my_modal_1").showModal()
+                {
+                  document.getElementById("my_modal_1").showModal();
+                  setError("");
+                }
                 }
               >
                 Delete Supplier

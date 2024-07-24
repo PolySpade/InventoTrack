@@ -32,7 +32,10 @@ const headers = {
   const setEdit = () => {
     if(selectedCategory){
       setEditMode((prev) => !prev)
+      const oldcategory = categoryTypes.find(cat => cat._id === selectedCategory).name
+      setNewCategory(oldcategory)
     }
+
     setError("")
   }
 
@@ -190,6 +193,7 @@ const headers = {
             defaultValue={selectedCategoryType.name} 
             className="input input-bordered w-full"
             onChange={(e) => setNewCategory(e.target.value)} 
+            placeholder="Input a category"
           />
           <div className="flex justify-evenly mt-5">
           <button className="btn text-white" onClick={setEdit}>

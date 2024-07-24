@@ -35,6 +35,8 @@ const WarehouseForm = ({ onClose }) => {
   const setEdit = () => {
     if(selectedWarehouse){
       setEditMode((prev) => !prev)
+      const old_name = warehouseTypes.find(war => war._id === selectedWarehouse).name;
+      setNewWarehouse(old_name)
     }
     setError("")
   }

@@ -67,6 +67,7 @@ const AppRoutes = () => {
                             <Route path="/terms-and-conditions" element={<TermsConditions />} />
                         </Route>
                     </Route>
+                    <Route path="/*" element={<Login />} />
                 </Routes>
             </Router>
         </AuthProvider>
