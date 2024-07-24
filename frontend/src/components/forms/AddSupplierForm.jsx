@@ -7,7 +7,7 @@ import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 const AddSupplierForm = ({ onClose }) => {
   const { refreshData } = useContext(SuppliersContext);
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL =process.env.VITE_API_URL;
 
   const [supplierName, setSupplierName] = useState("");
   const [website, setWebsite] = useState("");

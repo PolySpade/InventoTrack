@@ -12,7 +12,7 @@ import axios from "axios";
 import { useAuth } from "../routes/AuthContext";
 
 const Login = () => {
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL =process.env.VITE_API_URL;
   const [hidePass, setHidePass] = useState(true);
   const [error, setError] = useState("");
   const signIn = useSignIn();

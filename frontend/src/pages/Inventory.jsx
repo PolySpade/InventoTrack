@@ -5,7 +5,7 @@ import { InventoryContext } from '../contexts';
 import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 const Inventory = () => {
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL =process.env.VITE_API_URL;
   const [inventorydata, setInventorydata] = useState([]);
   const [warehouse, setWarehouse] = useState([]);
   const [category, setCategory] = useState([]);

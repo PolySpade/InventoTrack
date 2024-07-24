@@ -5,7 +5,7 @@ import axios from "axios";
 import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 const AddOrderForm = ({ onClose }) => {
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL =process.env.VITE_API_URL;
   const { couriers, salesplatforms, products, refreshData } = useContext(OrdersContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [addItemBox, setAddItemBox] = useState(false);

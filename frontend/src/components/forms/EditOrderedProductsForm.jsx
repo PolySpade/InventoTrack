@@ -6,7 +6,7 @@ import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 const EditOrderedProductsForm = ({ productslist, onClose, orderid }) => {
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL =process.env.VITE_API_URL;
   const { products: allProducts, refreshData, ordersData } = useContext(OrdersContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [checkedItems, setCheckedItems] = useState(

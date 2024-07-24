@@ -24,7 +24,7 @@ const EditSupplierForm = ({
   onClose,
 }) => {
   const { refreshData } = useContext(SuppliersContext);
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL =process.env.VITE_API_URL;
 
   const [editSupplierName, setEditSupplierName] = useState(supplierName);
   const [editWebsite, setEditWebsite] = useState(website);

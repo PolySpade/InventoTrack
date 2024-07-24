@@ -5,7 +5,7 @@ import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 const PlatformsForm = ({ onClose }) => {
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL =process.env.VITE_API_URL;
   const { ordersData, platforms: platformTypes, refreshData } = useContext(PreferencesContext);
   const [selectedPlatform, setSelectedPlatform] = useState("");
   const [editMode, setEditMode] = useState(false);

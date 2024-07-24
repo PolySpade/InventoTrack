@@ -13,7 +13,7 @@ import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 const AccountsForm = ({ onClose }) => {
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL =process.env.VITE_API_URL;
   const { accounts, roleTypes, refreshData } = useContext(PreferencesContext);
   const [selectedAccount, setSelectedAccount] = useState("");
   const [editMode, setEditMode] = useState(false);

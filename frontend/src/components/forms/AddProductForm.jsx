@@ -5,7 +5,7 @@ import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 const AddProductForm = ({ onClose }) => {
   const { category, warehouse, refreshData } = useContext(InventoryContext);
-  const API_URL = import.meta.env.VITE_API_URL; 
+  const API_URL =process.env.VITE_API_URL; 
   const [error, setError] = useState("");
   const authHeader = useAuthHeader();
   const headers = {

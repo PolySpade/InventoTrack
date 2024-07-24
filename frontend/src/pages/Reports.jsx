@@ -13,7 +13,7 @@ import NetProfitChart from "../components/charts/NetProfitChart";
 import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 const Reports = () => {
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL =process.env.VITE_API_URL;
   const [ordersData, setOrdersData] = useState([]);
   const [expensesData, setExpensesData] = useState([]);
   const [timeFrame, setTimeFrame] = useState("last7days");
