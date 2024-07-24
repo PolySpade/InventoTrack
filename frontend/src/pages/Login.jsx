@@ -9,6 +9,7 @@ import {
 } from "@primer/octicons-react";
 import useSignIn from 'react-auth-kit/hooks/useSignIn';
 import axios from "axios";
+import { useAuth } from "../routes/AuthContext";
 
 const Login = () => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -16,6 +17,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const signIn = useSignIn();
   const navigate = useNavigate();
+  const { refreshPermissions } = useAuth();
 
   useEffect(() => {
     // Change base to white
@@ -60,6 +62,7 @@ const Login = () => {
             name: response.data.user.name
           }
         });
+        refreshPermissions();
         navigate("/");
       }
     } catch (error) {
@@ -117,9 +120,9 @@ const Login = () => {
               </div>
 
               <div className="flex justify-center">
-                <Link to="/" className=" font-medium underline underline-offset-1">
+                <a onClick={() => alert("Contact Admin!")} className=" hover:cursor-pointer">
                   Can't login?
-                </Link>
+                </a>
               </div>
             </div>
           </div>

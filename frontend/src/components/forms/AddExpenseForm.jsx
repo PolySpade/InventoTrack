@@ -2,17 +2,29 @@ import { getCurrentDate } from '../../utils';
 import axios from 'axios';
 import { ExpenseContext } from '../../contexts';
 import { useContext, useState } from 'react';
+import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 
 const AddExpenseForm = ({ onClose }) => {
   const API_URL = import.meta.env.VITE_API_URL;
   const { expenseTypes: expense_types, refreshData } = useContext(ExpenseContext);
   const [error,setError] = useState("")
+      
+  let user_email, user_role;
+  const authUser = useAuthUser()
+  if(authUser){
+    user_email = authUser.email;
+    user_role = authUser.role_id;
+  }else{
+    user_email = "N/A"
+    user_role = "N/A"
+  }
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
     const numAmount = parseFloat(formData.get('amount'))
-    console.log(formData.get('expense_types'))
+
+    
     if(formData.get('expense_types') === null){
       setError("Set An Expense Type");
       return
@@ -46,8 +58,17 @@ const AddExpenseForm = ({ onClose }) => {
       expensestype: formData.get('expense_types'),
       description: formData.get('description')
     };
+
+    const history_data = {
+      timestamp: new Date().toISOString(),
+      role: user_role,
+      email: user_email,
+      action: `Added an Expense, Amount: ₱${numAmount} Reason: ${formData.get('description')}`
+    }
+
     try {
-      await axios.post(`${API_URL}/expenses/CreateExpense`, data);
+      const response = await axios.post(`${API_URL}/expenses/CreateExpense`, data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
       refreshData();
       onClose();
     } catch (error) {

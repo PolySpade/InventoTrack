@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import express from 'express';
 const router = express.Router();
 import { historyModel } from '../models/historyModel.js';
+import { roleModel } from '../models/roleModel.js';
 
 // create
 router.post('/CreateHistory', async (req, res) => {
@@ -11,9 +12,15 @@ router.post('/CreateHistory', async (req, res) => {
             return res.status(400).send({ message: "Send all fields!" });
         }
 
+        let rolename = "None"
+        const roleDoc = await roleModel.findById(role);
+        if(roleDoc){
+            rolename = roleDoc.roleName
+        }
+
         const newHistory = {
             timestamp,
-            role,
+            role: rolename,
             email,
             action
         }

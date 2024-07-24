@@ -15,6 +15,7 @@ import { formatTimestamp } from "../../utils";
 import axios from "axios";
 import { OrdersContext } from "../../contexts";
 import EditOrderedProductsForm from "./EditOrderedProductsForm";
+import useAuthUser from "react-auth-kit/hooks/useAuthUser";
 
 const EditOrderForm = ({
   _id,
@@ -30,8 +31,10 @@ const EditOrderForm = ({
   timestamp,
   timeline,
   notes,
-  onClose}) => {
-  const { refreshData, couriers, salesplatforms, statustypes } = useContext(OrdersContext);
+  onClose,
+}) => {
+  const { refreshData, couriers, salesplatforms, statustypes } =
+    useContext(OrdersContext);
   const API_URL = import.meta.env.VITE_API_URL;
   const [editNotes, setEditNotes] = useState(false);
   const [noteText, setNoteText] = useState(notes);
@@ -48,33 +51,44 @@ const EditOrderForm = ({
   const [buyerEmail, setBuyerEmail] = useState(buyer.buyerEmail);
   const [courierName, setCourierName] = useState(courier.name);
   const [trackingNum, setTrackingNum] = useState(trackingNumber);
-  const [sellingPlatformId, setSellingPlatformId] = useState(sellingPlatform._id);
+  const [sellingPlatformId, setSellingPlatformId] = useState(
+    sellingPlatform._id
+  );
   const [totalPaidValue, setTotalPaidValue] = useState(totalPaid);
   const [feesValue, setFeesValue] = useState(otherFees);
-  const [editProducts,setEditProducts] = useState(false);
-  const [alerts,setAlerts] = useState([])
+  const [editProducts, setEditProducts] = useState(false);
+  const [alerts, setAlerts] = useState([]);
 
-  const [error,setError] = useState("")
+  const [error, setError] = useState("");
+  let user_email, user_role;
+  const authUser = useAuthUser();
+  if (authUser) {
+    user_email = authUser.email;
+    user_role = authUser.role_id;
+  } else {
+    user_email = "N/A";
+    user_role = "N/A";
+  }
 
   useEffect(() => {
     const generateAlerts = () => {
       const newAlerts = [];
-  
+
       // Late shipment risk
-      if (status === 'To Process') {
+      if (status === "To Process") {
         const oneDay = 24 * 60 * 60 * 1000; // milliseconds in one day
         const orderDate = new Date(timestamp);
         const currentDate = new Date();
         const difference = currentDate - orderDate;
-  
+
         if (difference > oneDay) {
           newAlerts.push({
-            alertType: 'Warning',
-            message: 'Risk of late shipment',
+            alertType: "Warning",
+            message: "Risk of late shipment",
           });
         }
       }
-  
+
       // // Payment issues (assuming `totalPaid` should be greater than 0)
       // if (totalPaid <= 0) {
       //   newAlerts.push({
@@ -82,29 +96,43 @@ const EditOrderForm = ({
       //     message: 'Payment issue: Total paid is zero or negative',
       //   });
       // }
-  
+
       // Missing tracking information
-      if (status === 'Shipped' && (!trackingNumber || trackingNumber.trim() === '')) {
+      if (
+        status === "Shipped" &&
+        (!trackingNumber || trackingNumber.trim() === "")
+      ) {
         newAlerts.push({
-          alertType: 'Alert',
-          message: 'Tracking information is missing',
+          alertType: "Alert",
+          message: "Tracking information is missing",
         });
       }
-  
-  
+
       setAlerts(newAlerts);
     };
-  
+
     generateAlerts();
   }, [status, timestamp, totalPaid, trackingNumber]);
-  
+
   const saveNotes = async () => {
     setEditNotes(false);
     const data = {
       notes: noteText,
     };
+ 
+    const history_data = {
+      timestamp: new Date().toISOString(),
+      role: user_role,
+      email: user_email,
+      action: `Edited notes of order ID: ${id}`
+    }
     try {
-      const response = await axios.put(`${API_URL}/orders/EditNotes/${_id}`, data);
+      const response = await axios.put(
+        `${API_URL}/orders/EditNotes/${_id}`,
+        data
+      );
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+
       console.log("Notes Updated:", response);
       refreshData();
     } catch (err) {
@@ -119,8 +147,20 @@ const EditOrderForm = ({
       status: statusType.name,
       timeline: [statusType.timeline],
     };
+    const history_data = {
+      timestamp: new Date().toISOString(),
+      role: user_role,
+      email: user_email,
+      action: `Edited status of order ID: ${id}`
+    }
+
     try {
-      const response = await axios.put(`${API_URL}/orders/EditStatus/${_id}`, data);
+      const response = await axios.put(
+        `${API_URL}/orders/EditStatus/${_id}`,
+        data
+      );
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+       
       refreshData();
     } catch (err) {
       console.log(err);
@@ -128,7 +168,6 @@ const EditOrderForm = ({
   };
 
   const saveBuyer = async () => {
-    console.log(buyerEmail)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailRegex.test(buyerEmail) && buyerEmail) {
@@ -142,9 +181,19 @@ const EditOrderForm = ({
         buyerEmail,
       },
     };
-
+    const history_data = {
+      timestamp: new Date().toISOString(),
+      role: user_role,  
+      email: user_email,
+      action: `Edited buyer details of order ID: ${id}`
+    }
     try {
-      const response = await axios.put(`${API_URL}/orders/EditBuyer/${_id}`, data);
+      const response = await axios.put(
+        `${API_URL}/orders/EditBuyer/${_id}`,
+        data
+      );
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+       
       setEditBuyer(false);
       refreshData();
     } catch (err) {
@@ -158,9 +207,19 @@ const EditOrderForm = ({
       courier: courier._id,
       trackingNumber: trackingNum,
     };
-
+    const history_data = {
+      timestamp: new Date().toISOString(),
+      role: user_role,
+      email: user_email,
+      action: `Edited tracking info of order ID: ${id}`
+    }
     try {
-      const response = await axios.put(`${API_URL}/orders/EditTracking/${_id}`, data);
+      const response = await axios.put(
+        `${API_URL}/orders/EditTracking/${_id}`,
+        data
+      );
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+       
       console.log(response);
       refreshData();
     } catch (err) {
@@ -173,9 +232,19 @@ const EditOrderForm = ({
     const data = {
       sellingPlatform: sellingPlatformId,
     };
-
+    const history_data = {
+      timestamp: new Date().toISOString(),
+      role: user_role,
+      email: user_email,
+      action: `Edited Platform of order ID: ${id}`
+    }
     try {
-      const response = await axios.put(`${API_URL}/orders/EditPlatform/${_id}`, data);
+      const response = await axios.put(
+        `${API_URL}/orders/EditPlatform/${_id}`,
+        data
+      );
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+       
       console.log(response);
       refreshData();
     } catch (err) {
@@ -185,17 +254,27 @@ const EditOrderForm = ({
 
   const saveTotalPaid = async () => {
     const totalPaidnum = Number(totalPaidValue);
-    if (isNaN(totalPaidnum) || totalPaidnum < 0 || totalPaidValue ===  "") {
+    if (isNaN(totalPaidnum) || totalPaidnum < 0 || totalPaidValue === "") {
       alert("Please enter a valid non-negative number for the fees");
       return;
     }
-
+    const history_data = {
+      timestamp: new Date().toISOString(),
+      role: user_role,
+      email: user_email,
+      action: `Edited Total Paid of order ID: ${id}`
+    }
     const data = {
       totalPaid: totalPaidnum.toFixed(2),
     };
 
     try {
-      const response = await axios.put(`${API_URL}/orders/EditTotal/${_id}`, data);
+      const response = await axios.put(
+        `${API_URL}/orders/EditTotal/${_id}`,
+        data
+      );
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+       
       console.log(response);
       setEditTotalPaid(false);
       refreshData();
@@ -213,9 +292,19 @@ const EditOrderForm = ({
     const data = {
       otherFees: feesNum.toFixed(2),
     };
-
+    const history_data = {
+      timestamp: new Date().toISOString(),
+      role: user_role,
+      email: user_email,
+      action: `Edited fees of order ID: ${id}`
+    }
     try {
-      const response = await axios.put(`${API_URL}/orders/EditFees/${_id}`, data);
+      const response = await axios.put(
+        `${API_URL}/orders/EditFees/${_id}`,
+        data
+      );
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+       
       console.log(response);
       setEditFees(false);
       refreshData();
@@ -225,28 +314,44 @@ const EditOrderForm = ({
   };
 
   const handleDelete = async () => {
-    try{
-      const response = await axios.delete(`${API_URL}/orders/DeleteOrder/${_id}`);
+
+    const history_data = {
+      timestamp: new Date().toISOString(),
+      role: user_role,
+      email: user_email,
+      action: `Deleted order ID: ${id}`
+    }
+    try {
+      const response = await axios.delete(
+        `${API_URL}/orders/DeleteOrder/${_id}`
+      );
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+       
       console.log(response);
       onClose();
       refreshData();
-    }catch(err) {
-      console.log(err)
+    } catch (err) {
+      console.log(err);
     }
-  }
+  };
 
   const handleEditProducts = async () => {
     setEditProducts(true);
     // onClose();
-  }
-  
+  };
 
   return (
     <div className="fixed inset-4 flex items-center justify-end z-50">
-      <div className="fixed inset-0 bg-black opacity-50 z-0" onClick={onClose}></div>
+      <div
+        className="fixed inset-0 bg-black opacity-50 z-0"
+        onClick={onClose}
+      ></div>
       <div className="flex flex-col relative bg-base-100 bg-opacity-80 text-white rounded-l-lg shadow-lg z-10 w-full max-w-md h-full overflow-y-auto">
         <div className="bg-primary w-full p-6">
-          <button onClick={onClose} className="absolute top-6 right-6 font-bold text-white">
+          <button
+            onClick={onClose}
+            className="absolute top-6 right-6 font-bold text-white"
+          >
             <XIcon size={20} />
           </button>
           <h2 className="text-xl font-bold mb-2"># {id} </h2>
@@ -264,11 +369,15 @@ const EditOrderForm = ({
                   <div>
                     <p className="text-sm">Name: {buyer.buyerName}</p>
                     <p className="text-sm">
-                      Email: <span className="text-accent">{buyer.buyerEmail}</span>
+                      Email:{" "}
+                      <span className="text-accent">{buyer.buyerEmail}</span>
                     </p>
                     <p className="text-sm">Phone: {buyer.buyerPhone}</p>
                   </div>
-                  <button className="text-white" onClick={() => setEditBuyer((prev) => !prev)}>
+                  <button
+                    className="text-white"
+                    onClick={() => setEditBuyer((prev) => !prev)}
+                  >
                     <PencilIcon size={16} />
                   </button>
                 </>
@@ -323,12 +432,21 @@ const EditOrderForm = ({
             <h1 className="font-bold text-md my-2">Alerts</h1>
             <Alerts alerts={alerts} />
           </div>
-          
+
           <div className="flex justify-center">
-            <button className='btn btn-content text-white' onClick={handleEditProducts}>Edit Products</button>
+            <button
+              className="btn btn-content text-white"
+              onClick={handleEditProducts}
+            >
+              Edit Products
+            </button>
           </div>
           {editProducts && (
-            <EditOrderedProductsForm onClose={ () => setEditProducts(false)} productslist={products} orderid={_id}/>
+            <EditOrderedProductsForm
+              onClose={() => setEditProducts(false)}
+              productslist={products}
+              orderid={_id}
+            />
           )}
           <div>
             <h1 className="font-bold text-md my-2">Status</h1>
@@ -338,7 +456,9 @@ const EditOrderForm = ({
                   type="button"
                   className={`btn text-white text-xs p-1 border-none ${
                     item.color
-                  } ${status === item.name ? "opacity-50 cursor-not-allowed" : ""}`}
+                  } ${
+                    status === item.name ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                   key={item.name}
                   onClick={() => {
                     if (!(item.name === status)) {
@@ -355,10 +475,16 @@ const EditOrderForm = ({
               <div className="w-full flex justify-center items-center flex-col mt-2">
                 <p className="text-xs">Change Status to {statusname}</p>
                 <div>
-                  <button className="text-xs text-white p-1 mr-3" onClick={() => setEditStatus((prev) => !prev)}>
+                  <button
+                    className="text-xs text-white p-1 mr-3"
+                    onClick={() => setEditStatus((prev) => !prev)}
+                  >
                     <XCircleFillIcon />
                   </button>
-                  <button className="text-xs text-white p-1" onClick={saveStatus}>
+                  <button
+                    className="text-xs text-white p-1"
+                    onClick={saveStatus}
+                  >
                     <ArchiveIcon />
                   </button>
                 </div>
@@ -380,7 +506,10 @@ const EditOrderForm = ({
                     <p className="text-sm">Courier: {courier.name}</p>
                     <p className="text-sm">Tracking Number: {trackingNumber}</p>
                   </div>
-                  <button className="text-white" onClick={() => setEditTracking((prev) => !prev)}>
+                  <button
+                    className="text-white"
+                    onClick={() => setEditTracking((prev) => !prev)}
+                  >
                     <PencilIcon size={16} />
                   </button>
                 </>
@@ -438,7 +567,10 @@ const EditOrderForm = ({
                   <div>
                     <p className="text-sm">Platform: {sellingPlatform.name}</p>
                   </div>
-                  <button className="text-white" onClick={() => setEditSellingPlatform((prev) => !prev)}>
+                  <button
+                    className="text-white"
+                    onClick={() => setEditSellingPlatform((prev) => !prev)}
+                  >
                     <PencilIcon size={16} />
                   </button>
                 </>
@@ -468,7 +600,9 @@ const EditOrderForm = ({
                     </div>
                   </div>
                   <div className="flex flex-col">
-                    <button onClick={() => setEditSellingPlatform((prev) => !prev)}>
+                    <button
+                      onClick={() => setEditSellingPlatform((prev) => !prev)}
+                    >
                       <XCircleFillIcon size={15} />
                     </button>
                     <button className="mt-1" onClick={saveSellingPlatform}>
@@ -485,7 +619,10 @@ const EditOrderForm = ({
               {!editTotalPaid && (
                 <>
                   <p className="text-sm">Amount: ₱{totalPaidValue}</p>
-                  <button className="text-white" onClick={() => setEditTotalPaid((prev) => !prev)}>
+                  <button
+                    className="text-white"
+                    onClick={() => setEditTotalPaid((prev) => !prev)}
+                  >
                     <PencilIcon size={16} />
                   </button>
                 </>
@@ -523,7 +660,10 @@ const EditOrderForm = ({
               {!editFees && (
                 <>
                   <p className="text-sm">Fees: ₱{feesValue}</p>
-                  <button className="text-white" onClick={() => setEditFees((prev) => !prev)}>
+                  <button
+                    className="text-white"
+                    onClick={() => setEditFees((prev) => !prev)}
+                  >
                     <PencilIcon size={16} />
                   </button>
                 </>
@@ -592,10 +732,39 @@ const EditOrderForm = ({
               </div>
             </div>
             <p className="text-sm text-error flex justify-center">{error}</p>
-            <div className="mt-4 tooltip tooltip-right" data-tip="Delete Order Record">
-              <button className="p-1" onClick={handleDelete}>
+            <div
+              className="mt-4 tooltip tooltip-right"
+              data-tip="Delete Order Record"
+            >
+              <button
+                className="p-1"
+                onClick={() =>
+                  document.getElementById("my_modal_1").showModal()
+                }
+              >
                 <TrashIcon className="text-error" />
               </button>
+              <dialog id="my_modal_1" className="modal">
+                <div className="modal-box">
+                  <h3 className="font-bold text-lg text-left">Warning!</h3>
+                  <p className="py-4 pb-0 text-left">
+                    This action will delete your order!
+                  </p>
+                  <div className="modal-action">
+                    <form method="dialog">
+                      <button className="btn bg-error text-white border-none">
+                        Cancel
+                      </button>
+                    </form>
+                    <button
+                      className="btn text-white border-none"
+                      onClick={handleDelete}
+                    >
+                      Confirm
+                    </button>
+                  </div>
+                </div>
+              </dialog>
             </div>
           </div>
         </div>
@@ -609,21 +778,24 @@ export default EditOrderForm;
 const Alerts = ({ alerts }) => {
   const getIcon = (alertType) => {
     switch (alertType) {
-      case 'Warning':
+      case "Warning":
         return <StopIcon size={16} className="text-warning" />;
-      case 'Notification':
+      case "Notification":
         return <BellIcon size={16} className="text-success" />;
-      case 'Alert':
+      case "Alert":
         return <AlertIcon size={16} className="text-error" />;
       default:
-        return <QuestionIcon size={16} className="text-white"/>;
+        return <QuestionIcon size={16} className="text-white" />;
     }
   };
 
   return (
     <div className="space-y-2">
       {alerts.map((alert, index) => (
-        <div key={index} className="flex flex-row w-full bg-secondary rounded-lg h-11 items-center">
+        <div
+          key={index}
+          className="flex flex-row w-full bg-secondary rounded-lg h-11 items-center"
+        >
           <div className="flex items-center justify-center rounded-full ml-3 w-9 h-9 bg-base-100">
             {getIcon(alert.alertType)}
           </div>
@@ -634,20 +806,21 @@ const Alerts = ({ alerts }) => {
         </div>
       ))}
       {alerts.length === 0 ? (
-      <div className="flex flex-row w-full bg-secondary rounded-lg h-11 items-center">
-        <div className="flex items-center justify-center rounded-full ml-3 w-9 h-9 bg-base-100">
-          {getIcon("null")}
+        <div className="flex flex-row w-full bg-secondary rounded-lg h-11 items-center">
+          <div className="flex items-center justify-center rounded-full ml-3 w-9 h-9 bg-base-100">
+            {getIcon("null")}
+          </div>
+          <div className="ml-3 flex flex-col text-xs">
+            <div className="font-bold">None</div>
+            <div>Nothing to see here</div>
+          </div>
         </div>
-        <div className="ml-3 flex flex-col text-xs">
-          <div className="font-bold">None</div>
-          <div>Nothing to see here</div>
-        </div>
-      </div>
-    ) : (<></>)}
+      ) : (
+        <></>
+      )}
     </div>
   );
 };
-
 
 const Timeline = ({ data }) => {
   data = data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
@@ -666,7 +839,9 @@ const Timeline = ({ data }) => {
                 <div className="text-xs">{item.details}</div>
               </div>
               <div>
-                <div className="font-medium text-sm">{formatTimestamp(item.timestamp)}</div>
+                <div className="font-medium text-sm">
+                  {formatTimestamp(item.timestamp)}
+                </div>
               </div>
             </div>
           </li>
@@ -676,3 +851,5 @@ const Timeline = ({ data }) => {
     </ol>
   );
 };
+
+

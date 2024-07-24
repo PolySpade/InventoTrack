@@ -6,7 +6,7 @@ import StockInForm from "../forms/StockInForm";
 import StockOutForm from "../forms/StockOutForm";
 import { InventoryContext } from "../../contexts";
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 15;
 
 const InventoryTable = () => {
   const [searchTerm, setSearchTerm] = useState("");

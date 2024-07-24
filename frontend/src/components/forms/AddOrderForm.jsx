@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { SearchIcon, XCircleFillIcon } from "@primer/octicons-react";
 import { OrdersContext } from "../../contexts";
 import axios from "axios";
+import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 
 const AddOrderForm = ({ onClose }) => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -10,7 +11,16 @@ const AddOrderForm = ({ onClose }) => {
   const [addItemBox, setAddItemBox] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
   const [error, setError] = useState("");
-
+  let user_email, user_role;
+  const authUser = useAuthUser()
+  if(authUser){
+    user_email = authUser.email;
+    user_role = authUser.role_id;
+  }else{
+    user_email = "N/A"
+    user_role = "N/A"
+  }
+  
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
@@ -53,7 +63,7 @@ const AddOrderForm = ({ onClose }) => {
     if (!salesPlatformId) return setError("Please select a sales platform.");
     if (checkedProducts.length === 0) return setError("Please add at least one product to the order.");
     if (totalPaid <= 0) return setError("Total paid must be greater than zero.");
-    if (!trackingNumber) return setError("Tracking number cannot be empty.");
+    // if (!trackingNumber) return setError("Tracking number cannot be empty.");
     if (!validateEmail(customerEmail) && customerEmail != ""){ return setError("Please enter a valid email address.")};
     if (checkedProducts.some(product => Number(document.getElementById(`${product.sku}-quantity`).value) === 0))
       return setError("Some products have a quantity of 0. Please update the quantity.");
@@ -89,9 +99,16 @@ const AddOrderForm = ({ onClose }) => {
       notes: notes
     };
     
+    const history_data = {
+      timestamp: new Date().toISOString(),
+      role: user_role,
+      email: user_email,
+      action: `Added an Order, ID: ${orderId}`
+    }
+
     try {
       const response = await axios.post(`${API_URL}/orders/CreateOrder`, orderData);
-      console.log('Order created:', response);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
       refreshData();
       onClose();
     } catch (error) {

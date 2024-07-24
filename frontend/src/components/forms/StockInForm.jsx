@@ -2,17 +2,32 @@ import React, { useState, useContext } from "react";
 import { SearchIcon, XCircleFillIcon } from "@primer/octicons-react";
 import { InventoryContext } from "../../contexts";
 import axios from "axios";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import useAuthUser from "react-auth-kit/hooks/useAuthUser";
 
 const StockInForm = ({ onClose }) => {
-  const { inventorydata: products, suppliers, refreshData } = useContext(InventoryContext);
-  
+  const {
+    inventorydata: products,
+    suppliers,
+    refreshData,
+  } = useContext(InventoryContext);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [additembox, setAdditembox] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
-  const [selectedSupplier, setSelectedSupplier] = useState(""); 
-  const [error, setError] = useState("")
-  
+  const [selectedSupplier, setSelectedSupplier] = useState("");
+  const [error, setError] = useState("");
+
+  let user_email, user_role;
+  const authUser = useAuthUser();
+  if (authUser) {
+    user_email = authUser.email;
+    user_role = authUser.role_id;
+  } else {
+    user_email = "N/A";
+    user_role = "N/A";
+  }
+
   const API_URL = import.meta.env.VITE_API_URL;
 
   const handleCancel = () => {
@@ -21,26 +36,43 @@ const StockInForm = ({ onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!selectedSupplier) {
       setError("Please select a supplier.");
       return;
     }
-  
-    const productsToSubmit = checkedProducts.map(product => {
-      const quantity = parseInt(document.getElementById(`${product.sku}-quantity`).value);
+
+    const productsToSubmit = checkedProducts.map((product) => {
+      const quantity = parseInt(
+        document.getElementById(`${product.sku}-quantity`).value
+      );
       return { SKU: product.sku, quantity };
     });
-  
-    if (productsToSubmit.some(product => !product.quantity || product.quantity <= 0)) {
+
+    if (
+      productsToSubmit.some(
+        (product) => !product.quantity || product.quantity <= 0
+      )
+    ) {
       setError("Please enter a valid quantity for all selected products.");
       return;
     }
+    let productstring = ''
+    productsToSubmit.map( (pro) => {productstring += `${pro.quantity}:`;productstring += pro.SKU; productstring += " "})
+
+    const history_data = {
+      timestamp: new Date().toISOString(),
+      role: user_role,
+      email: user_email,
+      action: `Stocked in : ${productstring}`
+    }
+
     try {
       const response = await axios.put(`${API_URL}/inventory/stockIn`, {
         supplierName: selectedSupplier,
         products: productsToSubmit,
       });
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
       
       console.log(response.data);
       setError("");
@@ -236,7 +268,13 @@ const SearchContents = ({ sku, name, isChecked, onCheckboxChange }) => {
   );
 };
 
-const TableContents = ({ sku, name, stockLeft, isChecked, onCheckboxChange }) => {
+const TableContents = ({
+  sku,
+  name,
+  stockLeft,
+  isChecked,
+  onCheckboxChange,
+}) => {
   return (
     <tr>
       <td>{sku}</td>

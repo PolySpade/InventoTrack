@@ -4,14 +4,18 @@ import { formatTimestamp } from "../../utils";
 
 const RecordsHistory = ({ onClose }) => {
   const { histories } = useContext(PreferencesContext);
-  const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 20;
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 10;
+
+  const histories_sorted = histories.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+  
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = histories.slice(indexOfFirstRecord, indexOfLastRecord);
+  const currentRecords = histories_sorted.slice(indexOfFirstRecord, indexOfLastRecord);
 
-  const totalPages = Math.ceil(histories.length / recordsPerPage);
+  const totalPages = Math.ceil(histories_sorted.length / recordsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 

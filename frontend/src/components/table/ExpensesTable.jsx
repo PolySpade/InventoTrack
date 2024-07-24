@@ -6,7 +6,7 @@ import { formatTimestampDay } from "../../utils";
 
 import { ExpenseContext } from "../../contexts";
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 15 ;
 
 const ExpensesTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -16,6 +16,9 @@ const ExpensesTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const { data: expenses } = useContext(ExpenseContext);
+
+  
+
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -174,7 +177,7 @@ const TableContents = ({
         </label>
       </th> */}
       <td>{formattedTimestamp}</td>
-      <td>{amount}</td>
+      <td>₱{amount}</td>
       <td>{expensestype.name}</td>
       <td>{description}</td>
       <td className="relative">
