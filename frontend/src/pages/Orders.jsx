@@ -3,6 +3,7 @@ import OrdersTable from '../components/table/OrdersTable'
 import axios from "axios";
 import { createContext, useEffect, useState } from 'react';
 import { OrdersContext } from '../contexts';
+import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 const Orders = () => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -10,7 +11,10 @@ const Orders = () => {
   const [products, setProducts] = useState([]);
   const [couriers, setCouriers] = useState([]);
   const [salesplatforms, setSalesPlatforms] = useState([]);
-  
+  const authHeader = useAuthHeader();
+const headers = {
+    Authorization: authHeader,
+};
   const statustypes = [
     {
       name: "To Process",
@@ -61,28 +65,28 @@ const Orders = () => {
 
   const getOrdersData = () => {
     axios
-      .get(`${API_URL}/orders/`)
+      .get(`${API_URL}/orders/`, { headers })
       .then((response) => setOrdersData(response.data))
       .catch((err) => console.log(err));
   };
 
   const getProducts = () => {
     axios
-      .get(`${API_URL}/products/`)
+      .get(`${API_URL}/products/`, { headers })
       .then((response) => setProducts(response.data))
       .catch((err) => console.log(err));
   };
 
   const getCouriers = () => {
     axios
-      .get(`${API_URL}/couriers/`)
+      .get(`${API_URL}/couriers/`, { headers })
       .then((response) => setCouriers(response.data))
       .catch((err) => console.log(err));
   };
 
   const getSalesPlatforms = () => {
     axios
-      .get(`${API_URL}/platforms/`)
+      .get(`${API_URL}/platforms/`, { headers })
       .then((response) => setSalesPlatforms(response.data))
       .catch((err) => console.log(err));
   };

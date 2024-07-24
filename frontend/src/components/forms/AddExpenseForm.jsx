@@ -3,11 +3,16 @@ import axios from 'axios';
 import { ExpenseContext } from '../../contexts';
 import { useContext, useState } from 'react';
 import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
+import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 const AddExpenseForm = ({ onClose }) => {
   const API_URL = import.meta.env.VITE_API_URL;
   const { expenseTypes: expense_types, refreshData } = useContext(ExpenseContext);
   const [error,setError] = useState("")
+  const authHeader = useAuthHeader();
+const headers = {
+    Authorization: authHeader,
+};
       
   let user_email, user_role;
   const authUser = useAuthUser()
@@ -63,12 +68,12 @@ const AddExpenseForm = ({ onClose }) => {
       timestamp: new Date().toISOString(),
       role: user_role,
       email: user_email,
-      action: `Added an Expense, Amount: ₱${numAmount} Reason: ${formData.get('description')}`
+      action: `Added an Expense, Amount: ₱${numAmount} Description: ${formData.get('description')}`
     }
 
     try {
-      const response = await axios.post(`${API_URL}/expenses/CreateExpense`, data);
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const response = await axios.post(`${API_URL}/expenses/CreateExpense`, data, { headers });
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       refreshData();
       onClose();
     } catch (error) {

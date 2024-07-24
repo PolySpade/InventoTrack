@@ -2,12 +2,18 @@ import { useContext, useState } from "react";
 import axios from "axios";
 import { OrdersContext } from "../../contexts";
 import useAuthUser from "react-auth-kit/hooks/useAuthUser";
+import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 const BulkEditStatusForm = ({ onClose, checkedItems }) => {
   const { statustypes, refreshData, ordersData } = useContext(OrdersContext);
   const API_URL = import.meta.env.VITE_API_URL;
   const [status, setStatus] = useState("");
   let user_email, user_role;
+  const authHeader = useAuthHeader();
+  const headers = {
+      Authorization: authHeader,
+  };
+
   const authUser = useAuthUser();
   if (authUser) {
     user_email = authUser.email;
@@ -36,9 +42,9 @@ const BulkEditStatusForm = ({ onClose, checkedItems }) => {
         }
         const response = await axios.put(
           `${API_URL}/orders/EditStatus/${item}`,
-          data
+          data, { headers }
         );
-        const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+        const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       
         refreshData();
         onClose();

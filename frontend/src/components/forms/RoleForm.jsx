@@ -2,6 +2,8 @@ import React, { useContext, useState, useEffect } from "react";
 import { PreferencesContext } from "../../contexts";
 import axios from "axios";
 import useAuthUser from "react-auth-kit/hooks/useAuthUser";
+import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
+
 
 const RoleForm = ({ onClose }) => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -37,7 +39,11 @@ const RoleForm = ({ onClose }) => {
     user_email = "N/A";
     user_role = "N/A";
   }
-
+  const authHeader = useAuthHeader();
+  const headers = {
+      Authorization: authHeader,
+  };
+  
   const selectedRoleType = roleTypes.find((item) => item._id === selectedRole);
 
   useEffect(() => {
@@ -162,9 +168,9 @@ const RoleForm = ({ onClose }) => {
     try {
       const response = await axios.put(
         `${API_URL}/roles/EditRole/${_id}`,
-        data
+        data, { headers }
       );
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       refreshData();
       onClose();
     } catch (error) {
@@ -200,8 +206,8 @@ const RoleForm = ({ onClose }) => {
       return;
     }
     try {
-      const response = await axios.delete(`${API_URL}/roles/DeleteRole/${_id}`);
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const response = await axios.delete(`${API_URL}/roles/DeleteRole/${_id}`, { headers });
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       refreshData();
       onClose();
     } catch (error) {
@@ -237,8 +243,8 @@ const RoleForm = ({ onClose }) => {
       action: `Added a new Role: ${newRole}`
     }
     try {
-      const response = await axios.post(`${API_URL}/roles/CreateRole`, data);
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const response = await axios.post(`${API_URL}/roles/CreateRole`, data, { headers });
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
    
       refreshData();
       onClose();

@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { PreferencesContext } from "../../contexts";
 import axios from "axios";
-
+import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 import useAuthUser from "react-auth-kit/hooks/useAuthUser";
 
 const ExpenseTypeForm = ({ onClose }) => {
@@ -13,7 +13,11 @@ const ExpenseTypeForm = ({ onClose }) => {
   const [addMode, setAddMode] = useState(false);
   const [newExpense, setNewExpense] = useState("");
   const [error, setError] = useState("");
-
+  const authHeader = useAuthHeader();
+  const headers = {
+      Authorization: authHeader,
+  };
+  
   const selectedExpenseType = expenseTypes.find(
     (item) => item._id === selectedExpense
   );
@@ -74,9 +78,9 @@ const ExpenseTypeForm = ({ onClose }) => {
     try {
       const response = await axios.put(
         `${API_URL}/expensesTypes/EditExpensesType/${_id}`,
-        data
+        data, { headers }
       );
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       
   
       refreshData();
@@ -111,9 +115,9 @@ const ExpenseTypeForm = ({ onClose }) => {
 
     try {
       const response = await axios.delete(
-        `${API_URL}/expensesTypes/DeleteExpensesType/${_id}`
+        `${API_URL}/expensesTypes/DeleteExpensesType/${_id}`, { headers }
       );
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       
       refreshData();
       onClose();
@@ -149,9 +153,9 @@ const ExpenseTypeForm = ({ onClose }) => {
     try {
       const response = await axios.post(
         `${API_URL}/expensesTypes/CreateExpensesType`,
-        data
+        data, { headers }
       );
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       refreshData();
       onClose();
     } catch (error) {

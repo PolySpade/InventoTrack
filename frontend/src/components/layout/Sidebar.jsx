@@ -16,6 +16,7 @@ import {
 import { useLocation, Link } from "react-router-dom";
 import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 import axios from "axios";
+import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 const SidebarContext = createContext();
 
@@ -24,10 +25,14 @@ const Sidebar = () => {
   const [roleData, setRoleData] = useState([]);
   const [permissions, setPermissions] = useState([]);
   const authUser = useAuthUser();
+  const authHeader = useAuthHeader();
+  const headers = {
+    Authorization: authHeader,
+  };
 
   const getRoleData = () => {
     axios
-      .get(`${API_URL}/roles/`)
+      .get(`${API_URL}/roles/`, { headers })
       .then((response) => {
         setRoleData(response.data);
       })

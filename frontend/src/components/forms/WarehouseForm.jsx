@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { PreferencesContext } from "../../contexts";
 import axios from "axios";
 import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
+import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 
 const WarehouseForm = ({ onClose }) => {
@@ -10,7 +11,11 @@ const WarehouseForm = ({ onClose }) => {
   const [selectedWarehouse, setSelectedWarehouse] = useState("");
   const [editMode, setEditMode] = useState(false);
   const [addMode, setAddMode] = useState(false);
-
+  const authHeader = useAuthHeader();
+  const headers = {
+      Authorization: authHeader,
+  };
+  
   const [newWarehouse, setNewWarehouse] = useState("");
   const [error, setError] = useState("");
 
@@ -70,8 +75,8 @@ const WarehouseForm = ({ onClose }) => {
     }
 
     try {
-      const response = await axios.put(`${API_URL}/warehouses/EditWarehouse/${_id}`, data);
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const response = await axios.put(`${API_URL}/warehouses/EditWarehouse/${_id}`, data, { headers });
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       refreshData();
       onClose();
     } catch (error) {
@@ -99,8 +104,8 @@ const WarehouseForm = ({ onClose }) => {
     }
 
     try {
-      const response = await axios.delete(`${API_URL}/warehouses/DeleteWarehouse/${_id}`);
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const response = await axios.delete(`${API_URL}/warehouses/DeleteWarehouse/${_id}`, { headers });
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
   
       refreshData();
       onClose();
@@ -133,8 +138,8 @@ const WarehouseForm = ({ onClose }) => {
     }
 
     try {
-      const response = await axios.post(`${API_URL}/warehouses/CreateWarehouse`,data);
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const response = await axios.post(`${API_URL}/warehouses/CreateWarehouse`,data, { headers });
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
   
       refreshData();
       onClose();

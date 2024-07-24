@@ -3,6 +3,7 @@ import axios from "axios";
 import { SuppliersContext } from "../../contexts";
 import { XIcon, PlusIcon, TrashIcon } from "@primer/octicons-react";
 import useAuthUser from "react-auth-kit/hooks/useAuthUser";
+import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 const AddSupplierForm = ({ onClose }) => {
   const { refreshData } = useContext(SuppliersContext);
@@ -14,7 +15,10 @@ const AddSupplierForm = ({ onClose }) => {
   const [productList, setProductList] = useState([]);
   const [showProducts, setShowProducts] = useState(false);
   const [error, setError] = useState("");
-
+  const authHeader = useAuthHeader();
+  const headers = {
+      Authorization: authHeader,
+  };
   let user_email, user_role;
   const authUser = useAuthUser();
   if (authUser) {
@@ -77,9 +81,9 @@ const AddSupplierForm = ({ onClose }) => {
     try {
       const response = await axios.post(
         `${API_URL}/suppliers/RegisterSupplier`,
-        data
+        data, { headers }
       );
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       refreshData();
       onClose();
     } catch (err) {

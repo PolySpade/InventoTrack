@@ -2,6 +2,8 @@ import React, { useContext, useState } from "react";
 import axios from "axios";
 import { InventoryContext } from "../../contexts";
 import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
+import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
+
 
 const EditProductForm = ({ onClose, item }) => {
   const { category, warehouse, refreshData } = useContext(InventoryContext);
@@ -18,7 +20,12 @@ const EditProductForm = ({ onClose, item }) => {
     stockLeft: quantity,
     shown,
   } = item;
-
+  const authHeader = useAuthHeader();
+  const headers = {
+      Authorization: authHeader,
+  };
+  
+  
   const API_URL = import.meta.env.VITE_API_URL;
   let user_email, user_role;
   const authUser = useAuthUser()
@@ -109,12 +116,12 @@ const EditProductForm = ({ onClose, item }) => {
     try {
       const response = await axios.put(
         `${API_URL}/products/EditProduct/${_id}`,
-        data
+        data, { headers }
       );
       if (response.status !== 200) {
         throw new Error("Failed to update product");
       }
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
  
       console.log(response.data.message);
       onClose();
@@ -135,12 +142,12 @@ const EditProductForm = ({ onClose, item }) => {
     }
     try {
       const response = await axios.delete(
-        `${API_URL}/products/DeleteProduct/${_id}`
+        `${API_URL}/products/DeleteProduct/${_id}`, { headers }
       );
       if (response.status !== 200) {
         throw new Error("Failed to delete product");
       }
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
   
       console.log(response.data.message);
       refreshData();
@@ -175,9 +182,9 @@ const EditProductForm = ({ onClose, item }) => {
     try {
       const response = await axios.put(
         `${API_URL}/products/EditProduct/${_id}`,
-        data
+        data, { headers }
       );
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
   
       if (response.status !== 200) {
         throw new Error("Failed to restore product");

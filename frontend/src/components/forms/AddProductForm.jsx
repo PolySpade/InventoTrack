@@ -2,12 +2,16 @@ import { useContext, useState } from 'react';
 import { InventoryContext } from '../../contexts';
 import axios from 'axios';
 import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
-
+import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 const AddProductForm = ({ onClose }) => {
   const { category, warehouse, refreshData } = useContext(InventoryContext);
   const API_URL = import.meta.env.VITE_API_URL; 
   const [error, setError] = useState("");
-
+  const authHeader = useAuthHeader();
+  const headers = {
+      Authorization: authHeader,
+  };
+  
   let user_email, user_role;
   const authUser = useAuthUser()
   if(authUser){
@@ -69,9 +73,9 @@ const AddProductForm = ({ onClose }) => {
     }
 
     try {
-      const response = await axios.post(`${API_URL}/products/AddProduct`, data);
+      const response = await axios.post(`${API_URL}/products/AddProduct`, data, { headers });
       refreshData();
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       onClose();
     } catch (error) {
       console.error('Error submitting the form:', error);

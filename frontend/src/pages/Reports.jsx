@@ -10,6 +10,7 @@ import GrossProfitChart from "../components/charts/GrossProfitChart";
 import BestSellerTable from "../components/table/BestSellerTable";
 import SalesChannelTable from "../components/table/SalesChannelTable";
 import NetProfitChart from "../components/charts/NetProfitChart";
+import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 const Reports = () => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -27,16 +28,20 @@ const Reports = () => {
     bestSeller: true,
     salesChannel: true,
   });
+  const authHeader = useAuthHeader();
+  const headers = {
+    Authorization: authHeader,
+  };
 
   const getOrdersData = () => {
     axios
-      .get(`${API_URL}/orders/`)
+      .get(`${API_URL}/orders/`, { headers })
       .then((response) => setOrdersData(response.data))
       .catch((err) => console.log(err));
   };
   const getExpensesData = () => {
     axios
-      .get(`${API_URL}/expenses/`)
+      .get(`${API_URL}/expenses/`, { headers })
       .then((response) => setExpensesData(response.data))
       .catch((err) => console.log(err));
   };

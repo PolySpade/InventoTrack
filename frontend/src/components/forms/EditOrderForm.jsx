@@ -16,6 +16,8 @@ import axios from "axios";
 import { OrdersContext } from "../../contexts";
 import EditOrderedProductsForm from "./EditOrderedProductsForm";
 import useAuthUser from "react-auth-kit/hooks/useAuthUser";
+import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
+
 
 const EditOrderForm = ({
   _id,
@@ -69,7 +71,11 @@ const EditOrderForm = ({
     user_email = "N/A";
     user_role = "N/A";
   }
-
+  const authHeader = useAuthHeader();
+  const headers = {
+      Authorization: authHeader,
+  };
+  
   useEffect(() => {
     const generateAlerts = () => {
       const newAlerts = [];
@@ -129,9 +135,9 @@ const EditOrderForm = ({
     try {
       const response = await axios.put(
         `${API_URL}/orders/EditNotes/${_id}`,
-        data
+        data, { headers }
       );
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
 
       console.log("Notes Updated:", response);
       refreshData();
@@ -157,9 +163,9 @@ const EditOrderForm = ({
     try {
       const response = await axios.put(
         `${API_URL}/orders/EditStatus/${_id}`,
-        data
+        data, { headers }
       );
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
        
       refreshData();
     } catch (err) {
@@ -190,9 +196,9 @@ const EditOrderForm = ({
     try {
       const response = await axios.put(
         `${API_URL}/orders/EditBuyer/${_id}`,
-        data
+        data, { headers }
       );
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
        
       setEditBuyer(false);
       refreshData();
@@ -216,9 +222,9 @@ const EditOrderForm = ({
     try {
       const response = await axios.put(
         `${API_URL}/orders/EditTracking/${_id}`,
-        data
+        data, { headers }
       );
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
        
       console.log(response);
       refreshData();
@@ -241,9 +247,9 @@ const EditOrderForm = ({
     try {
       const response = await axios.put(
         `${API_URL}/orders/EditPlatform/${_id}`,
-        data
+        data, { headers }
       );
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
        
       console.log(response);
       refreshData();
@@ -271,9 +277,9 @@ const EditOrderForm = ({
     try {
       const response = await axios.put(
         `${API_URL}/orders/EditTotal/${_id}`,
-        data
+        data, { headers }
       );
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
        
       console.log(response);
       setEditTotalPaid(false);
@@ -301,9 +307,9 @@ const EditOrderForm = ({
     try {
       const response = await axios.put(
         `${API_URL}/orders/EditFees/${_id}`,
-        data
+        data, { headers }
       );
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
        
       console.log(response);
       setEditFees(false);
@@ -323,9 +329,9 @@ const EditOrderForm = ({
     }
     try {
       const response = await axios.delete(
-        `${API_URL}/orders/DeleteOrder/${_id}`
+        `${API_URL}/orders/DeleteOrder/${_id}`, { headers }
       );
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
        
       console.log(response);
       onClose();

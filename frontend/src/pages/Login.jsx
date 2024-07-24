@@ -47,7 +47,7 @@ const Login = () => {
       password: formData.get("password")
     };
     try {
-      const response = await axios.post(`${API_URL}/accounts/login/`, data);
+      const response = await axios.post(`${API_URL}/auth/login/`, data);
       if (response.status === 200) {
         signIn({
           auth: {

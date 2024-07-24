@@ -4,6 +4,7 @@ import { InventoryContext } from "../../contexts";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import useAuthUser from "react-auth-kit/hooks/useAuthUser";
+import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 const StockInForm = ({ onClose }) => {
   const {
@@ -17,7 +18,10 @@ const StockInForm = ({ onClose }) => {
   const [checkedItems, setCheckedItems] = useState([]);
   const [selectedSupplier, setSelectedSupplier] = useState("");
   const [error, setError] = useState("");
-
+  const authHeader = useAuthHeader();
+  const headers = {
+      Authorization: authHeader,
+  };
   let user_email, user_role;
   const authUser = useAuthUser();
   if (authUser) {
@@ -71,8 +75,8 @@ const StockInForm = ({ onClose }) => {
       const response = await axios.put(`${API_URL}/inventory/stockIn`, {
         supplierName: selectedSupplier,
         products: productsToSubmit,
-      });
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      }, { headers });
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       
       console.log(response.data);
       setError("");

@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { PreferencesContext } from "../../contexts";
 import axios from "axios";
 import useAuthUser from "react-auth-kit/hooks/useAuthUser";
+import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 const CouriersForm = ({ onClose }) => {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -25,7 +26,11 @@ const CouriersForm = ({ onClose }) => {
   const selectedCourierType = courierTypes.find(
     (item) => item._id === selectedCourier
   );
-
+  const authHeader = useAuthHeader();
+  const headers = {
+      Authorization: authHeader,
+  };
+  
   const setEdit = () => {
     if (selectedCourier) {
       setEditMode((prev) => !prev);
@@ -71,9 +76,9 @@ const CouriersForm = ({ onClose }) => {
     try {
       const response = await axios.put(
         `${API_URL}/couriers/EditCourier/${_id}`,
-        data
+        data, { headers }
       );
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       
       refreshData();
       onClose();
@@ -107,9 +112,9 @@ const CouriersForm = ({ onClose }) => {
 
     try {
       const response = await axios.delete(
-        `${API_URL}/couriers/DeleteCourier/${_id}`
+        `${API_URL}/couriers/DeleteCourier/${_id}`, { headers }
       );
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       
       refreshData();
       onClose();
@@ -143,9 +148,9 @@ const CouriersForm = ({ onClose }) => {
     try {
       const response = await axios.post(
         `${API_URL}/couriers/CreateCourier`,
-        data
+        data, { headers }
       );
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
       
       refreshData();
       onClose();

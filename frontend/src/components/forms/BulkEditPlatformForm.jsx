@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import axios from "axios";
 import { OrdersContext } from "../../contexts";
 import useAuthUser from "react-auth-kit/hooks/useAuthUser";
+import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 const BulkEditPlatformForm = ({ onClose, checkedItems }) => {
   const { salesplatforms, refreshData, ordersData } = useContext(OrdersContext);
@@ -16,7 +17,10 @@ const BulkEditPlatformForm = ({ onClose, checkedItems }) => {
     user_email = "N/A";
     user_role = "N/A";
   }
-  
+  const authHeader = useAuthHeader();
+const headers = {
+    Authorization: authHeader,
+};
   const handleSave = async () => {
     const data = {
       sellingPlatform: platform,
@@ -33,9 +37,9 @@ const BulkEditPlatformForm = ({ onClose, checkedItems }) => {
         }
         const response = await axios.put(
           `${API_URL}/orders/EditPlatform/${item}`,
-          data
+          data, { headers }
         );
-        const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data);
+        const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
         refreshData();
         onClose();
       } catch (err) {
