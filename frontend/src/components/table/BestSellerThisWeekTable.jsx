@@ -2,10 +2,12 @@ import React, { useContext, useMemo, useState } from 'react';
 import { DashboardContext } from '../../contexts';
 
 const ITEMS_PER_PAGE = 6;
+const MAX_PAGE_BUTTONS = 5;
 
 const BestSellerThisWeekTable = () => {
     const { ordersData: orders } = useContext(DashboardContext);
     const [currentPage, setCurrentPage] = useState(1);
+    const [inputPage, setInputPage] = useState('');
 
     const filteredOrders = useMemo(() => {
         const now = new Date();
@@ -51,6 +53,89 @@ const BestSellerThisWeekTable = () => {
         setCurrentPage(page);
     };
 
+    const handlePageInputChange = (e) => {
+        const page = e.target.value;
+        if (!isNaN(page) && page > 0 && page <= totalPages) {
+            setInputPage(page);
+        } else {
+            setInputPage('');
+        }
+    };
+
+    const handlePageInputSubmit = () => {
+        if (inputPage) {
+            handlePageChange(Number(inputPage));
+        }
+    };
+
+    const renderPaginationButtons = () => {
+        const paginationButtons = [];
+        const startPage = Math.max(1, currentPage - Math.floor(MAX_PAGE_BUTTONS / 2));
+        const endPage = Math.min(totalPages, currentPage + Math.floor(MAX_PAGE_BUTTONS / 2));
+
+        if (currentPage > Math.floor(MAX_PAGE_BUTTONS / 2) + 1) {
+            paginationButtons.push(
+                <button
+                    key={1}
+                    className={`join-item btn btn-sm ${currentPage === 1 ? 'btn-active' : ''}`}
+                    onClick={() => handlePageChange(1)}
+                >
+                    1
+                </button>
+            );
+            if (startPage > 2) {
+                paginationButtons.push(
+                    <span key="start-ellipsis" className="join-item btn btn-sm">...</span>
+                );
+            }
+        }
+
+        for (let i = startPage; i <= Math.min(endPage, totalPages); i++) {
+            paginationButtons.push(
+                <button
+                    key={i}
+                    className={`join-item btn btn-sm ${currentPage === i ? 'btn-active' : ''}`}
+                    onClick={() => handlePageChange(i)}
+                >
+                    {i}
+                </button>
+            );
+        }
+
+        if (endPage < totalPages - 1) {
+            paginationButtons.push(
+                <span key="end-ellipsis" className="join-item btn btn-sm">...</span>
+            );
+        }
+
+        if (endPage < totalPages) {
+            paginationButtons.push(
+                <button
+                    key={totalPages}
+                    className={`join-item btn btn-sm ${currentPage === totalPages ? 'btn-active' : ''}`}
+                    onClick={() => handlePageChange(totalPages)}
+                >
+                    {totalPages}
+                </button>
+            );
+        }
+
+        paginationButtons.push(
+            <input
+                key="input"
+                type="text"
+                value={inputPage}
+                onChange={handlePageInputChange}
+                onKeyPress={(e) => e.key === 'Enter' && handlePageInputSubmit()}
+                className="join-item text-white input input-sm"
+                placeholder="Go to"
+                style={{ width: '80px' }}
+            />
+        );
+
+        return paginationButtons;
+    };
+
     return (
         <div className='bg-neutral p-6 rounded-lg h-[27rem]'>
             <h2 className="text-lg font-bold mb-4">Top Performing Products This Week</h2>
@@ -69,15 +154,7 @@ const BestSellerThisWeekTable = () => {
             </div>
             <div className="flex justify-center mt-3">
                 <div className="join">
-                    {[...Array(totalPages)].map((_, i) => (
-                        <button
-                            key={i}
-                            onClick={() => handlePageChange(i + 1)}
-                            className={`join-item btn btn-sm ${currentPage === i + 1 ? "btn-active" : ""}`}
-                        >
-                            {i + 1}
-                        </button>
-                    ))}
+                    {renderPaginationButtons()}
                 </div>
             </div>
         </div>
