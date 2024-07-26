@@ -240,6 +240,7 @@ const headers = {
           <input 
             className="input input-bordered w-full"
             onChange={(e) => setNewCategory(e.target.value)} 
+            placeholder="Input a category"
           />
           <div className="flex justify-evenly mt-5">
           <button className="btn text-white" onClick={setAdd}>

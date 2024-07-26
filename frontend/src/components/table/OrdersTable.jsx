@@ -6,6 +6,7 @@ import EditOrderForm from "../forms/EditOrderForm";
 import { OrdersContext } from "../../contexts";
 import BulkEditStatusForm from "../forms/BulkEditStatusForm";
 import BulkEditPlatformForm from "../forms/BulkEditPlatformForm";
+import { formatTimestampMonth } from "../../utils";
 
 const ITEMS_PER_PAGE = 10;
 const MAX_PAGE_BUTTONS = 10;
@@ -307,6 +308,7 @@ const OrdersTable = () => {
                 />
               </label>
             </th>
+            <th>Order Date</th>
             <th>Order ID</th>
             <th>Products</th>
             <th>Courier Name</th>
@@ -359,6 +361,7 @@ const TableContents = ({
   isChecked,
   onCheckboxChange,
   setOrderDetailsId,
+  timestamp
 }) => {
   const [showProducts, setShowProducts] = useState(false);
   return (
@@ -374,6 +377,7 @@ const TableContents = ({
             />
           </label>
         </th>
+        <td>{formatTimestampMonth(timestamp)}</td>
         <td>{id}</td>
         <td>
           <button

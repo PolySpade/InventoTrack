@@ -23,11 +23,12 @@ export function formatTimestamp(timestamp) {
 
 // formatTimestampDay
 export function formatTimestampDay(timestamp) {
-    const date = new Date(timestamp);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based in JavaScript
-    const year = date.getFullYear();
-
+    // const date = new Date(timestamp);
+    // const day = String(date.getDate()).padStart(2, '0');
+    // const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based in JavaScript
+    // const year = date.getFullYear();
+    const [datePart] = timestamp.split('T');
+    const [year, month, day] = datePart.split('-');
     return `${month}-${day}-${year}`;
 }
 
