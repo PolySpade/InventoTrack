@@ -41,7 +41,7 @@ const Reports = () => {
 
   const authHeader = useAuthHeader();
   const headers = {
-    Authorization: authHeader(),
+    Authorization: authHeader,
   };
 
   const getOrdersData = () => {
