@@ -19,9 +19,6 @@ const OrdersDashboard = () => {
   const processingOrders = ordersData.filter(
     (order) => order.status === "Processing"
   );
-  const cancelledOrders = ordersData.filter(
-    (order) => order.status === "Cancelled"
-  );
 
   const toProcessQuantity = toProcessOrders.length;
   const processingQuantity = processingOrders.length;

@@ -67,7 +67,7 @@ const SmallChartv2 = ({ datas, name, timeFrame }) => {
             fontFamily: 'Poppins, sans-serif',
             toolbar: {
                 theme: 'dark',
-                show: false,
+                show: true,
                 tools: {
                     download: true,
                     selection: false,
@@ -84,7 +84,7 @@ const SmallChartv2 = ({ datas, name, timeFrame }) => {
                         headerCategory: 'Category',
                         headerValue: 'Value',
                         dateFormatter(timestamp) {
-                            return new Date(timestamp).toDateString();
+                            return formatTimestampDay(timestamp);
                         }
                     },
                     svg: {

@@ -6,7 +6,7 @@ import EditOrderForm from "../forms/EditOrderForm";
 import { OrdersContext } from "../../contexts";
 import BulkEditStatusForm from "../forms/BulkEditStatusForm";
 import BulkEditPlatformForm from "../forms/BulkEditPlatformForm";
-import { formatTimestampMonth } from "../../utils";
+import { formatTimestamp, formatTimestampDay, formatTimestampMonth } from "../../utils";
 
 const ITEMS_PER_PAGE = 10;
 const MAX_PAGE_BUTTONS = 10;
@@ -377,7 +377,7 @@ const TableContents = ({
             />
           </label>
         </th>
-        <td>{formatTimestampMonth(timestamp)}</td>
+        <td>{formatTimestampDay(timestamp)}</td>
         <td>{id}</td>
         <td>
           <button

@@ -13,7 +13,7 @@ import NetProfitChart from "../components/charts/NetProfitChart";
 import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 const Reports = () => {
-  const API_URL =import.meta.env.VITE_API_URL;
+  const API_URL = import.meta.env.VITE_API_URL;
   const [ordersData, setOrdersData] = useState([]);
   const [expensesData, setExpensesData] = useState([]);
   const [timeFrame, setTimeFrame] = useState("last7days");
@@ -28,9 +28,20 @@ const Reports = () => {
     bestSeller: true,
     salesChannel: true,
   });
+  const [chartKeys, setChartKeys] = useState({
+    sales: 0,
+    orders: 0,
+    expenses: 0,
+    cog: 0,
+    grossProfit: 0,
+    netProfit: 0,
+    bestSeller: 0,
+    salesChannel: 0,
+  });
+
   const authHeader = useAuthHeader();
   const headers = {
-    Authorization: authHeader,
+    Authorization: authHeader(),
   };
 
   const getOrdersData = () => {
@@ -39,6 +50,7 @@ const Reports = () => {
       .then((response) => setOrdersData(response.data))
       .catch((err) => console.log(err));
   };
+  
   const getExpensesData = () => {
     axios
       .get(`${API_URL}/expenses/`, { headers })
@@ -55,6 +67,10 @@ const Reports = () => {
     setVisibleCharts((prevState) => ({
       ...prevState,
       [chart]: !prevState[chart],
+    }));
+    setChartKeys((prevKeys) => ({
+      ...prevKeys,
+      [chart]: prevKeys[chart] + 1,
     }));
   };
 
@@ -123,34 +139,32 @@ const Reports = () => {
             </ul>
           </div>
           <div className="ml-3 mb-5 text-white">
-          <h2 className=" text-s mb-1 ">Toggle Charts</h2>
-          <div className="flex flex-wrap">
-            {Object.keys(visibleCharts).map((chart) => (
-              <label key={chart} className="flex items-center mr-4 mb-2">
-                <input
-                  type="checkbox"
-                  checked={visibleCharts[chart]}
-                  onChange={() => handleToggle(chart)}
-                  className="mr-2 checkbox checkbox-info"
-                />
-                {chart.charAt(0).toUpperCase() + chart.slice(1)}
-              </label>
-            ))}
+            <h2 className=" text-s mb-1 ">Toggle Charts</h2>
+            <div className="flex flex-wrap">
+              {Object.keys(visibleCharts).map((chart) => (
+                <label key={chart} className="flex items-center mr-4 mb-2">
+                  <input
+                    type="checkbox"
+                    checked={visibleCharts[chart]}
+                    onChange={() => handleToggle(chart)}
+                    className="mr-2 checkbox checkbox-info"
+                  />
+                  {chart.charAt(0).toUpperCase() + chart.slice(1)}
+                </label>
+              ))}
+            </div>
           </div>
         </div>
-        </div>
-
-        
 
         <div className="max-w-full text-white flex flex-row justify-between space-x-10">
           {visibleCharts.sales && (
             <div className="bg-base-content rounded-3xl flex-1">
-              <SalesChart />
+              <SalesChart key={chartKeys.sales} />
             </div>
           )}
           {visibleCharts.orders && (
             <div className="bg-base-content flex-1 rounded-3xl">
-              <OrdersChart />
+              <OrdersChart key={chartKeys.orders} />
             </div>
           )}
         </div>
@@ -158,22 +172,22 @@ const Reports = () => {
         <div className="mt-5 text-white flex flex-row justify-start space-x-10 overflow-y-hidden">
           {visibleCharts.expenses && (
             <div className="min-w-96 bg-base-content rounded-3xl">
-              <ExpensesChart />
+              <ExpensesChart key={chartKeys.expenses} />
             </div>
           )}
           {visibleCharts.cog && (
             <div className="bg-base-content min-w-96 rounded-3xl">
-              <COGChart />
+              <COGChart key={chartKeys.cog} />
             </div>
           )}
           {visibleCharts.grossProfit && (
             <div className="bg-base-content min-w-96 rounded-3xl">
-              <GrossProfitChart />
+              <GrossProfitChart key={chartKeys.grossProfit} />
             </div>
           )}
           {visibleCharts.netProfit && (
             <div className="bg-base-content min-w-96 rounded-3xl">
-              <NetProfitChart />
+              <NetProfitChart key={chartKeys.netProfit} />
             </div>
           )}
         </div>
