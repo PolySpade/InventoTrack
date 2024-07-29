@@ -405,7 +405,7 @@ const TableContents = ({
       </tr>
       {showProducts && (
         <tr className="border-none text-white bg-secondary">
-          <td colSpan="9">
+          <td colSpan="10">
             <table className="table w-full">
               <thead className="text-white">
                 <tr className="border-opacity-50">
