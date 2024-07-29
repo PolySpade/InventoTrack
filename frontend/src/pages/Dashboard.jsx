@@ -7,7 +7,7 @@ import InventoryLevelsTable from "../components/table/InventoryLevelsTable";
 import NotificationsDashboard from "../components/others/NotificationsDashboard";
 import useAuthHeader from "react-auth-kit/hooks/useAuthHeader";
 const Dashboard = () => {
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL =import.meta.env.VITE_API_URL;
   const [ordersData, setOrdersData] = useState([]);
   const [inventorydata, setInventorydata] = useState([]);
   const [expensesData, setExpensesData] = useState([]);

@@ -37,7 +37,7 @@ const EditOrderForm = ({
 }) => {
   const { refreshData, couriers, salesplatforms, statustypes } =
     useContext(OrdersContext);
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL =import.meta.env.VITE_API_URL;
   const [editNotes, setEditNotes] = useState(false);
   const [noteText, setNoteText] = useState(notes);
   const [editStatus, setEditStatus] = useState(false);

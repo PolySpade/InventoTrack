@@ -21,7 +21,7 @@ import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 const SidebarContext = createContext();
 
 const Sidebar = () => {
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL =import.meta.env.VITE_API_URL;
   const [roleData, setRoleData] = useState([]);
   const [permissions, setPermissions] = useState([]);
   const authUser = useAuthUser();

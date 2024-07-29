@@ -5,7 +5,7 @@ import useAuthUser from "react-auth-kit/hooks/useAuthUser";
 import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 const CouriersForm = ({ onClose }) => {
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL =import.meta.env.VITE_API_URL;
   const { ordersData, courierTypes, refreshData } =
     useContext(PreferencesContext);
   const [selectedCourier, setSelectedCourier] = useState("");
@@ -34,6 +34,8 @@ const CouriersForm = ({ onClose }) => {
   const setEdit = () => {
     if (selectedCourier) {
       setEditMode((prev) => !prev);
+      const oldcourier = courierTypes.find(cor => cor._id === selectedCourier).name
+      setNewCourier(oldcourier)
     }
     setError("");
   };

@@ -26,7 +26,7 @@ const EditProductForm = ({ onClose, item }) => {
   };
   
   
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL =import.meta.env.VITE_API_URL;
   let user_email, user_role;
   const authUser = useAuthUser()
   if(authUser){

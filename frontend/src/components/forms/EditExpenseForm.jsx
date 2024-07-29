@@ -13,7 +13,7 @@ const EditExpenseForm = ({
   expensestype,
   description,
 }) => {
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL =import.meta.env.VITE_API_URL;
   const { expenseTypes: expense_types, refreshData } =
     useContext(ExpenseContext);
   const [error, setError] = useState("");

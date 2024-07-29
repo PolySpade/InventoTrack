@@ -6,7 +6,7 @@ import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 
 const WarehouseForm = ({ onClose }) => {
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL =import.meta.env.VITE_API_URL;
   const { productsData, warehouseTypes, refreshData } = useContext(PreferencesContext);
   const [selectedWarehouse, setSelectedWarehouse] = useState("");
   const [editMode, setEditMode] = useState(false);
@@ -35,6 +35,8 @@ const WarehouseForm = ({ onClose }) => {
   const setEdit = () => {
     if(selectedWarehouse){
       setEditMode((prev) => !prev)
+      const old_name = warehouseTypes.find(war => war._id === selectedWarehouse).name;
+      setNewWarehouse(old_name)
     }
     setError("")
   }

@@ -4,7 +4,7 @@ import axios from "axios";
 import { ExpenseContext } from '../contexts';
 import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 const Expenses = () => {
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL =import.meta.env.VITE_API_URL;
   const [data, setData] = useState([]);
   const [expenseTypes, setExpenseTypes] = useState([]);
   const authHeader = useAuthHeader();

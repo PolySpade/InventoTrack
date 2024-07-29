@@ -12,7 +12,7 @@ const Suppliers = () => {
   };
 
   const getSuppliers = () => {
-    const API_URL = import.meta.env.VITE_API_URL;
+    const API_URL =import.meta.env.VITE_API_URL;
     axios
     .get(`${API_URL}/suppliers/`, { headers })
     .then((response) => setSuppliers(response.data))

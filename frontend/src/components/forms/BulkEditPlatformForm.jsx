@@ -6,7 +6,7 @@ import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 const BulkEditPlatformForm = ({ onClose, checkedItems }) => {
   const { salesplatforms, refreshData, ordersData } = useContext(OrdersContext);
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL =import.meta.env.VITE_API_URL;
   const [platform, setPlatform] = useState("");
   let user_email, user_role;
   const authUser = useAuthUser();

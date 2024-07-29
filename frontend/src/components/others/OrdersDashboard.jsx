@@ -19,9 +19,6 @@ const OrdersDashboard = () => {
   const processingOrders = ordersData.filter(
     (order) => order.status === "Processing"
   );
-  const cancelledOrders = ordersData.filter(
-    (order) => order.status === "Cancelled"
-  );
 
   const toProcessQuantity = toProcessOrders.length;
   const processingQuantity = processingOrders.length;
@@ -73,14 +70,14 @@ const OrdersDashboard = () => {
             <div className="text-xl font-bold">PROCESSING</div>
           </div>
           <div className="flex justify-center flex-col items-center pr-6">
-            <Link className="text-4xl text-info" to="/orders/Shipped">
+            <Link className="text-4xl text-info" to="/orders/ShippedToday">
               {shippedTodayQuantity}
             </Link>
             <div className="text-xl font-bold">SHIPPED</div>
             <div className="text-xs font-bold">TODAY</div>
           </div>
           <div className="flex justify-center flex-col items-center">
-            <Link className="text-4xl text-danger" to="/orders/Cancelled">
+            <Link className="text-4xl text-danger" to="/orders/CancelledToday">
               {cancelledQuantity}
             </Link>
             <div className="text-xl font-bold">CANCELLED</div>

@@ -5,6 +5,7 @@ import EditSupplierForm from '../forms/EditSupplierForm';
 import AddSupplierForm from '../forms/AddSupplierForm';
 
 const ITEMS_PER_PAGE = 10;
+const MAX_PAGE_BUTTONS = 5;
 
 const SuppliersTable = () => {
   const { suppliers } = useContext(SuppliersContext);
@@ -12,6 +13,7 @@ const SuppliersTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [editSupplier, setEditSupplier] = useState(null);
   const [addSupplier, setAddSupplier] = useState(false);
+  const [inputPage, setInputPage] = useState('');
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -27,12 +29,95 @@ const SuppliersTable = () => {
         product.name.toLowerCase().includes(searchTerm.toLowerCase())
       )
   );
-  
+
   const totalPages = Math.ceil(filteredSuppliers.length / ITEMS_PER_PAGE);
   const currentItems = filteredSuppliers.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+  };
+
+  const handlePageInputChange = (e) => {
+    const page = e.target.value;
+    if (!isNaN(page) && page > 0 && page <= totalPages) {
+      setInputPage(page);
+    } else {
+      setInputPage('');
+    }
+  };
+
+  const handlePageInputSubmit = () => {
+    if (inputPage) {
+      handlePageChange(Number(inputPage));
+    }
+  };
+
+  const renderPaginationButtons = () => {
+    const paginationButtons = [];
+    const startPage = Math.max(1, currentPage - Math.floor(MAX_PAGE_BUTTONS / 2));
+    const endPage = Math.min(totalPages, currentPage + Math.floor(MAX_PAGE_BUTTONS / 2));
+
+    if (currentPage > Math.floor(MAX_PAGE_BUTTONS / 2) + 1) {
+      paginationButtons.push(
+        <button
+          key={1}
+          className={`join-item btn ${currentPage === 1 ? 'btn-active' : ''}`}
+          onClick={() => handlePageChange(1)}
+        >
+          1
+        </button>
+      );
+      if (startPage > 2) {
+        paginationButtons.push(
+          <span key="start-ellipsis" className="join-item btn">...</span>
+        );
+      }
+    }
+
+    for (let i = startPage; i <= Math.min(endPage, totalPages); i++) {
+      paginationButtons.push(
+        <button
+          key={i}
+          className={`join-item btn ${currentPage === i ? 'btn-active' : ''}`}
+          onClick={() => handlePageChange(i)}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    if (endPage < totalPages - 1) {
+      paginationButtons.push(
+        <span key="end-ellipsis" className="join-item btn">...</span>
+      );
+    }
+
+    if (endPage < totalPages) {
+      paginationButtons.push(
+        <button
+          key={totalPages}
+          className={`join-item btn ${currentPage === totalPages ? 'btn-active' : ''}`}
+          onClick={() => handlePageChange(totalPages)}
+        >
+          {totalPages}
+        </button>
+      );
+    }
+
+    paginationButtons.push(
+      <input
+        key="input"
+        type="text"
+        value={inputPage}
+        onChange={handlePageInputChange}
+        onKeyPress={(e) => e.key === 'Enter' && handlePageInputSubmit()}
+        className="join-item text-white input"
+        placeholder="Go to"
+        style={{ width: '80px' }}
+      />
+    );
+
+    return paginationButtons;
   };
 
   const handleEditSupplier = (supplier) => {
@@ -78,15 +163,7 @@ const SuppliersTable = () => {
       </table>
       <div className="flex justify-center mt-4">
         <div className="join">
-          {[...Array(totalPages)].map((_, i) => (
-            <button
-              key={i}
-              onClick={() => handlePageChange(i + 1)}
-              className={`join-item btn ${currentPage === i + 1 ? "btn-active" : ""}`}
-            >
-              {i + 1}
-            </button>
-          ))}
+          {renderPaginationButtons()}
         </div>
       </div>
       {editSupplier && (

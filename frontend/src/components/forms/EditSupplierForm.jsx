@@ -24,7 +24,7 @@ const EditSupplierForm = ({
   onClose,
 }) => {
   const { refreshData } = useContext(SuppliersContext);
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL =import.meta.env.VITE_API_URL;
 
   const [editSupplierName, setEditSupplierName] = useState(supplierName);
   const [editWebsite, setEditWebsite] = useState(website);
@@ -209,7 +209,10 @@ const EditSupplierForm = ({
               <button
                 className="btn text-white bg-error border-none"
                 onClick={() =>
-                  document.getElementById("my_modal_1").showModal()
+                {
+                  document.getElementById("my_modal_1").showModal();
+                  setError("");
+                }
                 }
               >
                 Delete Supplier

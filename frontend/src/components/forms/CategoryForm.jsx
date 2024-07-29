@@ -4,7 +4,7 @@ import axios from "axios";
 import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
 import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 const CategoryForm = ({ onClose }) => {
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL =import.meta.env.VITE_API_URL;
   const { productsData, categoryTypes, refreshData } = useContext(PreferencesContext);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [editMode, setEditMode] = useState(false);
@@ -32,7 +32,10 @@ const headers = {
   const setEdit = () => {
     if(selectedCategory){
       setEditMode((prev) => !prev)
+      const oldcategory = categoryTypes.find(cat => cat._id === selectedCategory).name
+      setNewCategory(oldcategory)
     }
+
     setError("")
   }
 
@@ -190,6 +193,7 @@ const headers = {
             defaultValue={selectedCategoryType.name} 
             className="input input-bordered w-full"
             onChange={(e) => setNewCategory(e.target.value)} 
+            placeholder="Input a category"
           />
           <div className="flex justify-evenly mt-5">
           <button className="btn text-white" onClick={setEdit}>
@@ -236,6 +240,7 @@ const headers = {
           <input 
             className="input input-bordered w-full"
             onChange={(e) => setNewCategory(e.target.value)} 
+            placeholder="Input a category"
           />
           <div className="flex justify-evenly mt-5">
           <button className="btn text-white" onClick={setAdd}>

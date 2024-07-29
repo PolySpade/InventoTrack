@@ -82,7 +82,7 @@ const SalesChart = () => {
                         headerCategory: 'Category',
                         headerValue: 'Value',
                         dateFormatter(timestamp) {
-                            return new Date(timestamp).toDateString();
+                            return formatTimestampDay(timestamp);
                         }
                     },
                     svg: {

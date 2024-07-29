@@ -1,83 +1,91 @@
-import { getCurrentDate } from '../../utils';
-import axios from 'axios';
-import { ExpenseContext } from '../../contexts';
-import { useContext, useState } from 'react';
-import useAuthUser from 'react-auth-kit/hooks/useAuthUser';
-import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
+import { getCurrentDate } from "../../utils";
+import axios from "axios";
+import { ExpenseContext } from "../../contexts";
+import { useContext, useState } from "react";
+import useAuthUser from "react-auth-kit/hooks/useAuthUser";
+import useAuthHeader from "react-auth-kit/hooks/useAuthHeader";
 
 const AddExpenseForm = ({ onClose }) => {
   const API_URL = import.meta.env.VITE_API_URL;
-  const { expenseTypes: expense_types, refreshData } = useContext(ExpenseContext);
-  const [error,setError] = useState("")
+  const { expenseTypes: expense_types, refreshData } =
+    useContext(ExpenseContext);
+  const [error, setError] = useState("");
   const authHeader = useAuthHeader();
-const headers = {
+  const headers = {
     Authorization: authHeader,
-};
-      
+  };
+
   let user_email, user_role;
-  const authUser = useAuthUser()
-  if(authUser){
+  const authUser = useAuthUser();
+  if (authUser) {
     user_email = authUser.email;
     user_role = authUser.role_id;
-  }else{
-    user_email = "N/A"
-    user_role = "N/A"
+  } else {
+    user_email = "N/A";
+    user_role = "N/A";
   }
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
-    const numAmount = parseFloat(formData.get('amount'))
+    const numAmount = parseFloat(formData.get("amount"));
 
-    
-    if(formData.get('expense_types') === null){
+    if (formData.get("expense_types") === null) {
       setError("Set An Expense Type");
-      return
+      return;
     }
 
-
-    if (formData.get('amount') === "") {
+    if (formData.get("amount") === "") {
       setError("Input Amount");
       return;
     }
-  
+
     if (isNaN(numAmount)) {
       setError("Amount must be a number");
       return;
     }
-  
+
     if (numAmount < 0) {
       setError("Input a Non-Negative Number");
       return;
     }
 
-    if(formData.get('description') === ""){
-      setError("Input a short description")
-      return
+    if (formData.get("description") === "") {
+      setError("Input a short description");
+      return;
     }
 
-
     const data = {
-      timestamp: formData.get('date'),
+      timestamp: formData.get("date"),
       amount: numAmount,
-      expensestype: formData.get('expense_types'),
-      description: formData.get('description')
+      expensestype: formData.get("expense_types"),
+      description: formData.get("description"),
     };
 
     const history_data = {
       timestamp: new Date().toISOString(),
       role: user_role,
       email: user_email,
-      action: `Added an Expense, Amount: ₱${numAmount} Description: ${formData.get('description')}`
-    }
+      action: `Added an Expense, Amount: ₱${numAmount} Description: ${formData.get(
+        "description"
+      )}`,
+    };
 
     try {
-      const response = await axios.post(`${API_URL}/expenses/CreateExpense`, data, { headers });
-      const history_response = await axios.post(`${API_URL}/histories/CreateHistory`, history_data, { headers });
+      const response = await axios.post(
+        `${API_URL}/expenses/CreateExpense`,
+        data,
+        { headers }
+      );
+      const history_response = await axios.post(
+        `${API_URL}/histories/CreateHistory`,
+        history_data,
+        { headers }
+      );
       refreshData();
       onClose();
     } catch (error) {
-      setError(error.response.data.message)
+      setError(error.response.data.message);
       // Optionally handle the error here, e.g., show an error message to the user
     }
   };
@@ -87,36 +95,88 @@ const headers = {
   };
 
   return (
-    <div className='overflow-y-auto min-w-full bg-neutral rounded shadow-lg text-white'>
-      <form onSubmit={handleSubmit} method='get' className='p-6 flex flex-col min-w-full w-96'>
-        <h1 className='p-3 text-xl font-semibold'>Add Expenses</h1>
-        <div className='p-1 flex flex-col'>
-          <div className='my-2 flex flex-col'>
-            <label className='text-xs' htmlFor='date'>Date</label>
-            <input id="date" name="date" type="text" placeholder={`MM/DD/YYYY`} defaultValue={`${getCurrentDate()}`} className="input input-bordered w-full max-w-xs" />
+    <div className="overflow-y-auto min-w-full bg-neutral rounded shadow-lg text-white">
+      <form
+        onSubmit={handleSubmit}
+        method="get"
+        className="p-6 flex flex-col min-w-full w-96"
+      >
+        <h1 className="p-3 text-xl font-semibold">Add Expenses</h1>
+        <div className="p-1 flex flex-col">
+          <div className="my-2 flex flex-col">
+            <label className="text-xs" htmlFor="date">
+              Date
+            </label>
+            <input
+              id="date"
+              name="date"
+              type="text"
+              placeholder={`MM/DD/YYYY`}
+              defaultValue={`${getCurrentDate()}`}
+              className="input input-bordered w-full max-w-xs"
+            />
           </div>
-          <div className='my-2 flex flex-col'>
-            <label className='text-xs' htmlFor='expense_types'>Type</label>
-            <select id="expense_types" name="expense_types" className="input input-bordered w-full max-w-xs" defaultValue="">
-              <option disabled value="">Select a Type</option>
-              {expense_types.map((item) => <option key={item._id} value={item._id}>{item.name}</option>)}
+          <div className="my-2 flex flex-col">
+            <label className="text-xs" htmlFor="expense_types">
+              Type
+            </label>
+            <select
+              id="expense_types"
+              name="expense_types"
+              className="input input-bordered w-full max-w-xs"
+              defaultValue=""
+            >
+              <option disabled value="">
+                Select a Type
+              </option>
+              {expense_types.map((item) => (
+                <option key={item._id} value={item._id}>
+                  {item.name}
+                </option>
+              ))}
             </select>
-          </div>  
-          <div className='my-2 flex flex-col'>
-            <label className='text-xs' htmlFor='amount'>Amount</label>
-            <input id="amount" name="amount" type="text" placeholder="Type here" className="input input-bordered w-full max-w-xs" />
           </div>
-          <div className='my-2 flex flex-col'>
-            <label className='text-xs' htmlFor='description'>Short Description</label>
-            <input id="description" name="description" type="text" placeholder="Type here" className="input input-bordered w-full max-w-xs" />
+          <div className="my-2 flex flex-col">
+            <label className="text-xs" htmlFor="amount">
+              Amount
+            </label>
+            <input
+              id="amount"
+              name="amount"
+              type="text"
+              placeholder="Type here"
+              className="input input-bordered w-full max-w-xs"
+            />
+          </div>
+          <div className="my-2 flex flex-col">
+            <label className="text-xs" htmlFor="description">
+              Short Description
+            </label>
+            <input
+              id="description"
+              name="description"
+              type="text"
+              placeholder="Type here"
+              className="input input-bordered w-full max-w-xs"
+            />
           </div>
         </div>
 
-        <div className='pt-4 flex flex-row justify-around'>
-          <button type="button" onClick={handleCancel} className='btn text-white'>Cancel</button>
-          <button type="submit" className='btn text-white'>Submit</button>
+        <div className="pt-4 flex flex-row justify-around">
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="btn text-white"
+          >
+            Cancel
+          </button>
+          <button type="submit" className="btn text-white">
+            Submit
+          </button>
         </div>
-        {error && (<p className='flex justify-center text-sm text-error'>{error}</p>)}
+        {error && (
+          <p className="flex justify-center text-sm text-error">{error}</p>
+        )}
       </form>
     </div>
   );
