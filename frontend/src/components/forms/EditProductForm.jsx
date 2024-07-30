@@ -48,10 +48,10 @@ const EditProductForm = ({ onClose, item }) => {
     if (formData.get("product_name") === "") {
       setError("Input Product Name");
       return;
-    } else if (parseFloat(formData.get("unit_cost")) < 0) {
+    } else if (parseFloat(formData.get("unit_cost")) < 0 && hasCogPermission ) {
       setError("Negative Unit Cost");
       return;
-    } else if (isNaN(parseFloat(formData.get("unit_cost")))) {
+    } else if (isNaN(parseFloat(formData.get("unit_cost"))) && hasCogPermission ) {
       setError("Invalid Unit Cost");
       return;
     } else if (parseFloat(formData.get("weight")) < 0) {
