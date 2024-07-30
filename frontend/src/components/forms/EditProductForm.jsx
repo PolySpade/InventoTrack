@@ -6,7 +6,7 @@ import useAuthHeader from 'react-auth-kit/hooks/useAuthHeader';
 
 
 const EditProductForm = ({ onClose, item }) => {
-  const { category, warehouse, refreshData } = useContext(InventoryContext);
+  const { category, warehouse, refreshData, permissions } = useContext(InventoryContext);
   const [error, setError] = useState("");
   const {
     _id,
@@ -25,7 +25,7 @@ const EditProductForm = ({ onClose, item }) => {
       Authorization: authHeader,
   };
   
-  
+  const hasCogPermission = permissions.includes("cog");
   const API_URL =import.meta.env.VITE_API_URL;
   let user_email, user_role;
   const authUser = useAuthUser()
@@ -89,21 +89,21 @@ const EditProductForm = ({ onClose, item }) => {
         return;
       }
 
-    const data = {
-      sku,
-      name: formData.get("product_name"),
-      category: formData.get("category"),
-      unitCost: parseFloat(formData.get("unit_cost")),
-      weightKG: parseFloat(formData.get("weight")) || 0,
-      warehouse: formData.get("warehouse"),
-      dimensions: {
-        lengthCM: parseFloat(formData.get("length")) || 0,
-        widthCM: parseFloat(formData.get("width")) || 0,
-        heightCM: parseFloat(formData.get("height")) || 0,
-      },
-      stockLeft: parseInt(formData.get("quantity"), 10),
-      shown: item.shown 
-    };
+      const data = {
+        sku,
+        name: formData.get("product_name"),
+        category: formData.get("category"),
+        unitCost: hasCogPermission ? parseFloat(formData.get("unit_cost")) : cost, 
+        weightKG: parseFloat(formData.get("weight")) || 0,
+        warehouse: formData.get("warehouse"),
+        dimensions: {
+          lengthCM: parseFloat(formData.get("length")) || 0,
+          widthCM: parseFloat(formData.get("width")) || 0,
+          heightCM: parseFloat(formData.get("height")) || 0,
+        },
+        stockLeft: parseInt(formData.get("quantity"), 10),
+        shown: item.shown 
+      };
 
     
       const history_data = {
@@ -278,7 +278,7 @@ const EditProductForm = ({ onClose, item }) => {
                 className="input input-bordered w-full max-w-xs disabled:text-white"
               />
             </div>
-            <div className="my-2 flex flex-col">
+            {hasCogPermission && (<div className="my-2 flex flex-col">
               <label className="text-xs" htmlFor="unit_cost">
                 Unit Cost
               </label>
@@ -290,7 +290,8 @@ const EditProductForm = ({ onClose, item }) => {
                 defaultValue={cost}
                 className="input input-bordered w-full max-w-xs"
               />
-            </div>
+            </div>)}
+
             <div className="my-2 flex flex-col">
               <label className="text-xs" htmlFor="quantity">
                 Stock Quantity
