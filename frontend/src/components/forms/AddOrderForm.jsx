@@ -188,7 +188,7 @@ const AddOrderForm = ({ onClose }) => {
         className="p-6 flex flex-row min-w-full"
       >
         <div className="w-96">
-          <h1 className="text-xl font-semibold">Add Products</h1>
+          <h1 className="text-xl font-semibold">Add Orders</h1>
           <OrderDetails couriers={couriers} salesplatforms={salesplatforms} />
           <CustomerDetails />
           <Notes />
