@@ -3,35 +3,11 @@ import Chart from "react-apexcharts";
 import './chartStyles.css';
 import { formatTimestampDay, formatTimestampMonth, formatTimestampWeek } from '../../utils';
 
-const SmallChartv2 = ({ datas, name, timeFrame }) => {
-    const filterData = (datas, timeFrame) => {
-        const now = new Date();
-        let filteredData = datas;
-
-        if (timeFrame === 'last7days') {
-            const startOfPeriod = new Date(now.setDate(now.getDate() - 7));
-            filteredData = datas.filter(data => new Date(data.timestamp) >= startOfPeriod);
-        } else if (timeFrame === 'last15days') {
-            const startOfPeriod = new Date(now.setDate(now.getDate() - 15));
-            filteredData = datas.filter(data => new Date(data.timestamp) >= startOfPeriod);
-        } else if (timeFrame === 'last30days') {
-            const startOfPeriod = new Date(now.setDate(now.getDate() - 30));
-            filteredData = datas.filter(data => new Date(data.timestamp) >= startOfPeriod);
-        } else if (timeFrame === 'today') {
-            const startOfToday = new Date(now.setHours(0, 0, 0, 0));
-            const endOfToday = new Date(now.setHours(23, 59, 59, 999));
-            filteredData = datas.filter(data => {
-                const dataDate = new Date(data.timestamp);
-                return dataDate >= startOfToday && dataDate <= endOfToday;
-            });
-        } else if (timeFrame === 'overall') {
-            filteredData = datas;
-        }
-        
-
-        return filteredData;
-    }
-
+const SmallChartv2 = ({ datas, name, timeFrame, expenses }) => {
+    // Calculate the total expenses
+    let totalexpenses = expenses.reduce((sum, expense) => sum + Math.round(expense.amount * 100) / 100, 0);
+    
+    // Group data by date and sum the amounts
     const groupByDateAndSum = (datas) => {
         return datas.reduce((acc, data) => {
             let date = formatTimestampDay(data.timestamp);
@@ -45,21 +21,63 @@ const SmallChartv2 = ({ datas, name, timeFrame }) => {
         }, {});
     }
 
-    const filteredData = filterData(datas, timeFrame);
-    const groupedData = groupByDateAndSum(filteredData);
-
-    let chartData = Object.keys(groupedData).map(date => ({
-        date: date,
-        total: parseFloat(groupedData[date].toFixed(2))
-    }));
+    // Group the data and calculate the net profit for all dates
+    const groupedData = groupByDateAndSum(datas);
+    
+    let chartData = Object.keys(groupedData).map(date => {
+        // Calculate the total for this date after deducting the expenses
+        const total = parseFloat(groupedData[date].toFixed(2)) - totalexpenses;
+    
+        // Adjust the totalExpenses by subtracting the current total
+        totalexpenses -= parseFloat(groupedData[date].toFixed(2));
+    
+        return {
+            date: date,
+            total: total
+        };
+    });
 
     // Sort the data by date in ascending order
     chartData = chartData.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    const dates = chartData.map(data => data.date);
-    const total = chartData.map(data => data.total);
+    // Filter the data based on the selected timeFrame after net profit calculation
+    const filterData = (data, timeFrame) => {
+        const now = new Date();
+        let filteredData = data;
 
-    const totalAmount = total[total.length-1];
+        if (timeFrame === 'last7days') {
+            const startOfPeriod = new Date(now.setDate(now.getDate() - 7));
+            filteredData = data.filter(item => new Date(item.date) >= startOfPeriod);
+        } else if (timeFrame === 'last15days') {
+            const startOfPeriod = new Date(now.setDate(now.getDate() - 15));
+            filteredData = data.filter(item => new Date(item.date) >= startOfPeriod);
+        } else if (timeFrame === 'last30days') {
+            const startOfPeriod = new Date(now.setDate(now.getDate() - 30));
+            filteredData = data.filter(item => new Date(item.date) >= startOfPeriod);
+        } else if (timeFrame === 'today') {
+            const startOfToday = new Date(now.setHours(0, 0, 0, 0));
+            const endOfToday = new Date(now.setHours(23, 59, 59, 999));
+            filteredData = data.filter(item => {
+                const dataDate = new Date(item.date);
+                return dataDate >= startOfToday && dataDate <= endOfToday;
+            });
+        } else if (timeFrame === 'overall') {
+            filteredData = data;
+        }
+
+        return filteredData;
+    }
+
+    // Apply filtering after calculating net profit
+    const filteredChartData = filterData(chartData, timeFrame);
+
+    const dates = filteredChartData.map(data => data.date);
+    const total = filteredChartData.map(data => data.total);
+
+    const finaltotal = chartData.map(data => data.total)
+
+    const totalAmount = finaltotal[finaltotal.length - 1];
+
     const options = {
         chart: {
             type: 'area',
@@ -174,16 +192,6 @@ const SmallChartv2 = ({ datas, name, timeFrame }) => {
 
     return (
         <div className='chart flex flex-col relative px-5 pt-3 pb-0'>
-            {/* <div className='flex justify-center z-10 w-full absolute'>
-                <div className="dropdown -mt-1 p-0">
-                <label tabIndex={0} className="btn p-2 text-white">{timeFrame.toUpperCase()}</label>
-                <ul tabIndex={0} className="dropdown-content menu shadow bg-base-100 rounded-box p-1">
-                    <li><button onClick={() => setTimeFrame('daily')}>Daily</button></li>
-                    <li><button onClick={() => setTimeFrame('weekly')}>Weekly</button></li>
-                    <li><button onClick={() => setTimeFrame('monthly')}>Monthly</button></li>
-                </ul>
-                </div>
-            </div> */}
             <Chart options={options} series={series} type="area" />
         </div>
     );
