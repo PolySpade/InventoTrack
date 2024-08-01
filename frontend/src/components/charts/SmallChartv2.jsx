@@ -3,7 +3,10 @@ import Chart from "react-apexcharts";
 import './chartStyles.css';
 import { formatTimestampDay, formatTimestampMonth, formatTimestampWeek } from '../../utils';
 
-const SmallChartv2 = ({ datas, name, timeFrame }) => {
+const SmallChartv2 = ({ datas, name, timeFrame, expenses }) => {
+
+    const totalexpenses = expenses.reduce((sum, expense) => sum + Math.round(expense.amount * 100) / 100, 0);
+    
     const filterData = (datas, timeFrame) => {
         const now = new Date();
         let filteredData = datas;
@@ -50,7 +53,7 @@ const SmallChartv2 = ({ datas, name, timeFrame }) => {
 
     let chartData = Object.keys(groupedData).map(date => ({
         date: date,
-        total: parseFloat(groupedData[date].toFixed(2))
+        total: parseFloat((groupedData[date] - totalexpenses).toFixed(2))
     }));
 
     // Sort the data by date in ascending order
