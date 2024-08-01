@@ -5,7 +5,7 @@ import { formatTimestampDay, formatTimestampMonth, formatTimestampWeek } from '.
 
 const SmallChartv2 = ({ datas, name, timeFrame, expenses }) => {
 
-    const totalexpenses = expenses.reduce((sum, expense) => sum + Math.round(expense.amount * 100) / 100, 0);
+    let totalexpenses = expenses.reduce((sum, expense) => sum + Math.round(expense.amount * 100) / 100, 0);
     
     const filterData = (datas, timeFrame) => {
         const now = new Date();
@@ -50,11 +50,22 @@ const SmallChartv2 = ({ datas, name, timeFrame, expenses }) => {
 
     const filteredData = filterData(datas, timeFrame);
     const groupedData = groupByDateAndSum(filteredData);
+    
+    
+    let chartData = Object.keys(groupedData).map(date => {
+        // Calculate the total for this date after deducting the expenses
+        const total = parseFloat(groupedData[date].toFixed(2)) - totalexpenses;
+    
+        // Adjust the totalExpenses by subtracting the current total
+        totalexpenses -= parseFloat(groupedData[date].toFixed(2));
+    
+        return {
+            date: date,
+            total: total
+        };
+    });
+    
 
-    let chartData = Object.keys(groupedData).map(date => ({
-        date: date,
-        total: parseFloat((groupedData[date] - totalexpenses).toFixed(2))
-    }));
 
     // Sort the data by date in ascending order
     chartData = chartData.sort((a, b) => new Date(a.date) - new Date(b.date));
