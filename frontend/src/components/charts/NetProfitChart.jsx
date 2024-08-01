@@ -17,7 +17,6 @@ const NetProfitChart = () => {
         const amount = parseFloat((totalPaid - totalUnitCost - otherFees - totalexpenses).toFixed(2));
         
         accumulatedProfit += amount;
-        accumulatedProfit = parseFloat((accumulatedProfit).toFixed(2));
 
         return { timestamp: data.timestamp, accumulatedProfit };
     });
