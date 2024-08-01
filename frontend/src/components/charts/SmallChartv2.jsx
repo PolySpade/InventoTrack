@@ -76,7 +76,7 @@ const SmallChartv2 = ({ datas, name, timeFrame, expenses }) => {
 
     const finaltotal = chartData.map(data => data.total)
 
-    const totalAmount = finaltotal[total.length - 1];
+    const totalAmount = finaltotal[finaltotal.length - 1];
 
     const options = {
         chart: {
