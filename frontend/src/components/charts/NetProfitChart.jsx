@@ -5,13 +5,14 @@ import SmallChartv2 from './SmallChartv2';
 const NetProfitChart = () => {
     const { ordersData: orders, expensesData: expenses, timeFrame } = useContext(ReportsContext);
 
-    let totalexpenses = expenses.reduce((sum, product) => sum + Math.round(product.amount * 100) / 100, 0);
+    const totalexpenses = expenses.reduce((sum, expense) => sum + Math.round(expense.amount * 100) / 100, 0);
+    
     const parsedData = orders.map((data) => {
         const totalUnitCost = data.products.reduce((sum, product) => sum + (product.productId.unitCost * product.quantity), 0);
         const totalPaid = data.totalPaid;
         const otherFees = data.otherFees || 0; // Assuming otherFees might be undefined
+        
         const amount = parseFloat((totalPaid - totalUnitCost - otherFees - totalexpenses).toFixed(2));
-        totalexpenses = parseFloat((totalexpenses - (totalPaid - totalUnitCost - otherFees)).toFixed(2));
         
         return { timestamp: data.timestamp, amount };
     });
