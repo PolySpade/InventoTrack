@@ -74,7 +74,9 @@ const SmallChartv2 = ({ datas, name, timeFrame, expenses }) => {
     const dates = filteredChartData.map(data => data.date);
     const total = filteredChartData.map(data => data.total);
 
-    const totalAmount = total[total.length - 1];
+    const finaltotal = chartData.map(data => data.total)
+
+    const totalAmount = finaltotal[total.length - 1];
 
     const options = {
         chart: {
